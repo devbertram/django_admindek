@@ -1,0 +1,26 @@
+{
+    "private": true,
+    "scripts": {
+        "development": "mix",
+        "watch": "mix watch",
+        "watch-poll": "mix watch -- --watch-options-poll=1000",
+        "hot": "mix watch --hot",
+        "production": "mix --production"
+    },
+    "devDependencies": {
+        "webpack-cli": "^4.3.1"
+    },
+    "dependencies": {
+        "@babel/preset-react": "^7.12.10",
+        "@babel/runtime": "^7.12.5",
+        "animate.css": "^4.1.1",
+        "axios": "^0.21.1",
+        "cross-env": "^7.0.3",
+        "laravel-mix": "^6.0.8",
+        "postcss": "^8.1.14",
+        "react": "^17.0.1",
+        "react-dom": "^17.0.1",
+        "react-loader-spinner": "^3.1.14",
+        "react-notifications-component": "^3.0.3"
+    }
+}
