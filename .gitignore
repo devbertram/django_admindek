@@ -1,3 +1,5 @@
 /.vscode
-/swep_qc_afd/settings.py
+/django_admindek/settings.py
 /front_end/templates/node_modules
+/django_admindek/__pycache__
+/authentication/__pycache__
