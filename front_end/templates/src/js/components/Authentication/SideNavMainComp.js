@@ -31,8 +31,10 @@ function SideNavMain(props){
 
     }, []);
 
-
+    
+    
     eventBus.on("GET_ROUTES", (data) => setRoutes(data.routes));
+
 
 
     const getMenus = (category) => {
@@ -85,7 +87,7 @@ function SideNavMain(props){
                     <div className="pcoded-navigation-label">App</div>
                     <ul className="pcoded-item pcoded-left-item">
                         <li className="">
-                            <a href="/" className="waves-effect waves-dark">
+                            <a href="/dashboard" className="waves-effect waves-dark">
                                 <span className="pcoded-micon">
                                     <i className="ti-home"></i>
                                 </span>

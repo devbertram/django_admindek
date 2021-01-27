@@ -6,3 +6,5 @@ mix.js('src/js/components/Authentication/ProfileMainComp.js', 'static/build/js/A
 mix.js('src/js/components/Authentication/SideNavMainComp.js', 'static/build/js/Authentication').react();
 mix.js('src/js/components/Utils/FullPageLoaderComp.js', 'static/build/js/Utils').react();
 mix.js('src/js/components/Utils/ToastNotificationComp.js', 'static/build/js/Utils').react();
+
+mix.js('src/js/components/User/UserListMainComp.js', 'static/build/js/User').react();

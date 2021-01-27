@@ -45,14 +45,20 @@ def logoutUser(request):
 
 
 @login_required
-def dashboardPage(request):
+def dashboardHomePage(request):
     return render(request, 'dashboard/home.html')
 
 
 
 @login_required
-def userProfilePage(request):
+def dashboardProfilePage(request):
     return render(request, 'dashboard/profile/profile.html')
+
+
+
+@login_required
+def dashboardUserPage(request):
+    return render(request, 'dashboard/user/index.html')
     
 
         

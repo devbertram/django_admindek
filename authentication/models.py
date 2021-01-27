@@ -25,6 +25,7 @@ class Route(models.Model):
 
 
 
+
 class Subroute(models.Model):
 
     route = models.ForeignKey(Route, related_name='subroute_route', on_delete=models.CASCADE)
@@ -38,6 +39,7 @@ class Subroute(models.Model):
         return self.route.name +" - "+ self.name
 
 
+
     
 class UserRoute(models.Model):
     
@@ -49,13 +51,15 @@ class UserRoute(models.Model):
 
 
     
+    
 class UserSubroute(models.Model):
-
+    
+    user = models.ForeignKey(User, related_name='userSubroute_user', on_delete=models.CASCADE)
     user_route = models.ForeignKey(UserRoute, related_name='userSubroute_userRoute', on_delete=models.CASCADE)
     subroute = models.ForeignKey(Subroute, related_name='userSubroute_subroute', on_delete=models.PROTECT)
 
     def __str__(self):
-        return self.user_route.user.first_name +" - "+ self.user_route.route.name +" - "+ self.subroute.name
+        return self.user.first_name +" - "+ self.user_route.route.name +" - "+ self.subroute.name
 
 
     

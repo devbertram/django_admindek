@@ -8,3 +8,4 @@ if (auth_user) {
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.axios.defaults.baseURL = window.location.origin + '/';
+
