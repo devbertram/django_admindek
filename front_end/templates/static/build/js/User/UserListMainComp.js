@@ -1886,28 +1886,37 @@ function UserListMain(props) {
       SetPagination = _useState4[1];
 
   var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({
-    q: null
+    q: "",
+    page: 1,
+    page_size: 1
   }),
       _useState6 = _slicedToArray(_useState5, 2),
       query_params = _useState6[0],
-      SetQuery = _useState6[1];
+      SetQueryParams = _useState6[1];
 
-  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(10),
-      _useState8 = _slicedToArray(_useState7, 2),
-      page_limit = _useState8[0],
-      SetPageLimit = _useState8[1];
+  (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function () {
+    var is_mounted = true;
+    fetchUser(is_mounted);
+    return function () {
+      is_mounted = false;
+      _Utils_EventBus__WEBPACK_IMPORTED_MODULE_4__.default.remove("FETCH_USERS");
+    };
+  }, []);
 
   var fetchUser = function fetchUser(is_mounted) {
     if (is_mounted == true) {
       axios.get('api/user', {
-        params: {
-          q: query
-        }
+        params: query_params
       }).then(function (response) {
+        SetList(response.data.results);
+        SetPagination({
+          count: response.data.count,
+          next: response.data.next,
+          previous: response.data.previous
+        });
         _Utils_EventBus__WEBPACK_IMPORTED_MODULE_4__.default.dispatch("FETCH_USERS", {
           users: response.data
         });
-        SetList(response.data.results);
       });
     }
   };
@@ -1926,10 +1935,10 @@ function UserListMain(props) {
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
             className: "align-middle",
             children: val.is_active == true ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
-              "class": "label label-success",
+              className: "label label-success",
               children: "online"
             }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
-              "class": "label label-danger",
+              className: "label label-danger",
               children: "offline"
             })
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
@@ -1961,14 +1970,39 @@ function UserListMain(props) {
     return table_rows;
   };
 
-  (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function () {
-    var is_mounted = true;
-    fetchUser(is_mounted);
-    return function () {
-      is_mounted = false;
-      _Utils_EventBus__WEBPACK_IMPORTED_MODULE_4__.default.remove("FETCH_USERS");
-    };
-  }, []);
+  var getPaginationPageNumbers = function getPaginationPageNumbers() {
+    var page_numbers = [];
+    var num = pagination.count / query_params.page_size;
+
+    if (num > 1) {
+      for (var i = 0; i < num; i++) {
+        var page_number = i + 1;
+        page_numbers.push( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
+          className: query_params.page_size == page_number ? "page-item active" : "page-item",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
+            href: void 0,
+            className: "page-link",
+            children: i + 1
+          })
+        }, i));
+      }
+    }
+
+    return page_numbers;
+  };
+
+  var handlePaginationClickNext = function handlePaginationClickNext(e) {
+    e.preventDefault();
+    var next_page_num = query_params.page + 1;
+    SetQueryParams({
+      page: next_page_num
+    });
+  };
+
+  var handlePaginationClickPrevious = function handlePaginationClickPrevious(e) {
+    e.preventDefault();
+  };
+
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
     className: "row",
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
@@ -2083,31 +2117,18 @@ function UserListMain(props) {
                 children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("ul", {
                   className: "pagination",
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-                    className: "paginate_button page-item previous disabled",
-                    id: "complex-dt_previous",
+                    className: pagination.previous != null ? "page-item" : "page-item disabled",
+                    onClick: handlePaginationClickPrevious,
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
-                      href: "#",
+                      href: void 0,
                       className: "page-link",
                       children: "Previous"
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-                    className: "page-item active",
+                  }), getPaginationPageNumbers(), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
+                    className: pagination.next != null ? "page-item" : "page-item disabled",
+                    onClick: handlePaginationClickNext,
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
-                      href: "#",
-                      className: "page-link",
-                      children: "1"
-                    })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-                    className: "page-item",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
-                      href: "#",
-                      className: "page-link",
-                      children: "2"
-                    })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-                    className: "paginate_button page-item next",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
-                      href: "#",
+                      href: void 0,
                       className: "page-link",
                       children: "Next"
                     })

@@ -1,35 +1,51 @@
-require('../../config');
+require('../../config')
 
-import React, {useState, useEffect} from "react";
-import ReactDOM from "react-dom";
+import React, {useState, useEffect} from "react"
+import ReactDOM from "react-dom"
 
 import moment from "moment"
-import eventBus from "../Utils/EventBus";
+import eventBus from "../Utils/EventBus"
 
 function UserListMain(props){
 
     const [list, SetList] = useState({})
-    const [pagination, SetPagination] = useState({count:0, next:null, previous:null})
+    const [pagination, SetPagination] = useState({ count:0, next:null, previous:null })
+    const [query_params, SetQueryParams] = useState({ q:"", page:1, page_size:1 })
 
-    const [query_params, SetQuery] = useState({
-        q : null,
-        
 
-    })
-    const [page_limit, SetPageLimit] = useState(10)
+
+    useEffect (() => {
+
+        let is_mounted = true;
+
+        fetchUser(is_mounted)
+
+        return () => {
+            is_mounted = false;
+            eventBus.remove("FETCH_USERS");
+        } 
+
+    },[])
+
 
 
     const fetchUser = (is_mounted) => {
 
         if(is_mounted == true){
-            axios.get('api/user', { params: { q: query} })
+            axios.get('api/user', { params: query_params })
                  .then((response) => {
-                    eventBus.dispatch("FETCH_USERS", { users: response.data })
                     SetList(response.data.results)
+                    SetPagination({
+                        count: response.data.count, 
+                        next: response.data.next, 
+                        previous: response.data.previous
+                    })
+                    eventBus.dispatch("FETCH_USERS", { users: response.data })
             });
         }
 
     }
+
 
 
     const getTableRows = () => {
@@ -46,7 +62,7 @@ function UserListMain(props){
                 table_rows.push(
                     <tr key={key}>
                         <td className="align-middle">{ val.username }</td>
-                        <td className="align-middle">{ val.is_active == true ? <label class="label label-success">online</label> : <label class="label label-danger">offline</label> }</td>
+                        <td className="align-middle">{ val.is_active == true ? <label className="label label-success">online</label> : <label className="label label-danger">offline</label> }</td>
                         <td className="align-middle">{ last_login }</td>
                         <td className="align-middle">{ date_joined }</td>
                         <td className="align-middle">
@@ -69,21 +85,46 @@ function UserListMain(props){
     }
 
 
-    useEffect (() => {
 
-        let is_mounted = true;
+    const getPaginationPageNumbers = () => {
 
-        fetchUser(is_mounted)
+        let page_numbers = []
+        let num = pagination.count / query_params.page_size;
 
-        return () => {
-            is_mounted = false;
-            eventBus.remove("FETCH_USERS");
-        } 
+        if(num > 1){
+            for (var i = 0; i < num; i++) {
+                let page_number = i + 1;
+                page_numbers.push(
+                    <li className={ query_params.page_size == page_number ? "page-item active" : "page-item"} key={i}>
+                        <a href={ void(0) }  className="page-link">{ i + 1 }</a>
+                    </li>
+                )
+            }
+        }
 
-    },[])
+        return page_numbers
+
+    }
 
 
-    
+
+    const handlePaginationClickNext = (e) => {
+
+        e.preventDefault();
+
+        let next_page_num = query_params.page + 1
+        SetQueryParams({ page: next_page_num,})
+        
+    }
+
+
+
+    const handlePaginationClickPrevious = (e) => {
+
+        e.preventDefault();
+
+    }
+
 
 
     return (
@@ -169,24 +210,18 @@ function UserListMain(props){
                             <div className="col-md-7">
                                 <div className="dataTables_paginate">
                                     <ul className="pagination">
-                                        <li className="paginate_button page-item previous disabled" id="complex-dt_previous">
-                                            <a href="#" className="page-link">
-                                                Previous
-                                            </a>
+                                        <li className={pagination.previous != null ? "page-item" : "page-item disabled"} onClick={ handlePaginationClickPrevious }>
+                                            <a href={ void(0) } className="page-link">Previous</a>
                                         </li>
-                                        <li className="page-item active">
-                                            <a href="#" className="page-link">1</a>
-                                        </li>
-                                        <li className="page-item">
-                                            <a href="#" className="page-link">2</a>
-                                        </li>
-                                        <li className="paginate_button page-item next">
-                                            <a href="#" className="page-link">Next</a>
+                                        { getPaginationPageNumbers() }
+                                        <li className={pagination.next != null ? "page-item" : "page-item disabled"} onClick={ handlePaginationClickNext }>
+                                            <a href={ void(0) } className="page-link">Next</a>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
+
 
 
                     </div>
