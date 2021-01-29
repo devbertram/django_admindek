@@ -1847,7 +1847,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _Utils_EventBus__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Utils/EventBus */ "./src/js/components/Utils/EventBus.js");
 
 
 
@@ -1869,56 +1868,66 @@ __webpack_require__(/*! ../../config */ "./src/js/config.js");
 
 
 
-
 function UserListMain(props) {
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({}),
       _useState2 = _slicedToArray(_useState, 2),
       list = _useState2[0],
       SetList = _useState2[1];
 
-  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({
-    count: 0,
-    next: null,
-    previous: null
-  }),
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(0),
       _useState4 = _slicedToArray(_useState3, 2),
-      pagination = _useState4[0],
-      SetPagination = _useState4[1];
+      pagination_count = _useState4[0],
+      SetPaginationCount = _useState4[1];
 
-  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({
-    q: "",
-    page: 1,
-    page_size: 1
-  }),
+  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(0),
       _useState6 = _slicedToArray(_useState5, 2),
-      query_params = _useState6[0],
-      SetQueryParams = _useState6[1];
+      page_prev = _useState6[0],
+      SetPagePrev = _useState6[1];
 
+  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(1),
+      _useState8 = _slicedToArray(_useState7, 2),
+      page_current = _useState8[0],
+      SetPageCurrent = _useState8[1];
+
+  var _useState9 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(2),
+      _useState10 = _slicedToArray(_useState9, 2),
+      page_next = _useState10[0],
+      SetPageNext = _useState10[1];
+
+  var _useState11 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(""),
+      _useState12 = _slicedToArray(_useState11, 2),
+      query = _useState12[0],
+      SetQuery = _useState12[1];
+
+  var _useState13 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(5),
+      _useState14 = _slicedToArray(_useState13, 2),
+      page_size = _useState14[0],
+      SetPagSize = _useState14[1];
+
+  var page_limit = Math.ceil(pagination_count / page_size);
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function () {
     var is_mounted = true;
-    fetchUser(is_mounted);
+
+    if (is_mounted = true) {
+      fetch(query, page_size, page_current);
+    }
+
     return function () {
       is_mounted = false;
-      _Utils_EventBus__WEBPACK_IMPORTED_MODULE_4__.default.remove("FETCH_USERS");
     };
   }, []);
 
-  var fetchUser = function fetchUser(is_mounted) {
-    if (is_mounted == true) {
-      axios.get('api/user', {
-        params: query_params
-      }).then(function (response) {
-        SetList(response.data.results);
-        SetPagination({
-          count: response.data.count,
-          next: response.data.next,
-          previous: response.data.previous
-        });
-        _Utils_EventBus__WEBPACK_IMPORTED_MODULE_4__.default.dispatch("FETCH_USERS", {
-          users: response.data
-        });
-      });
-    }
+  var fetch = function fetch(q, ps, pc) {
+    axios.get('api/user', {
+      params: {
+        q: q,
+        page_size: ps,
+        page: pc
+      }
+    }).then(function (response) {
+      SetList(response.data.results);
+      SetPaginationCount(response.data.count);
+    });
   };
 
   var getTableRows = function getTableRows() {
@@ -1970,37 +1979,41 @@ function UserListMain(props) {
     return table_rows;
   };
 
-  var getPaginationPageNumbers = function getPaginationPageNumbers() {
-    var page_numbers = [];
-    var num = pagination.count / query_params.page_size;
+  var getPaginationCountFrom = function getPaginationCountFrom(count) {
+    var count_from = 0;
 
-    if (num > 1) {
-      for (var i = 0; i < num; i++) {
-        var page_number = i + 1;
-        page_numbers.push( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-          className: query_params.page_size == page_number ? "page-item active" : "page-item",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
-            href: void 0,
-            className: "page-link",
-            children: i + 1
-          })
-        }, i));
+    if (count > 0) {
+      var current_count = page_size * page_current;
+      var factor = page_size - 1;
+      count_from = current_count - factor;
+    }
+
+    return count_from;
+  };
+
+  var getPaginationCountTo = function getPaginationCountTo(count) {
+    var count_to = 0;
+
+    if (count > 0) {
+      if (page_current == page_limit) {
+        count_to = count;
+      } else {
+        count_to = page_size * page_current;
       }
     }
 
-    return page_numbers;
+    return count_to;
   };
 
-  var handlePaginationClickNext = function handlePaginationClickNext(e) {
+  var handlePaginationClick = function handlePaginationClick(e, q, ps, cp) {
     e.preventDefault();
-    var next_page_num = query_params.page + 1;
-    SetQueryParams({
-      page: next_page_num
-    });
-  };
 
-  var handlePaginationClickPrevious = function handlePaginationClickPrevious(e) {
-    e.preventDefault();
+    if (cp > 0 && cp <= page_limit) {
+      SetPagePrev(cp - 1);
+      SetPageNext(cp + 1);
+      SetPageCurrent(cp);
+      fetch(q, ps, cp);
+    }
   };
 
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
@@ -2014,9 +2027,18 @@ function UserListMain(props) {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
             className: "row",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-              className: "col-md-4",
+              className: "col-md-1",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", {
+                className: "btn btn-md btn-success",
+                type: "button",
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("i", {
+                  className: "fa fa-plus-square"
+                }), " Add User"]
+              })
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+              className: "col-md-5",
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-                className: "input-group input-group-md input-group-button",
+                className: "input-group input-group-md input-group-button ml-3",
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
                   type: "text",
                   className: "form-control",
@@ -2072,13 +2094,33 @@ function UserListMain(props) {
                 })]
               })
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-              className: "col-md-5",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", {
-                className: "btn btn-md btn-success float-right",
-                type: "button",
-                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("i", {
-                  className: "fa fa-plus-square"
-                }), " Add User"]
+              className: "col-md-3",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+                className: "dataTables_paginate mt-2",
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("ul", {
+                  className: "pagination",
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
+                    className: page_prev > 0 ? "page-item" : "page-item disabled",
+                    onClick: function onClick(e) {
+                      handlePaginationClick(e, query, page_size, page_prev);
+                    },
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
+                      href: void 0,
+                      className: "page-link",
+                      children: "Previous"
+                    })
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
+                    className: page_next != 0 && page_next <= page_limit ? "page-item" : "page-item disabled",
+                    onClick: function onClick(e) {
+                      handlePaginationClick(e, query, page_size, page_next);
+                    },
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
+                      href: void 0,
+                      className: "page-link",
+                      children: "Next"
+                    })
+                  })]
+                })
               })
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
@@ -2107,8 +2149,8 @@ function UserListMain(props) {
             className: "row mt-4",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
               className: "col-md-5 mt-1",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
-                children: "Showing 1 to 10 of 20 entries"
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", {
+                children: ["Showing ", getPaginationCountFrom(pagination_count), " to ", getPaginationCountTo(pagination_count), " of ", pagination_count, " entries"]
               })
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
               className: "col-md-7",
@@ -2117,16 +2159,20 @@ function UserListMain(props) {
                 children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("ul", {
                   className: "pagination",
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-                    className: pagination.previous != null ? "page-item" : "page-item disabled",
-                    onClick: handlePaginationClickPrevious,
+                    className: page_prev > 0 ? "page-item" : "page-item disabled",
+                    onClick: function onClick(e) {
+                      handlePaginationClick(e, query, page_size, page_prev);
+                    },
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
                       href: void 0,
                       className: "page-link",
                       children: "Previous"
                     })
-                  }), getPaginationPageNumbers(), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-                    className: pagination.next != null ? "page-item" : "page-item disabled",
-                    onClick: handlePaginationClickNext,
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
+                    className: page_next != 0 && page_next <= page_limit ? "page-item" : "page-item disabled",
+                    onClick: function onClick(e) {
+                      handlePaginationClick(e, query, page_size, page_next);
+                    },
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
                       href: void 0,
                       className: "page-link",
@@ -2144,36 +2190,6 @@ function UserListMain(props) {
 }
 
 react_dom__WEBPACK_IMPORTED_MODULE_2__.render( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(UserListMain, {}), document.getElementById('user_list'));
-
-/***/ }),
-
-/***/ "./src/js/components/Utils/EventBus.js":
-/*!*********************************************!*\
-  !*** ./src/js/components/Utils/EventBus.js ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
-/* harmony export */ });
-var eventBus = {
-  on: function on(event, callback) {
-    document.addEventListener(event, function (e) {
-      return callback(e.detail);
-    });
-  },
-  dispatch: function dispatch(event, data) {
-    document.dispatchEvent(new CustomEvent(event, {
-      detail: data
-    }));
-  },
-  remove: function remove(event, callback) {
-    document.removeEventListener(event, callback);
-  }
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (eventBus);
 
 /***/ }),
 

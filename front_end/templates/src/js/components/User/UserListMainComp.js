@@ -4,13 +4,20 @@ import React, {useState, useEffect} from "react"
 import ReactDOM from "react-dom"
 
 import moment from "moment"
-import eventBus from "../Utils/EventBus"
 
 function UserListMain(props){
 
     const [list, SetList] = useState({})
-    const [pagination, SetPagination] = useState({ count:0, next:null, previous:null })
-    const [query_params, SetQueryParams] = useState({ q:"", page:1, page_size:1 })
+    const [pagination_count, SetPaginationCount] = useState(0)
+    
+    const [page_prev, SetPagePrev] = useState(0)
+    const [page_current, SetPageCurrent] = useState(1)
+    const [page_next, SetPageNext] = useState(2)
+
+    const [query, SetQuery] = useState("")
+    const [page_size, SetPagSize] = useState(5)
+
+    const page_limit = Math.ceil(pagination_count / page_size)
 
 
 
@@ -18,31 +25,25 @@ function UserListMain(props){
 
         let is_mounted = true;
 
-        fetchUser(is_mounted)
+        if(is_mounted = true){
+            fetch(query, page_size, page_current)
+        }
 
         return () => {
             is_mounted = false;
-            eventBus.remove("FETCH_USERS");
         } 
 
     },[])
 
 
 
-    const fetchUser = (is_mounted) => {
+    const fetch = (q, ps, pc) => {
 
-        if(is_mounted == true){
-            axios.get('api/user', { params: query_params })
-                 .then((response) => {
-                    SetList(response.data.results)
-                    SetPagination({
-                        count: response.data.count, 
-                        next: response.data.next, 
-                        previous: response.data.previous
-                    })
-                    eventBus.dispatch("FETCH_USERS", { users: response.data })
-            });
-        }
+        axios.get('api/user', { params: { q:q, page_size:ps, page: pc } })
+             .then((response) => {
+                SetList(response.data.results)
+                SetPaginationCount(response.data.count)
+        });
 
     }
 
@@ -86,42 +87,55 @@ function UserListMain(props){
 
 
 
-    const getPaginationPageNumbers = () => {
+    const getPaginationCountFrom = (count) => {
 
-        let page_numbers = []
-        let num = pagination.count / query_params.page_size;
+        let count_from = 0
 
-        if(num > 1){
-            for (var i = 0; i < num; i++) {
-                let page_number = i + 1;
-                page_numbers.push(
-                    <li className={ query_params.page_size == page_number ? "page-item active" : "page-item"} key={i}>
-                        <a href={ void(0) }  className="page-link">{ i + 1 }</a>
-                    </li>
-                )
-            }
+        if(count > 0){
+            let current_count = page_size * page_current
+            let factor = page_size - 1
+            count_from = current_count - factor
         }
 
-        return page_numbers
+        return count_from
 
     }
 
 
 
-    const handlePaginationClickNext = (e) => {
+    const getPaginationCountTo = (count) => {
 
-        e.preventDefault();
+        let count_to = 0
 
-        let next_page_num = query_params.page + 1
-        SetQueryParams({ page: next_page_num,})
-        
+        if(count > 0){
+            
+            if(page_current == page_limit){
+                count_to = count
+            }else{
+                count_to = page_size * page_current
+            }
+            
+        }
+
+        return count_to
+
     }
 
 
 
-    const handlePaginationClickPrevious = (e) => {
+    const handlePaginationClick = (e, q, ps, cp) => {
 
-        e.preventDefault();
+        e.preventDefault()
+
+        if(cp > 0 && cp <= page_limit){
+
+            SetPagePrev(cp - 1)
+            SetPageNext(cp + 1)
+            SetPageCurrent(cp)
+
+            fetch(q, ps, cp)
+
+        }
 
     }
 
@@ -139,8 +153,14 @@ function UserListMain(props){
                         {/* FILTERS */}
                         <div className="row">
 
-                            <div className="col-md-4">
-                                <div className="input-group input-group-md input-group-button">
+                            <div className="col-md-1">
+                                <button className="btn btn-md btn-success" type="button">
+                                    <i className="fa fa-plus-square"></i> Add User
+                                </button>
+                            </div>
+
+                            <div className="col-md-5">
+                                <div className="input-group input-group-md input-group-button ml-3">
                                     <input type="text" className="form-control" placeholder="Search .."/>
                                     <div className="input-group-append">
                                         <button className="btn btn-primary" type="button">
@@ -174,10 +194,22 @@ function UserListMain(props){
                                 </div>
                             </div>
 
-                            <div className="col-md-5">
-                                <button className="btn btn-md btn-success float-right" type="button">
-                                    <i className="fa fa-plus-square"></i> Add User
-                                </button>
+                            <div className="col-md-3">
+                                <div className="dataTables_paginate mt-2">
+                                    <ul className="pagination">
+
+                                        <li className={page_prev > 0 ? "page-item" : "page-item disabled"} 
+                                            onClick={(e) => { handlePaginationClick(e, query, page_size, page_prev) }}>
+                                            <a href={ void(0) } className="page-link">Previous</a>
+                                        </li>
+
+                                        <li className={page_next != 0 && page_next <= page_limit ? "page-item" : "page-item disabled"} 
+                                            onClick={(e) => { handlePaginationClick(e, query, page_size, page_next) } }>
+                                            <a href={ void(0) } className="page-link">Next</a>
+                                        </li>
+
+                                    </ul>
+                                </div>
                             </div>
 
                         </div>
@@ -196,7 +228,9 @@ function UserListMain(props){
                                     </tr>
                                 </thead>
                                 <tbody>
+
                                     { getTableRows() }
+
                                 </tbody>
                             </table>
                         </div>
@@ -205,18 +239,24 @@ function UserListMain(props){
                         {/* PAGINATION */}
                         <div className="row mt-4">
                             <div className="col-md-5 mt-1">
-                                <span>Showing 1 to 10 of 20 entries</span>
+                                <span>
+                                    Showing { getPaginationCountFrom(pagination_count) } to { getPaginationCountTo(pagination_count) } of { pagination_count } entries
+                                </span>
                             </div>
                             <div className="col-md-7">
                                 <div className="dataTables_paginate">
                                     <ul className="pagination">
-                                        <li className={pagination.previous != null ? "page-item" : "page-item disabled"} onClick={ handlePaginationClickPrevious }>
+
+                                        <li className={page_prev > 0 ? "page-item" : "page-item disabled"} 
+                                            onClick={(e) => { handlePaginationClick(e, query, page_size, page_prev) }}>
                                             <a href={ void(0) } className="page-link">Previous</a>
                                         </li>
-                                        { getPaginationPageNumbers() }
-                                        <li className={pagination.next != null ? "page-item" : "page-item disabled"} onClick={ handlePaginationClickNext }>
+
+                                        <li className={page_next != 0 && page_next <= page_limit ? "page-item" : "page-item disabled"} 
+                                            onClick={(e) => { handlePaginationClick(e, query, page_size, page_next) } }>
                                             <a href={ void(0) } className="page-link">Next</a>
                                         </li>
+
                                     </ul>
                                 </div>
                             </div>
