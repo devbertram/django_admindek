@@ -2,12 +2,13 @@
 from authentication.models import UserRoute
 from django.contrib.auth.models import User
 
-from .serializers import UserRouteSerializer, UserSerializer
-from .pagination import UserListPagination
-
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import filters
+
+from .serializers import UserRouteSerializer, UserSerializer
+from .pagination import UserListPagination
 
 
 
@@ -26,9 +27,12 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = UserListPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['^username', '^email']
 
     def list(self, request):
-        page = self.paginate_queryset(self.queryset)
+        
+        page = self.paginate_queryset(self.queryset.filter())
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
     

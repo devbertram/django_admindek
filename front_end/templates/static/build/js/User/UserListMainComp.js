@@ -1876,12 +1876,13 @@ function UserListMain(props) {
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({}),
       _useState2 = _slicedToArray(_useState, 2),
       list = _useState2[0],
-      SetList = _useState2[1];
+      SetList = _useState2[1]; // 
+
 
   var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(0),
       _useState4 = _slicedToArray(_useState3, 2),
-      pagination_count = _useState4[0],
-      SetPaginationCount = _useState4[1]; // total count of records
+      total_records = _useState4[0],
+      SetTotalRecords = _useState4[1]; // total count of records
 
 
   var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(0),
@@ -1941,7 +1942,7 @@ function UserListMain(props) {
       }
     }).then(function (response) {
       SetList(response.data.results);
-      SetPaginationCount(response.data.count);
+      SetTotalRecords(response.data.count);
       SetPageLimit(Math.ceil(response.data.count / ps));
     });
   };
@@ -2000,8 +2001,9 @@ function UserListMain(props) {
 
     if (cp > 0 && cp <= page_limit) {
       SetPagePrev(cp - 1);
-      SetPageNext(cp + 1);
       SetPageCurrent(cp);
+      SetPageNext(cp + 1);
+      SetPageSize(ps);
       fetch(q, ps, cp);
     }
   };
@@ -2014,8 +2016,13 @@ function UserListMain(props) {
       SetPagePrev(0);
       SetPageCurrent(1);
       SetPageNext(2);
+      SetPageSize(ps);
       fetch(query, ps, 1);
     }
+  };
+
+  var handleSearchFilter = function handleSearchFilter(e) {
+    console.log(e.target.value);
   };
 
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
@@ -2044,7 +2051,9 @@ function UserListMain(props) {
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
                   type: "text",
                   className: "form-control",
-                  placeholder: "Search .."
+                  placeholder: "Search ..",
+                  onKeyUp: handleSearchFilter,
+                  onKeyDown: handleSearchFilter
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
                   className: "input-group-append",
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
@@ -2097,7 +2106,7 @@ function UserListMain(props) {
                 })]
               })
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-              className: "col-md-3",
+              className: "col-md-3 mt-1",
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_Utils_TablePaginationDefaultComp__WEBPACK_IMPORTED_MODULE_4__.default, {
                 pagePrev: page_prev,
                 pageNext: page_next,
@@ -2140,7 +2149,7 @@ function UserListMain(props) {
                 pageSize: page_size,
                 pageCurrent: page_current,
                 pageLimit: page_limit,
-                totalCount: pagination_count
+                totalCount: total_records
               })
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
               className: "col-md-7",

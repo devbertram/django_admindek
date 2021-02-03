@@ -9,10 +9,8 @@ import TableCounter from "../Utils/TableCounterComp"
 
 function UserListMain(props){
 
-    const [list, SetList] = useState({})
-
-    const [pagination_count, SetPaginationCount] = useState(0) // total count of records
-    
+    const [list, SetList] = useState({}) // 
+    const [total_records, SetTotalRecords] = useState(0) // total count of records
     const [page_prev, SetPagePrev] = useState(0) // previous page
     const [page_current, SetPageCurrent] = useState(1) // current page
     const [page_next, SetPageNext] = useState(2) // next page
@@ -43,7 +41,7 @@ function UserListMain(props){
         axios.get('api/user', { params: { q:q, page_size:ps, page: pc } })
              .then((response) => {
                 SetList(response.data.results)
-                SetPaginationCount(response.data.count)
+                SetTotalRecords(response.data.count)
                 SetPageLimit(Math.ceil(response.data.count / ps))
         });
 
@@ -95,8 +93,9 @@ function UserListMain(props){
 
         if(cp > 0 && cp <= page_limit){
             SetPagePrev(cp - 1)
-            SetPageNext(cp + 1)
             SetPageCurrent(cp)
+            SetPageNext(cp + 1)
+            SetPageSize(ps)
             fetch(q, ps, cp)
         }
 
@@ -114,8 +113,17 @@ function UserListMain(props){
             SetPagePrev(0)
             SetPageCurrent(1)
             SetPageNext(2)
+            SetPageSize(ps)
             fetch(query, ps, 1)
         }
+
+    }
+
+
+
+    const handleSearchFilter = (e) => {
+
+        console.log(e.target.value)
 
     }
 
@@ -141,7 +149,12 @@ function UserListMain(props){
 
                             <div className="col-md-5">
                                 <div className="input-group input-group-md input-group-button ml-3">
-                                    <input type="text" className="form-control" placeholder="Search .."/>
+                                    <input type="text" 
+                                           className="form-control" 
+                                           placeholder="Search .." 
+                                           onKeyUp={ handleSearchFilter } 
+                                           onKeyDown={ handleSearchFilter }
+                                    />
                                     <div className="input-group-append">
                                         <button className="btn btn-primary" type="button">
                                             <i className="fa fa-search"></i>
@@ -174,8 +187,7 @@ function UserListMain(props){
                                 </div>
                             </div>
 
-                            <div className="col-md-3">
-                                
+                            <div className="col-md-3 mt-1">
                                 <TablePaginationDefault
                                     pagePrev={ page_prev }
                                     pageNext={ page_next }
@@ -183,7 +195,6 @@ function UserListMain(props){
                                     prevClickHandler={ (e) => { handlePaginationClick(e, query, page_size, page_prev) } }
                                     nextClickHandler={ (e) => { handlePaginationClick(e, query, page_size, page_next) } }
                                 />
-
                             </div>
 
                         </div>
@@ -213,17 +224,14 @@ function UserListMain(props){
                         {/* PAGINATION */}
                         <div className="row mt-4">
                             <div className="col-md-5 mt-1">
-
                                 <TableCounter
                                     pageSize={ page_size }
                                     pageCurrent={ page_current }
                                     pageLimit={ page_limit }
-                                    totalCount={ pagination_count }
+                                    totalCount={ total_records }
                                 />
-                                
                             </div>
                             <div className="col-md-7">
-
                                 <TablePaginationDefault
                                     pagePrev={ page_prev }
                                     pageNext={ page_next }
@@ -231,7 +239,6 @@ function UserListMain(props){
                                     prevClickHandler={ (e) => { handlePaginationClick(e, query, page_size, page_prev) } }
                                     nextClickHandler={ (e) => { handlePaginationClick(e, query, page_size, page_next) } }
                                 />
-
                             </div>
                         </div>
 
