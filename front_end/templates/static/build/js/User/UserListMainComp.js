@@ -1847,6 +1847,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _Utils_TablePaginationDefaultComp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Utils/TablePaginationDefaultComp */ "./src/js/components/Utils/TablePaginationDefaultComp.js");
+/* harmony import */ var _Utils_TableCounterComp__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Utils/TableCounterComp */ "./src/js/components/Utils/TableCounterComp.js");
 
 
 
@@ -1868,6 +1870,8 @@ __webpack_require__(/*! ../../config */ "./src/js/config.js");
 
 
 
+
+
 function UserListMain(props) {
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({}),
       _useState2 = _slicedToArray(_useState, 2),
@@ -1877,34 +1881,45 @@ function UserListMain(props) {
   var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(0),
       _useState4 = _slicedToArray(_useState3, 2),
       pagination_count = _useState4[0],
-      SetPaginationCount = _useState4[1];
+      SetPaginationCount = _useState4[1]; // total count of records
+
 
   var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(0),
       _useState6 = _slicedToArray(_useState5, 2),
       page_prev = _useState6[0],
-      SetPagePrev = _useState6[1];
+      SetPagePrev = _useState6[1]; // previous page
+
 
   var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(1),
       _useState8 = _slicedToArray(_useState7, 2),
       page_current = _useState8[0],
-      SetPageCurrent = _useState8[1];
+      SetPageCurrent = _useState8[1]; // current page
+
 
   var _useState9 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(2),
       _useState10 = _slicedToArray(_useState9, 2),
       page_next = _useState10[0],
-      SetPageNext = _useState10[1];
+      SetPageNext = _useState10[1]; // next page
 
-  var _useState11 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(""),
+
+  var _useState11 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(10),
       _useState12 = _slicedToArray(_useState11, 2),
-      query = _useState12[0],
-      SetQuery = _useState12[1];
+      page_size = _useState12[0],
+      SetPageSize = _useState12[1]; // size per page
 
-  var _useState13 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(5),
+
+  var _useState13 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(0),
       _useState14 = _slicedToArray(_useState13, 2),
-      page_size = _useState14[0],
-      SetPagSize = _useState14[1];
+      page_limit = _useState14[0],
+      SetPageLimit = _useState14[1]; // number of pages
 
-  var page_limit = Math.ceil(pagination_count / page_size);
+
+  var _useState15 = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(""),
+      _useState16 = _slicedToArray(_useState15, 2),
+      query = _useState16[0],
+      SetQuery = _useState16[1]; // search query
+
+
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(function () {
     var is_mounted = true;
 
@@ -1927,6 +1942,7 @@ function UserListMain(props) {
     }).then(function (response) {
       SetList(response.data.results);
       SetPaginationCount(response.data.count);
+      SetPageLimit(Math.ceil(response.data.count / ps));
     });
   };
 
@@ -1979,32 +1995,6 @@ function UserListMain(props) {
     return table_rows;
   };
 
-  var getPaginationCountFrom = function getPaginationCountFrom(count) {
-    var count_from = 0;
-
-    if (count > 0) {
-      var current_count = page_size * page_current;
-      var factor = page_size - 1;
-      count_from = current_count - factor;
-    }
-
-    return count_from;
-  };
-
-  var getPaginationCountTo = function getPaginationCountTo(count) {
-    var count_to = 0;
-
-    if (count > 0) {
-      if (page_current == page_limit) {
-        count_to = count;
-      } else {
-        count_to = page_size * page_current;
-      }
-    }
-
-    return count_to;
-  };
-
   var handlePaginationClick = function handlePaginationClick(e, q, ps, cp) {
     e.preventDefault();
 
@@ -2013,6 +2003,18 @@ function UserListMain(props) {
       SetPageNext(cp + 1);
       SetPageCurrent(cp);
       fetch(q, ps, cp);
+    }
+  };
+
+  var handlePageSizeFilterClick = function handlePageSizeFilterClick(e) {
+    e.preventDefault();
+    var ps = e.target.value;
+
+    if (ps > 0) {
+      SetPagePrev(0);
+      SetPageCurrent(1);
+      SetPageNext(2);
+      fetch(query, ps, 1);
     }
   };
 
@@ -2077,6 +2079,7 @@ function UserListMain(props) {
                   className: "col-md-7",
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("select", {
                     className: "form-control input-md",
+                    onChange: handlePageSizeFilterClick,
                     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
                       value: "10",
                       children: "10"
@@ -2095,32 +2098,16 @@ function UserListMain(props) {
               })
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
               className: "col-md-3",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-                className: "dataTables_paginate mt-2",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("ul", {
-                  className: "pagination",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-                    className: page_prev > 0 ? "page-item" : "page-item disabled",
-                    onClick: function onClick(e) {
-                      handlePaginationClick(e, query, page_size, page_prev);
-                    },
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
-                      href: void 0,
-                      className: "page-link",
-                      children: "Previous"
-                    })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-                    className: page_next != 0 && page_next <= page_limit ? "page-item" : "page-item disabled",
-                    onClick: function onClick(e) {
-                      handlePaginationClick(e, query, page_size, page_next);
-                    },
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
-                      href: void 0,
-                      className: "page-link",
-                      children: "Next"
-                    })
-                  })]
-                })
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_Utils_TablePaginationDefaultComp__WEBPACK_IMPORTED_MODULE_4__.default, {
+                pagePrev: page_prev,
+                pageNext: page_next,
+                pageLimit: page_limit,
+                prevClickHandler: function prevClickHandler(e) {
+                  handlePaginationClick(e, query, page_size, page_prev);
+                },
+                nextClickHandler: function nextClickHandler(e) {
+                  handlePaginationClick(e, query, page_size, page_next);
+                }
               })
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
@@ -2149,37 +2136,24 @@ function UserListMain(props) {
             className: "row mt-4",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
               className: "col-md-5 mt-1",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", {
-                children: ["Showing ", getPaginationCountFrom(pagination_count), " to ", getPaginationCountTo(pagination_count), " of ", pagination_count, " entries"]
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_Utils_TableCounterComp__WEBPACK_IMPORTED_MODULE_5__.default, {
+                pageSize: page_size,
+                pageCurrent: page_current,
+                pageLimit: page_limit,
+                totalCount: pagination_count
               })
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
               className: "col-md-7",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-                className: "dataTables_paginate",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("ul", {
-                  className: "pagination",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-                    className: page_prev > 0 ? "page-item" : "page-item disabled",
-                    onClick: function onClick(e) {
-                      handlePaginationClick(e, query, page_size, page_prev);
-                    },
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
-                      href: void 0,
-                      className: "page-link",
-                      children: "Previous"
-                    })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
-                    className: page_next != 0 && page_next <= page_limit ? "page-item" : "page-item disabled",
-                    onClick: function onClick(e) {
-                      handlePaginationClick(e, query, page_size, page_next);
-                    },
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
-                      href: void 0,
-                      className: "page-link",
-                      children: "Next"
-                    })
-                  })]
-                })
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_Utils_TablePaginationDefaultComp__WEBPACK_IMPORTED_MODULE_4__.default, {
+                pagePrev: page_prev,
+                pageNext: page_next,
+                pageLimit: page_limit,
+                prevClickHandler: function prevClickHandler(e) {
+                  handlePaginationClick(e, query, page_size, page_prev);
+                },
+                nextClickHandler: function nextClickHandler(e) {
+                  handlePaginationClick(e, query, page_size, page_next);
+                }
               })
             })]
           })]
@@ -2190,6 +2164,105 @@ function UserListMain(props) {
 }
 
 react_dom__WEBPACK_IMPORTED_MODULE_2__.render( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(UserListMain, {}), document.getElementById('user_list'));
+
+/***/ }),
+
+/***/ "./src/js/components/Utils/TableCounterComp.js":
+/*!*****************************************************!*\
+  !*** ./src/js/components/Utils/TableCounterComp.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+
+
+function TableCounter(props) {
+  var getPaginationCountFrom = function getPaginationCountFrom() {
+    var count_from = 0;
+
+    if (props.totalCount > 0) {
+      var current_count = props.pageSize * props.pageCurrent;
+      var factor = props.pageSize - 1;
+      count_from = current_count - factor;
+    }
+
+    return count_from;
+  };
+
+  var getPaginationCountTo = function getPaginationCountTo() {
+    var count_to = 0;
+
+    if (props.totalCount > 0) {
+      if (props.pageCurrent == props.pageLimit) {
+        count_to = props.totalCount;
+      } else {
+        count_to = props.pageSize * props.pageCurrent;
+      }
+    }
+
+    return count_to;
+  };
+
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", {
+    children: ["Showing ", getPaginationCountFrom(), " to ", getPaginationCountTo(), " of ", props.totalCount, " entries"]
+  });
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TableCounter);
+
+/***/ }),
+
+/***/ "./src/js/components/Utils/TablePaginationDefaultComp.js":
+/*!***************************************************************!*\
+  !*** ./src/js/components/Utils/TablePaginationDefaultComp.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+
+
+
+
+function TablePaginationDefault(props) {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+    className: "dataTables_paginate",
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("ul", {
+      className: "pagination",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
+        className: props.pagePrev > 0 ? "page-item" : "page-item disabled",
+        onClick: props.prevClickHandler,
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
+          href: void 0,
+          className: "page-link",
+          children: "Previous"
+        })
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
+        className: props.pageNext != 0 && props.pageNext <= props.pageLimit ? "page-item" : "page-item disabled",
+        onClick: props.nextClickHandler,
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", {
+          href: void 0,
+          className: "page-link",
+          children: "Next"
+        })
+      })]
+    })
+  });
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TablePaginationDefault);
 
 /***/ }),
 
