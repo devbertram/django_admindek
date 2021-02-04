@@ -1,6 +1,6 @@
 /.vscode
+/authentication/__pycache__/
+/django_admindek/__pycache__/
+/django_admindek/settings.py
 /front_end/templates/node_modules
 /front_end/templates/static/build
-/django_admindek/settings.py
-/django_admindek/__pycache__/
-/authentication/__pycache__/
