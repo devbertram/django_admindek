@@ -1,11 +1,13 @@
 require('../../config')
 
-import React, {useState, useEffect} from "react"
+import React, {useState, useEffect, useCallback} from "react"
 import ReactDOM from "react-dom"
 import moment from "moment"
 
 import TablePaginationDefault from "../Utils/TablePaginationDefaultComp"
 import TableCounter from "../Utils/TableCounterComp"
+
+import { debounce } from 'lodash';
 
 function UserListMain(props){
 
@@ -17,6 +19,14 @@ function UserListMain(props){
     const [page_size, SetPageSize] = useState(10) // size per page
     const [page_limit, SetPageLimit] = useState(0) // number of pages
     const [query, SetQuery] = useState("") // search query
+
+	const debounceFetch = useCallback(
+        debounce(
+            function(q, ps, pc){
+                fetch(q, ps, pc)
+            }, 
+        500), []
+    );
 
 
     
@@ -63,6 +73,7 @@ function UserListMain(props){
                 table_rows.push(
                     <tr key={key}>
                         <td className="align-middle">{ val.username }</td>
+                        <td className="align-middle">{ val.fullname }</td>
                         <td className="align-middle">{ val.is_active == true ? <label className="label label-success">online</label> : <label className="label label-danger">offline</label> }</td>
                         <td className="align-middle">{ last_login }</td>
                         <td className="align-middle">{ date_joined }</td>
@@ -123,8 +134,17 @@ function UserListMain(props){
 
     const handleSearchFilter = (e) => {
 
-        console.log(e.target.value)
+        e.preventDefault()
+        
+        let q = e.target.value
 
+        SetPagePrev(0)
+        SetPageCurrent(1)
+        SetPageNext(2)
+        SetPageSize(10)
+        SetQuery(q)
+        debounceFetch(q, 10, 1)
+        
     }
 
 
@@ -149,12 +169,7 @@ function UserListMain(props){
 
                             <div className="col-md-5">
                                 <div className="input-group input-group-md input-group-button ml-3">
-                                    <input type="text" 
-                                           className="form-control" 
-                                           placeholder="Search .." 
-                                           onKeyUp={ handleSearchFilter } 
-                                           onKeyDown={ handleSearchFilter }
-                                    />
+                                    <input type="text" className="form-control" placeholder="Search .." onChange={ handleSearchFilter } />
                                     <div className="input-group-append">
                                         <button className="btn btn-primary" type="button">
                                             <i className="fa fa-search"></i>
@@ -206,6 +221,7 @@ function UserListMain(props){
                                 <thead>
                                     <tr>
                                         <th>Username</th>
+                                        <th>Name</th>
                                         <th>Status</th>
                                         <th>Last Login</th>
                                         <th>Date Joined</th>

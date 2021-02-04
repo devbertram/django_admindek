@@ -2,10 +2,10 @@
 from authentication.models import UserRoute
 from django.contrib.auth.models import User
 
+from django.db.models import Q
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import filters
 
 from .serializers import UserRouteSerializer, UserSerializer
 from .pagination import UserListPagination
@@ -24,15 +24,29 @@ class UserRouteViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     
-    queryset = User.objects.all()
+    queryset = User.objects.only('id', 'username', 'is_active', 'last_login', 'date_joined')
     serializer_class = UserSerializer
     pagination_class = UserListPagination
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['^username', '^email']
+
 
     def list(self, request):
+
+        search_query = request.GET.get('q')
+
+        if search_query:
+            page = self.paginate_queryset(
+                self.queryset
+                    .filter(
+                        Q(username__icontains=search_query) |
+                        Q(first_name__icontains=search_query) |
+                        Q(last_name__icontains=search_query)
+                    )
+                    .order_by('-date_joined')
+            )
+        else:
+            page = self.paginate_queryset(self.queryset.order_by('-date_joined'))
         
-        page = self.paginate_queryset(self.queryset.filter())
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
     

@@ -41,8 +41,13 @@ class UserRouteSerializer(serializers.ModelSerializer):
 
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer): 
+
+    fullname = serializers.SerializerMethodField('get_fullname')
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'date_joined', 'last_login', 'is_active')
+        fields = ('id', 'username', 'fullname', 'date_joined', 'last_login', 'is_active')
+
+    def get_fullname(self, user):
+        return user.first_name +" "+ user.last_name
