@@ -1,4 +1,4 @@
-!**/__pycache__/
+__pycache__
 /.vscode
 /django_admindek/settings.py
 /front_end/templates/node_modules
