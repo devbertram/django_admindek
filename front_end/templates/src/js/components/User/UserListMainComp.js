@@ -3,20 +3,19 @@ require('../../config')
 import React, {useState, useEffect, useCallback} from "react"
 import ReactDOM from "react-dom"
 import moment from "moment"
+import { debounce, filter } from 'lodash';
 
 import TablePaginationDefault from "../Utils/TablePaginationDefaultComp"
 import TableCounter from "../Utils/TableCounterComp"
 
-import { debounce } from 'lodash';
-
 function UserListMain(props){
 
-    const [list, SetList] = useState({}) // 
+    const [list, SetList] = useState({}) // records
     const [total_records, SetTotalRecords] = useState(0) // total count of records
     const [page_prev, SetPagePrev] = useState(0) // previous page
     const [page_current, SetPageCurrent] = useState(1) // current page
     const [page_next, SetPageNext] = useState(2) // next page
-    const [page_size, SetPageSize] = useState(10) // size per page
+    const [page_size, SetPageSize] = useState(10) // number of records per page
     const [page_limit, SetPageLimit] = useState(0) // number of pages
     const [query, SetQuery] = useState("") // search query
 
@@ -27,6 +26,10 @@ function UserListMain(props){
             }, 
         500), []
     );
+
+    // filters
+    const [filter_online_status, SetFilterOnlineStatus] = useState("")
+    const [filter_su_status, SetFilterSUStatus] = useState("")
 
 
     
@@ -48,7 +51,7 @@ function UserListMain(props){
 
     const fetch = (q, ps, pc) => {
 
-        axios.get('api/user', { params: { q:q, page_size:ps, page: pc } })
+        axios.get('api/user', { params: { q:q, page_size:ps, page: pc, os:filter_online_status, sus:filter_su_status } })
              .then((response) => {
                 SetList(response.data.results)
                 SetTotalRecords(response.data.count)
@@ -114,7 +117,7 @@ function UserListMain(props){
 
 
 
-    const handlePageSizeFilterClick = (e) => {
+    const handlePageSizeClick = (e) => {
 
         e.preventDefault()
 
@@ -132,7 +135,7 @@ function UserListMain(props){
 
 
 
-    const handleSearchFilter = (e) => {
+    const handleSearch = (e) => {
 
         e.preventDefault()
         
@@ -149,8 +152,50 @@ function UserListMain(props){
 
 
 
+    const handleFilterButtonClick = (e) => {
+
+        e.preventDefault()
+
+        $("#user-filter-modal").modal('toggle');
+        
+    }
+
+
+
+    const handleSubmitFilter = (e) => {
+
+        e.preventDefault()
+
+        SetPagePrev(0)
+        SetPageCurrent(1)
+        SetPageNext(2)
+        fetch(query, page_size, 1)
+        
+        $("#user-filter-modal").modal('hide')
+        
+    }
+
+
+
+    const handleRefreshClick = (e) => {
+
+        e.preventDefault()
+
+        SetPagePrev(0)
+        SetPageCurrent(1)
+        SetPageNext(2)
+        SetPageSize(10)
+        SetQuery("")
+        SetFilterOnlineStatus("")
+        SetFilterSUStatus("")
+        fetch("", 10, 1)
+        
+    }
+
+
+
     return (
-            
+
         <div className="row">
             <div className="col-sm-12">
                 <div className="card">
@@ -169,7 +214,7 @@ function UserListMain(props){
 
                             <div className="col-md-5">
                                 <div className="input-group input-group-md input-group-button ml-3">
-                                    <input type="text" className="form-control" placeholder="Search .." onChange={ handleSearchFilter } />
+                                    <input type="text" className="form-control" placeholder="Search .." value={ query } onChange={ handleSearch } />
                                     <div className="input-group-append">
                                         <button className="btn btn-primary" type="button">
                                             <i className="fa fa-search"></i>
@@ -179,20 +224,26 @@ function UserListMain(props){
                             </div>
 
                             <div className="col-md-1">
-                                <button className="btn btn-primary ml-2" type="button">
+                                <button className="btn btn-primary ml-2" type="button" onClick={ handleFilterButtonClick } >
                                     <i className="fa fa-filter"></i> Filters
                                 </button>
                             </div>
 
+                            <div className="col-md-1">
+                                <button className="btn btn-primary ml-2" type="button" onClick={ handleRefreshClick } >
+                                    &nbsp;<i className="fa fa-refresh"></i>
+                                </button>
+                            </div>
+
                             <div className="col-md-2">
-                                <div className="form-group row mt-1">
+                                <div className="form-group row">
                                     <div className="col-md-5">
-                                        <label className="col-form-label mt-1 ml-4">
+                                        <label className="col-form-label mt-1">
                                             Entries:
                                         </label>
                                     </div>
                                     <div className="col-md-7">
-                                        <select className="form-control input-md" onChange={ handlePageSizeFilterClick }>
+                                        <select className="form-control input-md" value={ page_size } onChange={ handlePageSizeClick }>
                                             <option value="10">10</option>
                                             <option value="25">25</option>
                                             <option value="50">50</option>
@@ -202,7 +253,7 @@ function UserListMain(props){
                                 </div>
                             </div>
 
-                            <div className="col-md-3 mt-1">
+                            <div className="col-md-2 mt-1">
                                 <TablePaginationDefault
                                     pagePrev={ page_prev }
                                     pageNext={ page_next }
@@ -255,6 +306,58 @@ function UserListMain(props){
                                     prevClickHandler={ (e) => { handlePaginationClick(e, query, page_size, page_prev) } }
                                     nextClickHandler={ (e) => { handlePaginationClick(e, query, page_size, page_next) } }
                                 />
+                            </div>
+                        </div>
+
+
+                        {/* Filter Modal */}
+                        <div className="modal fade" id="user-filter-modal" role="dialog">
+                            <div className="modal-dialog modal-lg" role="document">
+                                <div className="modal-content">
+
+                                    <div className="modal-header">
+                                        <h4 className="modal-title">Filter Records</h4>
+                                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+
+                                    <div className="modal-body">
+
+                                        <div className="form-group row">
+
+                                            <div className="col-sm-6">
+                                                <label className="col-sm-12 col-form-label">Online Status:</label>
+                                                <div className="col-sm-12">
+                                                    <select name="select" className="form-control" value={ filter_online_status } onChange={ e => SetFilterOnlineStatus(e.target.value) }>
+                                                        <option value="">Select</option>
+                                                        <option value="1">Online</option>
+                                                        <option value="0">Offline</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-sm-6">
+                                                <label className="col-sm-12 col-form-label">Super User Status:</label>
+                                                <div className="col-sm-12">
+                                                    <select name="select" className="form-control" value={ filter_su_status } onChange={ e => SetFilterSUStatus(e.target.value) }>
+                                                        <option value="">Select</option>
+                                                        <option value="1">Super User</option>
+                                                        <option value="0">Normal User</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+
+                                    </div>
+
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ handleSubmitFilter }>Filter</button>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
 

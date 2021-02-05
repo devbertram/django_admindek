@@ -30,20 +30,40 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
     def list(self, request):
-
-        search_query = request.GET.get('q')
+        
+        search_query = request.GET.get('q', None)
+        online_status = request.GET.get('os', None)
+        su_status = request.GET.get('sus', None)        
+        filter_conditions = dict()
 
         if search_query:
+
             page = self.paginate_queryset(
-                self.queryset
-                    .filter(
-                        Q(username__icontains=search_query) |
-                        Q(first_name__icontains=search_query) |
-                        Q(last_name__icontains=search_query)
-                    )
-                    .order_by('-date_joined')
-            )
+                    self.queryset
+                        .filter(
+                            Q(username__icontains=search_query) |
+                            Q(first_name__icontains=search_query) |
+                            Q(last_name__icontains=search_query)
+                        )
+                        .order_by('-date_joined')
+                )
+
+        elif online_status or su_status:
+
+            if online_status:
+                filter_conditions['is_active'] = online_status
+            
+            if su_status:
+                filter_conditions['is_superuser'] = su_status
+
+            page = self.paginate_queryset(
+                    self.queryset
+                        .filter(**filter_conditions)
+                        .order_by('-date_joined')
+                )
+
         else:
+            
             page = self.paginate_queryset(self.queryset.order_by('-date_joined'))
         
         serializer = self.get_serializer(page, many=True)
