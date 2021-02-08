@@ -31,36 +31,23 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         
-        search_query = request.GET.get('q', None)
+        search = request.GET.get('q', None)
         online_status = request.GET.get('os', None)
-        su_status = request.GET.get('sus', None)        
-        filter_conditions = dict()
+        su_status = request.GET.get('sus', None)     
+        filter_conditions = Q()
 
-        if search_query:
+        if search or online_status or su_status:
 
-            page = self.paginate_queryset(
-                    self.queryset
-                        .filter(
-                            Q(username__icontains=search_query) |
-                            Q(first_name__icontains=search_query) |
-                            Q(last_name__icontains=search_query)
-                        )
-                        .order_by('-date_joined')
-                )
-
-        elif online_status or su_status:
+            if search:
+                filter_conditions.add(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search), Q.AND)
 
             if online_status:
-                filter_conditions['is_active'] = online_status
-            
-            if su_status:
-                filter_conditions['is_superuser'] = su_status
+                filter_conditions.add(Q(is_active = online_status), Q.AND) 
 
-            page = self.paginate_queryset(
-                    self.queryset
-                        .filter(**filter_conditions)
-                        .order_by('-date_joined')
-                )
+            if su_status:
+                filter_conditions.add(Q(is_superuser = su_status), Q.AND)
+
+            page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by('-date_joined'))
 
         else:
             

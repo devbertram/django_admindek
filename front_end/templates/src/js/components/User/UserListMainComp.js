@@ -1,12 +1,13 @@
 require('../../config')
 
-import React, {useState, useEffect, useCallback} from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import ReactDOM from "react-dom"
 import moment from "moment"
-import { debounce, filter } from 'lodash';
+import { debounce, entries, filter } from 'lodash'
+import eventBus from '../Utils/EventBus'
 
-import TablePaginationDefault from "../Utils/TablePaginationDefaultComp"
-import TableCounter from "../Utils/TableCounterComp"
+import { Counter, FooterPaginationDefault } from '../Utils/Table/TableFooters'
+import { AddButton, SearchInput, FilterButton, RefreshButton, EntriesSelect, HeaderPaginationDefault } from '../Utils/Table/TableHeaders'
 
 function UserListMain(props){
 
@@ -18,27 +19,28 @@ function UserListMain(props){
     const [page_size, SetPageSize] = useState(10) // number of records per page
     const [page_limit, SetPageLimit] = useState(0) // number of pages
     const [query, SetQuery] = useState("") // search query
-
-	const debounceFetch = useCallback(
-        debounce(
-            function(q, ps, pc){
-                fetch(q, ps, pc)
-            }, 
-        500), []
-    );
-
+    
     // filters
     const [filter_online_status, SetFilterOnlineStatus] = useState("")
     const [filter_su_status, SetFilterSUStatus] = useState("")
 
+    // search 
+	const debounceFetch = useCallback(
+        debounce(
+            function(prm_query, prm_page_size, prm_page_current, prm_filter_online_status, prm_filter_su_status){
+                fetch(prm_query, prm_page_size, prm_page_current, prm_filter_online_status, prm_filter_su_status)
+            }, 
+        500), []
+    );
+
 
     
     useEffect (() => {
-
+        
         let is_mounted = true;
 
         if(is_mounted = true){
-            fetch(query, page_size, page_current)
+            fetch(query, page_size, page_current, filter_online_status, filter_su_status)
         }
 
         return () => {
@@ -49,13 +51,20 @@ function UserListMain(props){
 
 
 
-    const fetch = (q, ps, pc) => {
+    const fetch = (prm_query, prm_page_size, prm_page_current, prm_filter_online_status, prm_filter_su_status) => {
 
-        axios.get('api/user', { params: { q:q, page_size:ps, page: pc, os:filter_online_status, sus:filter_su_status } })
-             .then((response) => {
-                SetList(response.data.results)
-                SetTotalRecords(response.data.count)
-                SetPageLimit(Math.ceil(response.data.count / ps))
+        axios.get('api/user', { 
+            params: { 
+                q: prm_query, 
+                page_size: prm_page_size, 
+                page: prm_page_current, 
+                os:prm_filter_online_status, 
+                sus:prm_filter_su_status 
+            }
+        }).then((response) => {
+            SetList(response.data.results)
+            SetTotalRecords(response.data.count)
+            SetPageLimit(Math.ceil(response.data.count / prm_page_size))
         });
 
     }
@@ -101,16 +110,15 @@ function UserListMain(props){
 
 
 
-    const handlePaginationClick = (e, q, ps, cp) => {
+    const handlePaginationClick = (e, prm_page_current) => {
 
         e.preventDefault()
 
-        if(cp > 0 && cp <= page_limit){
-            SetPagePrev(cp - 1)
-            SetPageCurrent(cp)
-            SetPageNext(cp + 1)
-            SetPageSize(ps)
-            fetch(q, ps, cp)
+        if(prm_page_current > 0 && prm_page_current <= page_limit){
+            SetPagePrev(prm_page_current - 1)
+            SetPageCurrent(prm_page_current)
+            SetPageNext(prm_page_current + 1)
+            fetch(query, page_size, prm_page_current, filter_online_status, filter_su_status)
         }
 
     }
@@ -121,14 +129,14 @@ function UserListMain(props){
 
         e.preventDefault()
 
-        let ps = e.target.value
+        let prm_page_size = e.target.value
 
-        if(ps > 0){
+        if(prm_page_size > 0){
             SetPagePrev(0)
             SetPageCurrent(1)
             SetPageNext(2)
-            SetPageSize(ps)
-            fetch(query, ps, 1)
+            SetPageSize(prm_page_size)
+            fetch(query, prm_page_size, 1, filter_online_status, filter_su_status)
         }
 
     }
@@ -139,39 +147,39 @@ function UserListMain(props){
 
         e.preventDefault()
         
-        let q = e.target.value
+        let prm_query = e.target.value
 
         SetPagePrev(0)
         SetPageCurrent(1)
         SetPageNext(2)
-        SetPageSize(10)
-        SetQuery(q)
-        debounceFetch(q, 10, 1)
+        SetQuery(prm_query)
+        debounceFetch(prm_query, page_size, 1, filter_online_status, filter_su_status)
         
     }
 
 
 
     const handleFilterButtonClick = (e) => {
-
         e.preventDefault()
-
         $("#user-filter-modal").modal('toggle');
-        
     }
 
 
 
-    const handleSubmitFilter = (e) => {
+    const handleFilterSubmit = (e) => {
 
         e.preventDefault()
+        
+        eventBus.dispatch("SHOW_FULLPAGE_LOADER", { is_loading: true, is_dashboard: true })
 
         SetPagePrev(0)
         SetPageCurrent(1)
         SetPageNext(2)
-        fetch(query, page_size, 1)
+        fetch(query, page_size, 1, filter_online_status, filter_su_status)
         
         $("#user-filter-modal").modal('hide')
+
+        eventBus.dispatch("SHOW_FULLPAGE_LOADER", { is_loading: false, is_dashboard: true })
         
     }
 
@@ -188,7 +196,17 @@ function UserListMain(props){
         SetQuery("")
         SetFilterOnlineStatus("")
         SetFilterSUStatus("")
-        fetch("", 10, 1)
+        fetch("", 10, 1, "", "")
+        
+    }
+
+
+
+    const handleAddButtonClick = (e) => {
+
+        e.preventDefault()
+
+        console.log('test');
         
     }
 
@@ -203,64 +221,42 @@ function UserListMain(props){
                     <div className="card-block table-border-style">
 
 
-                        {/* FILTERS */}
+                        {/* Table Header */}
                         <div className="row">
 
-                            <div className="col-md-1">
-                                <button className="btn btn-md btn-success" type="button">
-                                    <i className="fa fa-plus-square"></i> Add User
-                                </button>
-                            </div>
+                            <div className="col-md-9 d-flex flex-row">
 
-                            <div className="col-md-5">
-                                <div className="input-group input-group-md input-group-button ml-3">
-                                    <input type="text" className="form-control" placeholder="Search .." value={ query } onChange={ handleSearch } />
-                                    <div className="input-group-append">
-                                        <button className="btn btn-primary" type="button">
-                                            <i className="fa fa-search"></i>
-                                        </button>
-                                    </div>
+                                <div>
+                                    <AddButton displayText="Add" clickHandler={ handleAddButtonClick }/>
                                 </div>
-                            </div>
 
-                            <div className="col-md-1">
-                                <button className="btn btn-primary ml-2" type="button" onClick={ handleFilterButtonClick } >
-                                    <i className="fa fa-filter"></i> Filters
-                                </button>
-                            </div>
-
-                            <div className="col-md-1">
-                                <button className="btn btn-primary ml-2" type="button" onClick={ handleRefreshClick } >
-                                    &nbsp;<i className="fa fa-refresh"></i>
-                                </button>
-                            </div>
-
-                            <div className="col-md-2">
-                                <div className="form-group row">
-                                    <div className="col-md-5">
-                                        <label className="col-form-label mt-1">
-                                            Entries:
-                                        </label>
-                                    </div>
-                                    <div className="col-md-7">
-                                        <select className="form-control input-md" value={ page_size } onChange={ handlePageSizeClick }>
-                                            <option value="10">10</option>
-                                            <option value="25">25</option>
-                                            <option value="50">50</option>
-                                            <option value="100">100</option>
-                                        </select>
-                                    </div>
+                                <div className="pl-4" style={{ width : '40%' }}>
+                                    <SearchInput searchText={ query } clickHandler={ handleSearch } />
                                 </div>
+
+                                <div className="pl-4">
+                                    <FilterButton clickHandler={ handleFilterButtonClick } />
+                                </div>
+
+                                <div className="pl-4">
+                                    <RefreshButton clickHandler={ handleRefreshClick } />
+                                </div>
+
                             </div>
 
-                            <div className="col-md-2 mt-1">
-                                <TablePaginationDefault
-                                    pagePrev={ page_prev }
-                                    pageNext={ page_next }
-                                    pageLimit={ page_limit }
-                                    prevClickHandler={ (e) => { handlePaginationClick(e, query, page_size, page_prev) } }
-                                    nextClickHandler={ (e) => { handlePaginationClick(e, query, page_size, page_next) } }
-                                />
+                            <div className="col-md-3 d-flex flex-row mt-1">
+                                <div style={{ width:'50%' }}>
+                                    <EntriesSelect pageSize={ page_size } clickHandler={ handlePageSizeClick } />
+                                </div>
+                                <div className="pl-4 mt-1 float-right">
+                                    <HeaderPaginationDefault
+                                        pagePrev={ page_prev }
+                                        pageNext={ page_next }
+                                        pageLimit={ page_limit }
+                                        prevClickHandler={ (e) => { handlePaginationClick(e, page_prev) } }
+                                        nextClickHandler={ (e) => { handlePaginationClick(e, page_next) } }
+                                    />
+                                </div>
                             </div>
 
                         </div>
@@ -288,10 +284,10 @@ function UserListMain(props){
                         </div>
 
 
-                        {/* PAGINATION */}
+                        {/* Table Footer */}
                         <div className="row mt-4">
                             <div className="col-md-5 mt-1">
-                                <TableCounter
+                                <Counter
                                     pageSize={ page_size }
                                     pageCurrent={ page_current }
                                     pageLimit={ page_limit }
@@ -299,19 +295,19 @@ function UserListMain(props){
                                 />
                             </div>
                             <div className="col-md-7">
-                                <TablePaginationDefault
+                                <FooterPaginationDefault
                                     pagePrev={ page_prev }
                                     pageNext={ page_next }
                                     pageLimit={ page_limit }
-                                    prevClickHandler={ (e) => { handlePaginationClick(e, query, page_size, page_prev) } }
-                                    nextClickHandler={ (e) => { handlePaginationClick(e, query, page_size, page_next) } }
+                                    prevClickHandler={ (e) => { handlePaginationClick(e, page_prev) } }
+                                    nextClickHandler={ (e) => { handlePaginationClick(e, page_next) } }
                                 />
                             </div>
                         </div>
 
 
                         {/* Filter Modal */}
-                        <div className="modal fade" id="user-filter-modal" role="dialog">
+                        <div className="modal" id="user-filter-modal" role="dialog">
                             <div className="modal-dialog modal-lg" role="document">
                                 <div className="modal-content">
 
@@ -330,7 +326,7 @@ function UserListMain(props){
                                                 <label className="col-sm-12 col-form-label">Online Status:</label>
                                                 <div className="col-sm-12">
                                                     <select name="select" className="form-control" value={ filter_online_status } onChange={ e => SetFilterOnlineStatus(e.target.value) }>
-                                                        <option value="">Select</option>
+                                                        <option value="">None</option>
                                                         <option value="1">Online</option>
                                                         <option value="0">Offline</option>
                                                     </select>
@@ -341,7 +337,7 @@ function UserListMain(props){
                                                 <label className="col-sm-12 col-form-label">Super User Status:</label>
                                                 <div className="col-sm-12">
                                                     <select name="select" className="form-control" value={ filter_su_status } onChange={ e => SetFilterSUStatus(e.target.value) }>
-                                                        <option value="">Select</option>
+                                                        <option value="">None</option>
                                                         <option value="1">Super User</option>
                                                         <option value="0">Normal User</option>
                                                     </select>
@@ -354,7 +350,7 @@ function UserListMain(props){
 
                                     <div className="modal-footer">
                                         <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
-                                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ handleSubmitFilter }>Filter</button>
+                                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ handleFilterSubmit }>Filter</button>
                                     </div>
 
                                 </div>
