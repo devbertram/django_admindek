@@ -5,5 +5,5 @@
     "/static/build/js/Authentication/SideNavMainComp.js": "/static/build/js/Authentication/SideNavMainComp.js",
     "/static/build/js/Utils/FullPageLoaderComp.js": "/static/build/js/Utils/FullPageLoaderComp.js",
     "/static/build/js/Utils/ToastNotificationComp.js": "/static/build/js/Utils/ToastNotificationComp.js",
-    "/static/build/js/User/UserListMainComp.js": "/static/build/js/User/UserListMainComp.js"
+    "/static/build/js/User/UserMain.js": "/static/build/js/User/UserMain.js"
 }

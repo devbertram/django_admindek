@@ -3,20 +3,15 @@ import { useLocalStore } from "mobx-react"
 import { createUserStore } from "./UserStore"
 
 
-const UserContext = React.createContext()
+const UserContext = React.createContext(null)
 
 export const UserStoreProvider = ({ children }) => {
-
-    const store = useLocalStore(() => ({
-        test: 'test',
-    }))
-
+    const store = useLocalStore(createUserStore)
     return (
-        <UserContext.Provider value={store}>
-            {children}
+        <UserContext.Provider value={store}> 
+            {children} 
         </UserContext.Provider>
     )
-    
 }
 
 export const useUserStore = () => React.useContext(UserContext)
