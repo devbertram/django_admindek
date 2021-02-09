@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import eventBus from "../Utils/EventBus";
 
-import InputTextInline from "../Utils/Forms/InputTextInlineComp";
+import { InputTextInline } from "../Utils/Forms/InlineInputs";
 
 function ProfilePasswordForm(props){ 
     

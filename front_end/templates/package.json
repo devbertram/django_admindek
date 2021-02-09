@@ -18,6 +18,8 @@
         "cross-env": "^7.0.3",
         "laravel-mix": "^6.0.8",
         "lodash": "^4.17.20",
+        "mobx": "^6.1.5",
+        "mobx-react": "^7.1.0",
         "moment": "^2.29.1",
         "postcss": "^8.1.14",
         "react": "^17.0.1",

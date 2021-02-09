@@ -15,7 +15,7 @@ function AddButton(props){
 function SearchInput(props){
     return (
         <div className="input-group input-group-button">
-            <input type="text" className="form-control" placeholder="Search .." value={ props.searchText } onChange={ props.clickHandler } />
+            <input type="text" className="form-control" placeholder="Search .." value={ props.searchValue } onChange={ props.searchHandler } />
             <div className="input-group-append">
                 <button className="btn btn-primary" type="button">
                     <i className="fa fa-search"></i>
@@ -56,7 +56,7 @@ function EntriesSelect(props){
                 </label>
             </div>
             <div className="pl-2">
-                <select className="form-control input-md" value={ props.pageSize } onChange={ props.clickHandler } style={{ width:'100%' }}>
+                <select className="form-control input-md" value={ props.pageSize } onChange={ props.changeHandler } style={{ width:'100%' }}>
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -88,5 +88,50 @@ function HeaderPaginationDefault(props){
 
 
 
+// Header Pagination Default
+function TableHeaderDefault(props){
+
+    return (
+
+        <div className="row">
+            
+            <div className="col-md-9 d-flex flex-row">
+                <div>
+                    <AddButton displayText="Add" clickHandler={ props.addButtonClickHandler }/>
+                </div>
+                <div className="pl-4" style={{ width : '40%' }}>
+                    <SearchInput searchValue={ props.searchInputValue } searchHandler={ props.searchInputHandler } />
+                </div>
+                <div className="pl-4">
+                    <FilterButton clickHandler={ props.filterButtonClickHandler } />
+                </div>
+                <div className="pl-4">
+                    <RefreshButton clickHandler={ props.refreshButtonClickHandler } />
+                </div>
+            </div>
+
+            <div className="col-md-3 d-flex flex-row mt-1">
+                <div style={{ width:'50%' }}>
+                    <EntriesSelect pageSize={ props.entriesSelectPageSize } changeHandler={ props.entriesSelectChangeHandler } />
+                </div>
+                <div className="pl-4 mt-1 float-right">
+                    <HeaderPaginationDefault
+                        pagePrev={ props.paginationPagePrev }
+                        pageNext={ props.paginationPageNext }
+                        pageLimit={ props.paginationPageLimit }
+                        prevClickHandler={ props.paginationPrevClickHandler }
+                        nextClickHandler={ props.paginationNextClickHandler }
+                    />
+                </div>
+            </div>
+
+        </div>
+
+    );
+
+}
+
+
+
 // Export Functions
-export { AddButton, SearchInput, FilterButton, RefreshButton, EntriesSelect, HeaderPaginationDefault }
+export { AddButton, SearchInput, FilterButton, RefreshButton, EntriesSelect, HeaderPaginationDefault, TableHeaderDefault }
