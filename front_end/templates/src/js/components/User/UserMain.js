@@ -3,17 +3,10 @@ require('../../config')
 import React from "react"
 import ReactDOM from "react-dom"
 
-import { UserStoreProvider } from './store/UserContext'
 import UserListComp from './UserListComp'
+import userStore from './store/UserStore'
 
-const UserMain = (prop) => {
-
-    return (
-        <UserStoreProvider>
-            <UserListComp/>
-        </UserStoreProvider>
-    )
-    
-}
-
-ReactDOM.render( <UserMain/> , document.getElementById('user_root'));
+ReactDOM.render( 
+    <UserListComp userStore={ userStore }/>, 
+    document.getElementById('user_root')
+);

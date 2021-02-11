@@ -1,21 +1,18 @@
 
 
 import React, { useState, useEffect, useCallback } from 'react'
+
 import moment from 'moment'
 import { debounce } from 'lodash'
+import { observer } from 'mobx-react'
 
 import eventBus from '../Utils/EventBus'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
 import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { SelectDefault } from '../Utils/Forms/FilterInputs'
 
-import { useUserStore } from './store/UserContext'
-import { useObserver } from 'mobx-react'
 
-
-export default function UserListComp(props){
-
-    const userStore = useUserStore();
+const UserListComp = observer(({ userStore }) => {
 
     const [list, SetList] = useState({}) // records
     const [total_records, SetTotalRecords] = useState(0) // total count of records
@@ -80,7 +77,6 @@ export default function UserListComp(props){
     const getTableRows = () => {
         
         let table_rows = [];
-
         let user_list = userStore.list;
 
         if(user_list.length > 0){
@@ -219,7 +215,7 @@ export default function UserListComp(props){
 
 
 
-    return useObserver(() => (
+    return (
 
         <div className="row">
             <div className="col-sm-12">
@@ -230,8 +226,8 @@ export default function UserListComp(props){
                         {/* Table Header */}
                         <TableHeaderDefault
                             addButtonClickHandler={ handleAddButtonClick }
-                            searchInputValue={ query }
-                            searchInputHandler={ handleSearch }
+                            searchInputValue={ userStore.query }
+                            searchInputHandler={ (e) => userStore.handleSearch(e) }
                             filterButtonClickHandler={ handleFilterButtonClick }
                             refreshButtonClickHandler={ handleRefreshClick }
                             entriesSelectPageSize={ page_size }
@@ -329,6 +325,9 @@ export default function UserListComp(props){
             </div>
         </div>
 
-    ));
+    );
     
-}
+});
+
+
+export default UserListComp
