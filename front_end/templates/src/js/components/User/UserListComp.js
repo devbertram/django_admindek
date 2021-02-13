@@ -1,40 +1,17 @@
 
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useEffect } from 'react'
 
 import moment from 'moment'
-import { debounce } from 'lodash'
 import { observer } from 'mobx-react'
 
-import eventBus from '../Utils/EventBus'
-import { TableFooterDefault } from '../Utils/Table/TableFooters'
 import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
-import { SelectDefault } from '../Utils/Forms/FilterInputs'
+import { TableFooterDefault } from '../Utils/Table/TableFooters'
+
+import UserListFilter from './UserListFilterComp'
 
 
-const UserListComp = observer(({ userStore }) => {
-
-    const [list, SetList] = useState({}) // records
-    const [total_records, SetTotalRecords] = useState(0) // total count of records
-    const [page_prev, SetPagePrev] = useState(0) // previous page
-    const [page_current, SetPageCurrent] = useState(1) // current page
-    const [page_next, SetPageNext] = useState(2) // next page
-    const [page_size, SetPageSize] = useState(10) // number of records per page
-    const [page_limit, SetPageLimit] = useState(0) // number of pages
-    const [query, SetQuery] = useState("") // search query
-    
-    // filters
-    const [filter_online_status, SetFilterOnlineStatus] = useState("")
-    const [filter_su_status, SetFilterSUStatus] = useState("")
-
-    // search 
-	const debounceFetch = useCallback(
-        debounce(
-            function(prm_query, prm_page_size, prm_page_current, prm_filter_online_status, prm_filter_su_status){
-                fetch(prm_query, prm_page_size, prm_page_current, prm_filter_online_status, prm_filter_su_status)
-            },  
-        500), []
-    );
+const UserList = observer(({ userStore }) => {
 
 
     
@@ -54,30 +31,10 @@ const UserListComp = observer(({ userStore }) => {
 
 
 
-    const fetch = (prm_query, prm_page_size, prm_page_current, prm_filter_online_status, prm_filter_su_status) => {
-
-        axios.get('api/user', { 
-            params: { 
-                q: prm_query, 
-                page_size: prm_page_size, 
-                page: prm_page_current, 
-                os:prm_filter_online_status, 
-                sus:prm_filter_su_status 
-            }
-        }).then((response) => {
-            SetList(response.data.results)
-            SetTotalRecords(response.data.count)
-            SetPageLimit(Math.ceil(response.data.count / prm_page_size))
-        });
-
-    }
-
-
-
     const getTableRows = () => {
         
-        let table_rows = [];
-        let user_list = userStore.list;
+        let table_rows = []
+        let user_list = userStore.list
 
         if(user_list.length > 0){
 
@@ -115,102 +72,14 @@ const UserListComp = observer(({ userStore }) => {
 
 
     const handleAddButtonClick = (e) => {
-
         e.preventDefault()
-        userStore.setTest('SAMPLE TEST')
-        
-    }
-
-
-
-    const handleSearch = (e) => {
-
-        e.preventDefault()
-        
-        let prm_query = e.target.value
-
-        SetPagePrev(0)
-        SetPageCurrent(1)
-        SetPageNext(2)
-        SetQuery(prm_query)
-        debounceFetch(prm_query, page_size, 1, filter_online_status, filter_su_status)
-        
     }
 
 
 
     const handleFilterButtonClick = (e) => {
         e.preventDefault()
-        $("#user-filter-modal").modal('toggle');
-    }
-
-
-
-    const handleFilterSubmit = (e) => {
-
-        e.preventDefault()
-        
-        eventBus.dispatch("SHOW_FULLPAGE_LOADER", { is_loading: true, is_dashboard: true })
-
-        SetPagePrev(0)
-        SetPageCurrent(1)
-        SetPageNext(2)
-        fetch(query, page_size, 1, filter_online_status, filter_su_status)
-        
-        $("#user-filter-modal").modal('hide')
-
-        eventBus.dispatch("SHOW_FULLPAGE_LOADER", { is_loading: false, is_dashboard: true })
-        
-    }
-
-
-
-    const handleRefreshClick = (e) => {
-
-        e.preventDefault()
-
-        SetPagePrev(0)
-        SetPageCurrent(1)
-        SetPageNext(2)
-        SetPageSize(10)
-        SetQuery("")
-        SetFilterOnlineStatus("")
-        SetFilterSUStatus("")
-        fetch("", 10, 1, "", "")
-        
-    }
-
-
-
-    const handlePageSizeClick = (e) => {
-
-        e.preventDefault()
-
-        let prm_page_size = e.target.value
-
-        if(prm_page_size > 0){
-            SetPagePrev(0)
-            SetPageCurrent(1)
-            SetPageNext(2)
-            SetPageSize(prm_page_size)
-            fetch(query, prm_page_size, 1, filter_online_status, filter_su_status)
-        }
-
-    }
-
-
-
-    const handlePaginationClick = (e, prm_page_current) => {
-
-        e.preventDefault()
-
-        if(prm_page_current > 0 && prm_page_current <= page_limit){
-            SetPagePrev(prm_page_current - 1)
-            SetPageCurrent(prm_page_current)
-            SetPageNext(prm_page_current + 1)
-            fetch(query, page_size, prm_page_current, filter_online_status, filter_su_status)
-        }
-
+        $("#user-filter-modal").modal('toggle')
     }
 
 
@@ -229,14 +98,14 @@ const UserListComp = observer(({ userStore }) => {
                             searchInputValue={ userStore.query }
                             searchInputHandler={ (e) => userStore.handleSearch(e) }
                             filterButtonClickHandler={ handleFilterButtonClick }
-                            refreshButtonClickHandler={ handleRefreshClick }
-                            entriesSelectPageSize={ page_size }
-                            entriesSelectChangeHandler={ handlePageSizeClick }
-                            paginationPagePrev={ page_prev }
-                            paginationPageNext={ page_next }
-                            paginationPageLimit={ page_limit }
-                            paginationPrevClickHandler={ (e) => { handlePaginationClick(e, page_prev) } }
-                            paginationNextClickHandler={ (e) => { handlePaginationClick(e, page_next) } }
+                            refreshButtonClickHandler={ (e) => userStore.handleRefreshClick(e) }
+                            entriesSelectPageSize={ userStore.page_size }
+                            entriesSelectChangeHandler={ (e) => userStore.handlePageSizeClick(e) }
+                            paginationPagePrev={ userStore.page_prev }
+                            paginationPageNext={ userStore.page_next }
+                            paginationPageLimit={ userStore.page_limit }
+                            paginationPrevClickHandler={ (e) => userStore.handlePaginationClick(e, userStore.page_prev) }
+                            paginationNextClickHandler={ (e) => userStore.handlePaginationClick(e, userStore.page_next) }
                         />
 
 
@@ -245,7 +114,7 @@ const UserListComp = observer(({ userStore }) => {
                             <table className="table table-striped table-bordered table-de">
                                 <thead>
                                     <tr>
-                                        <th>{ userStore.test }</th>
+                                        <th>Username</th>
                                         <th>Name</th>
                                         <th>Status</th>
                                         <th>Last Login</th>
@@ -262,62 +131,20 @@ const UserListComp = observer(({ userStore }) => {
 
                         {/* Table Footer */}
                         <TableFooterDefault
-                            counterPageSize={ page_size }
-                            counterPageCurrent={ page_current }
-                            counterPageLimit={ page_limit }
-                            counterTotalRecords={ total_records }
-                            paginationPagePrev={ page_prev }
-                            paginationPageNext={ page_next }
-                            paginationPageLimit={ page_limit }
-                            paginationPrevClickHandler={ (e) => { handlePaginationClick(e, page_prev) } }
-                            paginationNextClickHandler={ (e) => { handlePaginationClick(e, page_next) } }  
+                            counterPageSize={ userStore.page_size }
+                            counterPageCurrent={ userStore.page_current }
+                            counterPageLimit={ userStore.page_limit }
+                            counterTotalRecords={ userStore.total_records }
+                            paginationPagePrev={ userStore.page_prev }
+                            paginationPageNext={ userStore.page_next }
+                            paginationPageLimit={ userStore.page_limit }
+                            paginationPrevClickHandler={ (e) => userStore.handlePaginationClick(e, userStore.page_prev) }
+                            paginationNextClickHandler={ (e) => userStore.handlePaginationClick(e, userStore.page_next) }  
                         />
 
 
                         {/* Filter Modal */}
-                        <div className="modal" id="user-filter-modal" role="dialog">
-                            <div className="modal-dialog modal-lg" role="document">
-                                <div className="modal-content">
-
-                                    <div className="modal-header">
-                                        <h4 className="modal-title">Filter Records</h4>
-                                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-
-                                    <div className="modal-body">
-                                        <div className="form-group row">
-
-                                            <SelectDefault
-                                                divColumn="col-md-6"
-                                                label="Online Status:"
-                                                list={ [ ['1', 'Online'], ['0', 'Offline'] ] }
-                                                value={ filter_online_status }
-                                                setter={ e => SetFilterOnlineStatus(e.target.value) }
-                                            />
-
-                                            <SelectDefault
-                                                divColumn="col-md-6"
-                                                label="Super User Status:"
-                                                list={ [ ['1', 'Super User'], ['0', 'Normal User'] ] }
-                                                value={ filter_su_status }
-                                                setter={ e => SetFilterSUStatus(e.target.value) }
-                                            />
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div className="modal-footer">
-                                        <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
-                                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ handleFilterSubmit }>Filter</button>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-
-
+                        <UserListFilter userStore={ userStore } />
 
                     </div>
 
@@ -330,4 +157,4 @@ const UserListComp = observer(({ userStore }) => {
 });
 
 
-export default UserListComp
+export default UserList
