@@ -8,7 +8,8 @@ import { observer } from 'mobx-react'
 import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
 
-import UserListFilter from './UserListFilterComp'
+import UserListFilterModal from './UserListFilterModalComp'
+import UserCreateModal from './UserCreateModalComp'
 
 
 const UserList = observer(({ userStore }) => {
@@ -73,6 +74,7 @@ const UserList = observer(({ userStore }) => {
 
     const handleAddButtonClick = (e) => {
         e.preventDefault()
+        $("#user-create-modal").modal('toggle')
     }
 
 
@@ -144,7 +146,11 @@ const UserList = observer(({ userStore }) => {
 
 
                         {/* Filter Modal */}
-                        <UserListFilter userStore={ userStore } />
+                        <UserListFilterModal userStore={ userStore } />
+
+
+                        {/* Create Modal */}
+                        <UserCreateModal userStore={ userStore } />
 
                     </div>
 

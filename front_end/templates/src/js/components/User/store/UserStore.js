@@ -12,12 +12,9 @@ class UserStore{
     page_size = 10;
     page_limit = 0;
     query = "";
-
-    filter_online_status = "";
-    filter_su_status = "";
-
-    // search 
-	delaySearch = debounce(() => this.fetch(), 500);
+    filter_online_status = ""; // filter
+    filter_su_status = ""; // filter
+	delaySearch = debounce(() => this.fetch(), 500); // search delay
 
     
     constructor(){
@@ -25,11 +22,9 @@ class UserStore{
     }
 
 
-
     setFilterSUStatus(su_status){
         this.filter_su_status = su_status;
     }
-
 
 
     setFilterOnlineStatus(online_status){
@@ -37,9 +32,7 @@ class UserStore{
     }
 
 
-
     fetch(){
-    
         axios.get('api/user', { 
             params: { 
                 q: this.query, 
@@ -55,28 +48,21 @@ class UserStore{
                 this.page_limit = Math.ceil(response.data.count / this.page_size);
             })
         });
-   
     }
 
 
-
     handleSearch(e){
-
         e.preventDefault()
         this.page_prev = 0;
         this.page_current = 1;
         this.page_next = 2;
         this.query = e.target.value;
-        this.delaySearch()
-        
+        this.delaySearch();
     }
 
 
-
     handleRefreshClick(e){
-
         e.preventDefault()
-
         this.page_prev = 0;
         this.page_current = 1;
         this.page_next = 2;
@@ -85,15 +71,11 @@ class UserStore{
         this.filter_online_status = "";
         this.filter_su_status = "";
         this.fetch();
-        
     }
 
 
-
     handlePageSizeClick(e){
-
         e.preventDefault()
-
         if(e.target.value > 0){
             this.page_prev = 0;
             this.page_current = 1;
@@ -101,33 +83,25 @@ class UserStore{
             this.page_size = e.target.value;
             this.fetch();
         }
-
     }
 
 
-
     handlePaginationClick(e, page_current){
-
         e.preventDefault()
-
         if(page_current > 0 && page_current <= this.page_limit){
             this.page_prev = page_current - 1;
             this.page_current = page_current;
             this.page_next = page_current + 1;
             this.fetch();
         }
-
     }
 
 
-
     handleFilterSubmit(){
-
         this.page_prev = 0;
         this.page_current = 1;
         this.page_next = 2;
-        this.fetch() 
-
+        this.fetch();
     }
 
 

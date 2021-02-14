@@ -8,7 +8,7 @@ import eventBus from '../Utils/EventBus'
 import { SelectDefault } from '../Utils/Forms/FilterInputs'
 
 
-const UserListFilter = observer(({ userStore }) => {
+const UserListFilterModal = observer(({ userStore }) => {
 
 
 
@@ -71,4 +71,4 @@ const UserListFilter = observer(({ userStore }) => {
 });
 
 
-export default UserListFilter
+export default UserListFilterModal
