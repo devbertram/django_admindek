@@ -7,7 +7,6 @@ import { observer } from 'mobx-react'
 
 import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
-
 import UserListFilterModal from './UserListFilterModalComp'
 import UserCreateModal from './UserCreateModalComp'
 
@@ -43,9 +42,9 @@ const UserList = observer(({ userStore }) => {
 
                 let last_login = moment(val.last_login).format("MM/DD/YYYY hh:mm A")
                 let date_joined = moment(val.date_joined).format("MM/DD/YYYY hh:mm A")
-
+                
                 table_rows.push(
-                    <tr key={key}>
+                    <tr key={key} className={ val.id == userStore.selected_user ? "table-success" : "" }>
                         <td className="align-middle">{ val.username }</td>
                         <td className="align-middle">{ val.fullname }</td>
                         <td className="align-middle">{ val.is_active == true ? <label className="label label-success">online</label> : <label className="label label-danger">offline</label> }</td>
@@ -128,6 +127,16 @@ const UserList = observer(({ userStore }) => {
                                     { getTableRows() }
                                 </tbody>
                             </table>
+                        </div>
+
+                        <div className="table-responsive mt-3" 
+                             style={ userStore.is_loading == true ? {} : { display:"none", }}>
+                            <center><h4>Loading ...</h4></center>
+                        </div>
+        
+                        <div className="table-responsive mt-3" 
+                             style={ userStore.is_loading == false && userStore.list.length == 0 ? {} : { display:"none", }}>
+                            <center><h4>No records found!</h4></center>
                         </div>
 
 

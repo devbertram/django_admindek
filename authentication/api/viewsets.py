@@ -7,7 +7,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .serializers import UserRouteSerializer, UserSerializer, UserCreateSerializer
+from .serializers import UserRouteSerializer, UserSerializer, UserFormSerializer
 from .pagination import UserListPagination
 
 
@@ -58,11 +58,13 @@ class UserViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
         
 
+
     def create(self, request):
-        serializer = UserCreateSerializer(data=request.data)
+
+        serializer = UserFormSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.create(request.data)
-        return Response(serializer.data, 201)
+        user_instance = serializer.create(request.data)
+        return Response({"id": user_instance.id}, 201)
 
 
 

@@ -54,14 +54,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 
-class UserCreateSerializer(serializers.ModelSerializer): 
+class UserFormSerializer(serializers.ModelSerializer): 
 
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'username', 'password')
+        fields = ('id', 'first_name', 'last_name', 'email', 'username', 'password')
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -74,9 +74,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
             last_name=validated_data['last_name'],
             email=validated_data['email'],
             username=validated_data['username'],
+            is_staff=False,
+            is_active=False,
+            is_superuser=False,
         )
-
         user.set_password(validated_data['password'])
         user.save()
-
         return user

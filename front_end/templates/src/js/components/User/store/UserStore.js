@@ -15,10 +15,16 @@ class UserStore{
     filter_online_status = ""; // filter
     filter_su_status = ""; // filter
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
-
+    selected_user = 0; // selected user id after create or update
+    is_loading = false;
     
     constructor(){
         makeAutoObservable(this)
+    }
+
+
+    setSelectedUser(id){
+        this.selected_user = id;
     }
 
 
@@ -33,6 +39,9 @@ class UserStore{
 
 
     fetch(){
+
+        this.is_loading = true;
+
         axios.get('api/user', { 
             params: { 
                 q: this.query, 
@@ -48,6 +57,9 @@ class UserStore{
                 this.page_limit = Math.ceil(response.data.count / this.page_size);
             })
         });
+
+        this.is_loading = false;
+
     }
 
 
@@ -70,6 +82,7 @@ class UserStore{
         this.query = "";
         this.filter_online_status = "";
         this.filter_su_status = "";
+        this.selected_user = 0;
         this.fetch();
     }
 

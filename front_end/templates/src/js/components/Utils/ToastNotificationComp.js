@@ -13,23 +13,44 @@ function ToastNotification(props){
         
         eventBus.on("SHOW_TOAST_NOTIFICATION", (data) => {
 
-            store.addNotification({
-                title: data.title,
-                message: data.message,
-                type: data.type,
-                insert: "top",
-                container: "top-right",
-                animationIn: ["animate__animated", "animate__slideInRight"],
-                animationOut: ["animate__animated", "animate__slideOutRight"], 
-                width: 400,
-                dismiss: {
-                  duration: 4000,
-                  onScreen: true,
-                  pauseOnHover: true,
-                  click: true,
-                  showIcon: true
+            let icon = "";
+
+            switch (data.type) {
+                case "success":
+                    icon = "fa fa-check"
+                    break;
+                case "danger":
+                    icon = "fa fa-ban"
+                    break;
+                case "warning":
+                    icon = "fa fa-warning"
+                    break;
+                case "info":
+                    icon = "fa fa-info-circle"
+                    break;
+                default:
+                    break;
+            }
+
+            $.growl(
+                { 
+                    icon: icon,
+                    title: " ",
+                    message: data.message 
+                },
+                {
+                    type: data.type,
+                    allow_dismiss: true,
+                    placement: { from: "top", align: "right" },
+                    offset: { x: 30, y: 30 },
+                    spacing: 10,
+                    z_index: 999999,
+                    delay: 4500,
+                    mouse_over: false,
+                    animate: { enter: "animated fadeInRight", exit: "animated fadeOutRight" },
+                    icon_type: "class",
                 }
-            });
+            );
             
         });
 
@@ -38,10 +59,11 @@ function ToastNotification(props){
         }
 
     });
+    
 
-    return (
-        <ReactNotification />
-    );
+    return (null)
+
+
 }
 
 
