@@ -5,7 +5,9 @@ import { observer } from 'mobx-react'
 import eventBus from '../Utils/EventBus'
 
 import { InputTextInline } from '../Utils/Forms/InlineInputs'
+import Select from 'react-select'
 import DivLoader from '../Utils/DivLoaderComp'
+
 
 
 const UserCreateModal = observer(({ userStore }) => {
@@ -16,10 +18,23 @@ const UserCreateModal = observer(({ userStore }) => {
     const[username, SetUsername] = useState("");
     const[password, SetPassword] = useState("");
     const[password_confirm, SetPasswordConfirm] = useState("");
-    const[routes, SetRoutes] = useState([]);
+    const[routes, SetRoutes] = useState();
     const[error_fields, SetErrorFields] = useState({ firstname: "", lastname: "",  email: "", username: "", password: ""});
 
     const [loader, SetLoader] = useState(false);
+
+    const options = [
+        { value: 'chocolate', label: 'Chocolate' },
+        { value: 'strawberry', label: 'Strawberry' },
+        { value: 'vanilla', label: 'Vanilla' }
+    ]
+
+
+    const handleMultiSelectChange = (values) => {
+
+        SetRoutes(values)
+
+    }
 
 
     const handleResetForm = (e) => {
@@ -33,15 +48,6 @@ const UserCreateModal = observer(({ userStore }) => {
         SetPassword("")
         SetPasswordConfirm("")
         SetErrorFields({})
-
-    }
-
-
-    const handleRouteSelectChange = (e) => {
-
-        e.preventDefault()
-
-        console.log('test')
 
     }
 
@@ -190,29 +196,23 @@ const UserCreateModal = observer(({ userStore }) => {
 
 
                         <div className="col-sm-12 mt-4">
-                            <h4 className="sub-title">User Routes</h4>
-                            <button type="button"
-                                    className="btn btn-primary waves-effect waves-light m-b-10 mr-2" 
-                                    id="select-all">
-                                select all
-                            </button>
-                            <button type="button"
-                                    className="btn btn-primary waves-effect waves-light m-b-10" 
-                                    id="deselect-all">
-                                deselect all
-                            </button>
-                            <select id="public-methods" value={ routes } onChange={ handleRouteSelectChange } multiple>
-                                <option value="elem_1">elem 1</option>
-                                <option value="elem_2">elem 2</option>
-                                <option value="elem_3">elem 3</option>
-                                <option value="elem_4">elem 4</option>
-                                <option value="elem_5">elem 5</option>
-                                <option value="elem_6">elem 6</option>
-                                <option value="elem_7">elem 7</option>
-                                <option value="elem_8">elem 8</option>
-                                <option value="elem_9">elem 9</option>
-                                <option value="elem_10">elem 10</option>
-                            </select>
+
+                            <div className="form-group row">
+                                <label className="col-sm-2 col-form-label">Routes / Modules</label>
+                                <div className="col-sm-10">
+                                    <Select 
+                                        options={options} 
+                                        isMulti
+                                        name="colors"
+                                        className="basic-multi-select"
+                                        classNamePrefix="select"
+                                        closeMenuOnSelect={false}
+                                        value={ routes }
+                                        onChange={ handleMultiSelectChange }
+                                    />
+                                </div>
+                            </div>
+
                         </div>
 
 
