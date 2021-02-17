@@ -18,8 +18,6 @@ const UserCreateModal = observer(({ userStore }) => {
     const[username, SetUsername] = useState("");
     const[password, SetPassword] = useState("");
     const[password_confirm, SetPasswordConfirm] = useState("");
-    const[user_routes, SetUserRoutes] = useState();
-    const[user_subroutes, SetUserSubroutes] = useState();
 
     const[error_fields, SetErrorFields] = useState({ 
         firstname: "", lastname: "",  email: "", username: "", password: "", user_routes:"", user_subroutes:"", 
@@ -45,13 +43,13 @@ const UserCreateModal = observer(({ userStore }) => {
 
 
     const handleUserRouteMultiSelectChange = (values) => {
-        SetUserRoutes(values)
+        userStore.setUserRoutes(values)
     }
 
 
-
+    
     const handleUserSubrouteMultiSelectChange = (values) => {
-        SetUserSubroutes(values)
+        userStore.setUserSubroutes(values)
     }
 
 
@@ -65,8 +63,8 @@ const UserCreateModal = observer(({ userStore }) => {
         SetPassword("")
         SetPasswordConfirm("")
         SetErrorFields({})
-        SetUserRoutes([])
-        SetUserSubroutes([])
+        userStore.setUserRoutes([])
+        userStore.setUserSubroutes([])
 
     }
 
@@ -92,8 +90,8 @@ const UserCreateModal = observer(({ userStore }) => {
                 email : email,
                 username : username, 
                 password : password, 
-                user_routes : user_routes,
-                user_subroutes : user_subroutes,
+                user_routes : userStore.user_routes,
+                user_subroutes : userStore.user_subroutes,
 
             }).then((response) => {
 
@@ -242,7 +240,7 @@ const UserCreateModal = observer(({ userStore }) => {
                                         className="basic-multi-select"
                                         classNamePrefix="select"
                                         closeMenuOnSelect={false}
-                                        value={user_routes}
+                                        value={userStore.user_routes}
                                         onChange={handleUserRouteMultiSelectChange}
                                     />
                                 </div>
@@ -258,7 +256,7 @@ const UserCreateModal = observer(({ userStore }) => {
                                         className="basic-multi-select"
                                         classNamePrefix="select"
                                         closeMenuOnSelect={false}
-                                        value={user_subroutes}
+                                        value={userStore.user_subroutes}
                                         onChange={handleUserSubrouteMultiSelectChange}
                                     />
                                 </div>

@@ -19,11 +19,43 @@ class UserStore{
     is_loading = false;
 
     // User Create
+    user_routes = [];
+    user_subroutes = [];
     user_route_options = [];
     user_subroute_options = [];
     
     constructor(){
         makeAutoObservable(this)
+    }
+
+
+    setUserRoutes(array){
+
+        this.user_subroute_options = [];
+
+        array.forEach(data => {
+            
+            axios.get('api/route/' + data['value'])
+                 .then((response) => {
+                    let subroutes = response.data.subroute_route;
+                    if(subroutes.length > 0){
+                        runInAction(() => {
+                            subroutes.forEach(data_subroute => {
+                                this.user_subroute_options.push({ value:data_subroute.id, label:data_subroute.name });
+                            });
+                        })
+                    }
+                 });
+
+        });
+
+        this.user_routes = array;
+
+    }
+
+
+    setUserSubroutes(array){
+        this.user_subroutes = array;
     }
 
 
@@ -37,7 +69,9 @@ class UserStore{
                         array.push({value:data.id, label:data.name})
                     });
                 }
-                this.user_route_options = array;
+                runInAction(() => {
+                    this.user_route_options = array;
+                })
              });
     }
 
