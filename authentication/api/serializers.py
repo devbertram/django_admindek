@@ -101,18 +101,22 @@ class UserFormSerializer(serializers.ModelSerializer):
 
         #insert User Routes
         for user_route in user_routes:
+
             user_route = UserRoute.objects.create(
                 route_id=user_route['value'],
                 user_id=user.id,
             )
             user_route.save()
-            
-        #insert User Subroutes
-        for user_subroute in user_subroutes:
-            user_subroute = UserSubroute.objects.create(
-                subroute_id=user_subroute['value'],
-                user_id=user.id,
-            )
-            user_subroute.save()
+
+            #insert User Subroutes
+            for user_subroute in user_subroutes:
+                subroute = Subroute.objects.all().get(id=user_subroute['value'])
+                if subroute.route_id == user_route.route_id:
+                    user_subroute = UserSubroute.objects.create(
+                        user_route_id=user_route.id,
+                        subroute_id=user_subroute['value'],
+                        user_id=user.id,
+                    )
+                    user_subroute.save()
             
         return user
