@@ -17,9 +17,33 @@ class UserStore{
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
     selected_user = 0; // selected user id after create or update
     is_loading = false;
+
+    // User Create
+    user_route_options = [];
+    user_subroute_options = [];
     
     constructor(){
         makeAutoObservable(this)
+    }
+
+
+    setUserRouteOptions(){
+        axios.get('api/route/get_all')
+             .then((response) => {
+                let routes = response.data; 
+                let array = [];
+                if(routes.length > 0){
+                    routes.forEach(data => {
+                        array.push({value:data.id, label:data.name})
+                    });
+                }
+                this.user_route_options = array;
+             });
+    }
+
+
+    setUserSubrouteOptions(array){
+        this.user_subroute_options = array;
     }
 
 

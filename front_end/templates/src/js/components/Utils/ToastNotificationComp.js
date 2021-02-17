@@ -3,10 +3,6 @@ import React, { useEffect } from "react";
 import ReactDOM from 'react-dom';
 import eventBus from "./EventBus";
 
-import ReactNotification, { store } from 'react-notifications-component'
-import 'react-notifications-component/dist/theme.css'
-import 'animate.css/animate.min.css';
-
 function ToastNotification(props){ 
 
     useEffect(() => {
@@ -29,6 +25,7 @@ function ToastNotification(props){
                     icon = "fa fa-info-circle"
                     break;
                 default:
+                    icon = ""
                     break;
             }
 

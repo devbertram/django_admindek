@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-
 from django.utils.timezone import now
 
 
@@ -25,7 +24,6 @@ class Route(models.Model):
 
 
 
-
 class Subroute(models.Model):
 
     route = models.ForeignKey(Route, related_name='subroute_route', on_delete=models.CASCADE)
@@ -40,7 +38,6 @@ class Subroute(models.Model):
 
 
 
-    
 class UserRoute(models.Model):
     
     user = models.ForeignKey(User, related_name='userRoute_user', on_delete=models.CASCADE)
@@ -50,7 +47,6 @@ class UserRoute(models.Model):
         return self.user.first_name +" - "+ self.route.name
 
 
-    
     
 class UserSubroute(models.Model):
     

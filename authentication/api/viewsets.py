@@ -1,5 +1,5 @@
 
-from authentication.models import UserRoute
+from authentication.models import Route, UserRoute
 from django.contrib.auth.models import User
 
 from django.db.models import Q
@@ -7,8 +7,26 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .serializers import UserRouteSerializer, UserSerializer, UserFormSerializer
+from .serializers import RouteSerializer, UserRouteSerializer, UserSerializer, UserFormSerializer
 from .pagination import UserListPagination
+
+
+
+class RouteViewSet(viewsets.ModelViewSet):
+    
+    queryset = Route.objects.all()
+    serializer_class = RouteSerializer
+
+    def retrieve(self, request, pk=None):
+        route = self.queryset.get(id=pk)
+        serializer = self.get_serializer(route)
+        return Response(serializer.data)
+
+
+    @action(methods=['get'], detail=False)
+    def get_all(self, request):
+        serializer = self.get_serializer(self.queryset, many=True)
+        return Response(serializer.data)
 
 
 
@@ -27,7 +45,6 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.only('id', 'username', 'is_active', 'last_login', 'date_joined')
     serializer_class = UserSerializer
     pagination_class = UserListPagination
-
 
 
     def list(self, request):
@@ -58,13 +75,12 @@ class UserViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
         
 
-
     def create(self, request):
 
         serializer = UserFormSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user_instance = serializer.create(request.data)
-        return Response({"id": user_instance.id}, 201)
+        user = serializer.create(request.data)
+        return Response({"id": user.id}, 201)
 
 
 

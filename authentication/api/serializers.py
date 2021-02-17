@@ -4,19 +4,22 @@ from authentication.models import Route, Subroute, UserRoute, UserSubroute
 from django.contrib.auth.models import User
 
 
-class RouteSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Route
-        fields = ('category', 'name', 'nav_name', 'url', 'url_name', 'icon', 'is_menu', 'is_dropdown')
-
-
 
 class SubrouteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subroute
-        fields = ('is_nav', 'name', 'nav_name', 'url', 'url_name')
+        fields = ('id', 'is_nav', 'name', 'nav_name', 'url', 'url_name')
+
+
+
+class RouteSerializer(serializers.ModelSerializer):
+
+    subroute_route = SubrouteSerializer(many=True)
+    
+    class Meta:
+        model = Route
+        fields = ('id', 'category', 'name', 'nav_name', 'url', 'url_name', 'icon', 'is_menu', 'is_dropdown', 'subroute_route')
 
 
 
@@ -27,6 +30,13 @@ class UserSubrouteSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSubroute
         fields = ('subroute',)
+        
+
+
+class UserSubrouteFormSerializer(serializers.Serializer):
+    
+    value = serializers.IntegerField(required=True)
+    label = serializers.CharField(required=True, max_length=100)
 
 
 
@@ -38,6 +48,13 @@ class UserRouteSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserRoute
         fields = ('route', 'userSubroute_userRoute')
+
+
+
+class UserRouteFormSerializer(serializers.Serializer):
+    
+    value = serializers.IntegerField(required=True)
+    label = serializers.CharField(required=True, max_length=100)
 
 
 
@@ -56,19 +73,20 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserFormSerializer(serializers.ModelSerializer): 
 
-    first_name = serializers.CharField(required=True)
-    last_name = serializers.CharField(required=True)
+    user_routes = UserRouteFormSerializer(many=True)
+    user_subroutes = UserSubrouteFormSerializer(many=True)
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'username', 'password')
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
-
+        fields = ('first_name', 'last_name', 'email', 'username', 'password', 'user_routes', 'user_subroutes')
+        extra_kwargs = { 'password': {'write_only': True} }
 
     def create(self, validated_data):
+        
+        user_routes = validated_data['user_routes']
+        user_subroutes = validated_data['user_subroutes']
 
+        #Insert User
         user = User.objects.create(
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
@@ -80,4 +98,21 @@ class UserFormSerializer(serializers.ModelSerializer):
         )
         user.set_password(validated_data['password'])
         user.save()
+
+        #insert User Routes
+        for user_route in user_routes:
+            user_route = UserRoute.objects.create(
+                route_id=user_route['value'],
+                user_id=user.id,
+            )
+            user_route.save()
+            
+        #insert User Subroutes
+        for user_subroute in user_subroutes:
+            user_subroute = UserSubroute.objects.create(
+                subroute_id=user_subroute['value'],
+                user_id=user.id,
+            )
+            user_subroute.save()
+            
         return user

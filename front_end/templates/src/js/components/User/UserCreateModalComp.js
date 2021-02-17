@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { observer } from 'mobx-react'
 import eventBus from '../Utils/EventBus'
 
@@ -18,28 +18,45 @@ const UserCreateModal = observer(({ userStore }) => {
     const[username, SetUsername] = useState("");
     const[password, SetPassword] = useState("");
     const[password_confirm, SetPasswordConfirm] = useState("");
-    const[routes, SetRoutes] = useState();
-    const[error_fields, SetErrorFields] = useState({ firstname: "", lastname: "",  email: "", username: "", password: ""});
+    const[user_routes, SetUserRoutes] = useState();
+    const[user_subroutes, SetUserSubroutes] = useState();
+
+    const[error_fields, SetErrorFields] = useState({ 
+        firstname: "", lastname: "",  email: "", username: "", password: "", user_routes:"", user_subroutes:"", 
+    });
 
     const [loader, SetLoader] = useState(false);
 
-    const options = [
-        { value: 'chocolate', label: 'Chocolate' },
-        { value: 'strawberry', label: 'Strawberry' },
-        { value: 'vanilla', label: 'Vanilla' }
-    ]
+    
+    useEffect (() => {
+        
+        let is_mounted = true;
+
+        if(is_mounted = true){
+            userStore.setUserRouteOptions();
+        }
+
+        return () => {
+            is_mounted = false;
+        } 
+
+    },[])
 
 
-    const handleMultiSelectChange = (values) => {
 
-        SetRoutes(values)
-
+    const handleUserRouteMultiSelectChange = (values) => {
+        SetUserRoutes(values)
     }
 
 
-    const handleResetForm = (e) => {
 
-        e.preventDefault()
+    const handleUserSubrouteMultiSelectChange = (values) => {
+        SetUserSubroutes(values)
+    }
+
+
+
+    const handleResetForm = () => {
 
         SetFirstname("")
         SetLastname("")
@@ -48,15 +65,16 @@ const UserCreateModal = observer(({ userStore }) => {
         SetPassword("")
         SetPasswordConfirm("")
         SetErrorFields({})
+        SetUserRoutes([])
+        SetUserSubroutes([])
 
     }
+
 
 
     const handleSave = (e, is_save_another) => {
 
         e.preventDefault()
-
-        console.log(routes)
 
         SetLoader(true)
 
@@ -74,42 +92,56 @@ const UserCreateModal = observer(({ userStore }) => {
                 email : email,
                 username : username, 
                 password : password, 
+                user_routes : user_routes,
+                user_subroutes : user_subroutes,
 
             }).then((response) => {
 
-                userStore.fetch()
-                userStore.setSelectedUser(response.data.id)
-                SetLoader(false)
-                handleResetForm()
+                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                    message: "User Successfully Created!", type: "inverse" 
+                });
 
-                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", { 
-                    message: "User Successfully Created!", type: "success" 
-                })
+                userStore.fetch();
+                userStore.setSelectedUser(response.data.id);
+
+                SetLoader(false);
+                handleResetForm();
 
                 if (is_save_another == 0){
-                    $("#user-create-modal").modal('hide')
+                    $("#user-create-modal").modal('hide');
                 }
 
             }).catch((error) => {
 
-                let field_errors = error.response.data;
+                if(error.response.status == 400){
 
-                SetErrorFields({
-                    firstname: field_errors.first_name?.toString(),
-                    lastname: field_errors.last_name?.toString(),
-                    email: field_errors.email?.toString(),
-                    username: field_errors.username?.toString(),
-                    password: field_errors.password?.toString(),
-                })
+                    let field_errors = error.response.data;
+    
+                    SetErrorFields({
+                        firstname: field_errors.first_name?.toString(),
+                        lastname: field_errors.last_name?.toString(),
+                        email: field_errors.email?.toString(),
+                        username: field_errors.username?.toString(),
+                        password: field_errors.password?.toString(),
+                        user_routes: field_errors.user_routes?.toString(),
+                        user_subroutes: field_errors.user_subroutes?.toString(),
+                    });
 
-                SetLoader(false)
-                
+                }
+
+                if(error.response.status == 500){
+
+                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                        message: "There's an error trying to send data to the server!", type: "danger" 
+                    });
+
+                }
+    
+                SetLoader(false);
             });
 
 
         }
-
-
 
     }
 
@@ -135,6 +167,7 @@ const UserCreateModal = observer(({ userStore }) => {
                     <div className="modal-body">
 
                         <div className="col-sm-12">
+
                             <h4 className="sub-title">User Details</h4>
 
                             <InputTextInline 
@@ -197,18 +230,36 @@ const UserCreateModal = observer(({ userStore }) => {
 
                         <div className="col-sm-12 mt-4">
 
+                            <h4 className="sub-title">User Permissions</h4>
+
                             <div className="form-group row">
-                                <label className="col-sm-2 col-form-label">Routes / Modules</label>
+                                <label className="col-sm-2 col-form-label mt-1">Modules:</label>
                                 <div className="col-sm-10">
                                     <Select 
-                                        options={options} 
+                                        options={userStore.user_route_options} 
                                         isMulti
                                         name="colors"
                                         className="basic-multi-select"
                                         classNamePrefix="select"
                                         closeMenuOnSelect={false}
-                                        value={ routes }
-                                        onChange={ handleMultiSelectChange }
+                                        value={user_routes}
+                                        onChange={handleUserRouteMultiSelectChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group row">
+                                <label className="col-sm-2 col-form-label mt-1">Sub Modules:</label>
+                                <div className="col-sm-10">
+                                    <Select 
+                                        options={userStore.user_subroute_options} 
+                                        isMulti
+                                        name="colors"
+                                        className="basic-multi-select"
+                                        classNamePrefix="select"
+                                        closeMenuOnSelect={false}
+                                        value={user_subroutes}
+                                        onChange={handleUserSubrouteMultiSelectChange}
                                     />
                                 </div>
                             </div>
