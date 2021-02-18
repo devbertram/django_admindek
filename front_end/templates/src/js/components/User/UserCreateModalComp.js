@@ -247,7 +247,7 @@ const UserCreateModal = observer(({ userStore }) => {
                             </div>
 
                             <div className="form-group row">
-                                <label className="col-sm-2 col-form-label mt-1">Sub Modules:</label>
+                                <label className="col-sm-2 col-form-label mt-1">Permissions:</label>
                                 <div className="col-sm-10">
                                     <Select 
                                         options={userStore.user_subroute_options} 

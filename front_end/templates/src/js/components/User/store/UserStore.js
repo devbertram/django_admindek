@@ -31,26 +31,73 @@ class UserStore{
 
     setUserRoutes(array){
 
-        this.user_subroute_options = [];
+        let existing = this.getUserRouteValues();
+        let passed = this.getUserRoutePassedValues(array);
+        let diff = [];
 
-        array.forEach(data => {
-            
-            axios.get('api/route/' + data['value'])
-                 .then((response) => {
-                    let subroutes = response.data.subroute_route;
-                    if(subroutes.length > 0){
-                        runInAction(() => {
+        if(existing.length < passed.length ){
+
+            diff = passed.filter(x => !existing.includes(x));
+
+            axios.get('api/route/' + diff)
+                .then((response) => {
+                    runInAction(() => {
+                        let subroutes = response.data.subroute_route;
+                        if(subroutes.length > 0){
                             subroutes.forEach(data_subroute => {
-                                this.user_subroute_options.push({ value:data_subroute.id, label:data_subroute.name });
+                                let obj = { value:data_subroute.id, label:data_subroute.name };
+                                this.user_subroute_options.push(obj);
                             });
-                        })
-                    }
-                 });
+                        }
+                    })
+                });
 
-        });
+        }
+
+        if(existing.length > passed.length ){
+
+            diff = existing.filter(x => !passed.includes(x));
+
+            axios.get('api/route/' + diff)
+                .then((response) => {
+                    runInAction(() => {
+                        let subroutes = response.data.subroute_route;
+                        if(subroutes.length > 0){
+                            subroutes.forEach(data_subroute => {
+                                this.removeObjectFromUserSubroute(data_subroute.id)
+                            });
+                        }
+                    })
+                });
+                
+        }
 
         this.user_routes = array;
 
+    }
+
+
+    removeObjectFromUserSubroute(value){
+        for (var i=0; i < this.user_subroute_options.length; i++){
+            if (this.user_subroute_options[i].value === value) {
+                this.user_subroute_options.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+
+    getUserRouteValues(){
+        let array = [];
+        this.user_routes.forEach(data => array.push(data.value))
+        return array;
+    }
+
+
+    getUserRoutePassedValues(values){
+        let array = [];
+        values.forEach(data => array.push(data.value))
+        return array;
     }
 
 
