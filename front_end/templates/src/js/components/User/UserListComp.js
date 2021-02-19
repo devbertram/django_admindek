@@ -51,7 +51,7 @@ const UserList = observer(({ userStore }) => {
                         <td className="align-middle">{ last_login }</td>
                         <td className="align-middle">{ date_joined }</td>
                         <td className="align-middle">
-                            <button className="btn btn-primary btn-sm" type="button">
+                            <button className="btn btn-primary btn-sm" type="button" onClick={ (e) => handleEditButtonClick(e, val.id) }>
                                 <i className="fa fa-pencil ml-1"></i>
                             </button>
                             <button className="btn btn-danger btn-sm ml-1" type="button">
@@ -72,6 +72,13 @@ const UserList = observer(({ userStore }) => {
 
 
     const handleAddButtonClick = (e) => {
+        e.preventDefault()
+        $("#user-create-modal").modal('toggle')
+    }
+
+
+
+    const handleEditButtonClick = (e, id) => {
         e.preventDefault()
         $("#user-create-modal").modal('toggle')
     }

@@ -73,13 +73,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserFormSerializer(serializers.ModelSerializer): 
 
-    user_routes = UserRouteFormSerializer(many=True)
-    user_subroutes = UserSubrouteFormSerializer(many=True)
+    user_routes = UserRouteFormSerializer(many=True, required=True)
+    user_subroutes = UserSubrouteFormSerializer(many=True, required=True)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'email', 'username', 'password', 'user_routes', 'user_subroutes')
-        extra_kwargs = { 'password': {'write_only': True} }
 
     def create(self, validated_data):
         
@@ -100,23 +100,24 @@ class UserFormSerializer(serializers.ModelSerializer):
         user.save()
 
         #insert User Routes
-        for user_route in user_routes:
+        if user_routes:
+            for user_route in user_routes:
+                user_route = UserRoute.objects.create(
+                    route_id=user_route['value'],
+                    user_id=user.id,
+                )
+                user_route.save()
 
-            user_route = UserRoute.objects.create(
-                route_id=user_route['value'],
-                user_id=user.id,
-            )
-            user_route.save()
-
-            #insert User Subroutes
-            for user_subroute in user_subroutes:
-                subroute = Subroute.objects.all().get(id=user_subroute['value'])
-                if subroute.route_id == user_route.route_id:
-                    user_subroute = UserSubroute.objects.create(
-                        user_route_id=user_route.id,
-                        subroute_id=user_subroute['value'],
-                        user_id=user.id,
-                    )
-                    user_subroute.save()
+                #insert User Subroutes
+                if user_subroutes:
+                    for user_subroute in user_subroutes:
+                        subroute = Subroute.objects.all().get(id=user_subroute['value'])
+                        if subroute.route_id == user_route.route_id:
+                            user_subroute = UserSubroute.objects.create(
+                                user_route_id=user_route.id,
+                                subroute_id=user_subroute['value'],
+                                user_id=user.id,
+                            )
+                            user_subroute.save()
             
         return user

@@ -12,8 +12,8 @@ class UserStore{
     page_size = 10;
     page_limit = 0;
     query = "";
-    filter_online_status = ""; // filter
-    filter_su_status = ""; // filter
+    filter_online_status = { value:"", label:"Select" }; // filter
+    filter_su_status = { value:"", label:"Select" }; // filter
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
     selected_user = 0; // selected user id after create or update
     is_loading = false;
@@ -21,9 +21,10 @@ class UserStore{
     // User Create
     user_routes = [];
     user_subroutes = [];
-    user_route_options = [];
-    user_subroute_options = [];
+    route_options = [];
+    subroute_options = [];
     
+
     constructor(){
         makeAutoObservable(this)
     }
@@ -34,42 +35,36 @@ class UserStore{
         let existing = this.getUserRouteValues();
         let passed = this.getUserRoutePassedValues(array);
         let diff = [];
-
+        
         if(existing.length < passed.length ){
-
             diff = passed.filter(x => !existing.includes(x));
-
-            axios.get('api/route/' + diff)
-                .then((response) => {
-                    runInAction(() => {
+            if(diff.length === 1){
+                axios.get('api/route/' + diff.toString())
+                    .then((response) => {
                         let subroutes = response.data.subroute_route;
                         if(subroutes.length > 0){
                             subroutes.forEach(data_subroute => {
-                                let obj = { value:data_subroute.id, label:data_subroute.name };
-                                this.user_subroute_options.push(obj);
+                                this.subroute_options.push({ value:data_subroute.id, label:data_subroute.name });
                             });
                         }
-                    })
-                });
-
+                    });
+            }
         }
-
+        
         if(existing.length > passed.length ){
-
             diff = existing.filter(x => !passed.includes(x));
-
-            axios.get('api/route/' + diff)
-                .then((response) => {
-                    runInAction(() => {
+            if(diff.length === 1){
+                axios.get('api/route/' + diff.toString())
+                    .then((response) => {
                         let subroutes = response.data.subroute_route;
                         if(subroutes.length > 0){
                             subroutes.forEach(data_subroute => {
-                                this.removeObjectFromUserSubroute(data_subroute.id)
+                                this.removeObjectFromSubrouteOptions(data_subroute.id)
+                                this.removeObjectFromUserSubroutes(data_subroute.id)
                             });
                         }
-                    })
-                });
-                
+                    });
+            }
         }
 
         this.user_routes = array;
@@ -77,21 +72,13 @@ class UserStore{
     }
 
 
-    removeObjectFromUserSubroute(value){
-        for (var i=0; i < this.user_subroute_options.length; i++){
-            if (this.user_subroute_options[i].value === value) {
-                this.user_subroute_options.splice(i, 1);
-                break;
-            }
-        }
-    }
-
-
+    
     getUserRouteValues(){
         let array = [];
         this.user_routes.forEach(data => array.push(data.value))
         return array;
     }
+
 
 
     getUserRoutePassedValues(values){
@@ -101,12 +88,48 @@ class UserStore{
     }
 
 
+
+    removeObjectFromSubrouteOptions(value){
+
+        for (var i=0; i < this.subroute_options.length; i++){
+            if (this.subroute_options[i].value === value) {
+                this.subroute_options.splice(i, 1);
+                break;
+            }
+        }
+
+    }
+
+
+
+    removeObjectFromUserSubroutes(value){
+
+        let user_subroutes = [];
+
+        this.user_subroutes.forEach(data => {
+            user_subroutes.push({value:data.value, label:data.label})
+        })
+
+        for (var i=0; i < user_subroutes.length; i++){
+            if (user_subroutes[i].value === value) {
+                user_subroutes.splice(i, 1);
+                break;
+            }
+        }
+        
+        this.user_subroutes = user_subroutes;
+
+    }
+
+
+
     setUserSubroutes(array){
         this.user_subroutes = array;
     }
 
 
-    setUserRouteOptions(){
+
+    setRouteOptions(){
         axios.get('api/route/get_all')
              .then((response) => {
                 let routes = response.data; 
@@ -117,15 +140,17 @@ class UserStore{
                     });
                 }
                 runInAction(() => {
-                    this.user_route_options = array;
+                    this.route_options = array;
                 })
              });
     }
 
 
-    setUserSubrouteOptions(array){
-        this.user_subroute_options = array;
+
+    setSubrouteOptions(array){
+        this.subroute_options = array;
     }
+
 
 
     setSelectedUser(id){
@@ -133,14 +158,17 @@ class UserStore{
     }
 
 
-    setFilterSUStatus(su_status){
-        this.filter_su_status = su_status;
-    }
-
 
     setFilterOnlineStatus(online_status){
         this.filter_online_status = online_status;
     }
+
+
+
+    setFilterSUStatus(su_status){
+        this.filter_su_status = su_status;
+    }
+
 
 
     fetch(){
@@ -152,8 +180,8 @@ class UserStore{
                 q: this.query, 
                 page_size: this.page_size, 
                 page: this.page_current, 
-                os: this.filter_online_status, 
-                sus: this.filter_su_status 
+                os: this.filter_online_status.value,
+                sus: this.filter_su_status.value
             }
         }).then((response) => {
             runInAction(() => {
@@ -168,6 +196,7 @@ class UserStore{
     }
 
 
+
     handleSearch(e){
         e.preventDefault()
         this.page_prev = 0;
@@ -176,6 +205,7 @@ class UserStore{
         this.query = e.target.value;
         this.delaySearch();
     }
+
 
 
     handleRefreshClick(e){
@@ -192,6 +222,7 @@ class UserStore{
     }
 
 
+
     handlePageSizeClick(e){
         e.preventDefault()
         if(e.target.value > 0){
@@ -204,6 +235,7 @@ class UserStore{
     }
 
 
+
     handlePaginationClick(e, page_current){
         e.preventDefault()
         if(page_current > 0 && page_current <= this.page_limit){
@@ -213,6 +245,7 @@ class UserStore{
             this.fetch();
         }
     }
+
 
 
     handleFilterSubmit(){

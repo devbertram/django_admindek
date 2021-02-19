@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { observer } from 'mobx-react'
 import eventBus from '../Utils/EventBus'
 
-import { InputTextInline } from '../Utils/Forms/InlineInputs'
-import Select from 'react-select'
+import { InputTextInline, SelectMultiInline } from '../Utils/Forms/InlineInputs'
 import DivLoader from '../Utils/DivLoaderComp'
 
 
@@ -31,7 +30,7 @@ const UserCreateModal = observer(({ userStore }) => {
         let is_mounted = true;
 
         if(is_mounted = true){
-            userStore.setUserRouteOptions();
+            userStore.setRouteOptions();
         }
 
         return () => {
@@ -65,6 +64,7 @@ const UserCreateModal = observer(({ userStore }) => {
         SetErrorFields({})
         userStore.setUserRoutes([])
         userStore.setUserSubroutes([])
+        userStore.setSubrouteOptions([])
 
     }
 
@@ -148,12 +148,10 @@ const UserCreateModal = observer(({ userStore }) => {
     return (
 
         <div className="modal" id="user-create-modal" role="dialog">
-
             <div className="modal-dialog modal-lg" role="document">
-
                 <div className="modal-content">
 
-                    <DivLoader loading={loader}/>
+                    <DivLoader type="Circles" loading={loader}/>
 
                     <div className="modal-header">
                         <h4 className="modal-title">Add User</h4>
@@ -230,40 +228,30 @@ const UserCreateModal = observer(({ userStore }) => {
 
                             <h4 className="sub-title">User Permissions</h4>
 
-                            <div className="form-group row">
-                                <label className="col-sm-2 col-form-label mt-1">Modules:</label>
-                                <div className="col-sm-10">
-                                    <Select 
-                                        options={userStore.user_route_options} 
-                                        isMulti
-                                        name="colors"
-                                        className="basic-multi-select"
-                                        classNamePrefix="select"
-                                        closeMenuOnSelect={false}
-                                        value={userStore.user_routes}
-                                        onChange={handleUserRouteMultiSelectChange}
-                                    />
-                                </div>
-                            </div>
+                                <SelectMultiInline 
+                                    label="Modules:"
+                                    name="user_routes"
+                                    value={userStore.user_routes}
+                                    errorField={ error_fields.user_routes }
+                                    options={userStore.route_options}
+                                    onChange={handleUserRouteMultiSelectChange}
+                                    closeMenuOnSelect={false}
+                                    defaultMenuIsOpen={false}
 
-                            <div className="form-group row">
-                                <label className="col-sm-2 col-form-label mt-1">Permissions:</label>
-                                <div className="col-sm-10">
-                                    <Select 
-                                        options={userStore.user_subroute_options} 
-                                        isMulti
-                                        name="colors"
-                                        className="basic-multi-select"
-                                        classNamePrefix="select"
-                                        closeMenuOnSelect={false}
-                                        value={userStore.user_subroutes}
-                                        onChange={handleUserSubrouteMultiSelectChange}
-                                    />
-                                </div>
-                            </div>
+                                />
+
+                                <SelectMultiInline 
+                                    label="Permissions:"
+                                    name="user_subroutes"
+                                    value={userStore.user_subroutes}
+                                    errorField={ error_fields.user_subroutes }
+                                    options={userStore.subroute_options}
+                                    onChange={handleUserSubrouteMultiSelectChange}
+                                    closeMenuOnSelect={false}
+                                    defaultMenuIsOpen={false}
+                                />
 
                         </div>
-
 
                     </div>
 

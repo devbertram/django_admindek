@@ -5,11 +5,20 @@ import React from 'react'
 import { observer } from 'mobx-react'
 
 import eventBus from '../Utils/EventBus'
-import { SelectDefault } from '../Utils/Forms/FilterInputs'
+import { SelectFilter } from '../Utils/Forms/FilterInputs'
 
 
 const UserListFilterModal = observer(({ userStore }) => {
 
+
+    const handleOnlineStatusSelectChange = (values) => {
+        userStore.setFilterOnlineStatus(values)
+    }
+
+
+    const handleSUSelectChange = (values) => {
+        userStore.setFilterSUStatus(values)
+    }
 
 
     const handleFilterSubmit = (e) => {
@@ -19,7 +28,6 @@ const UserListFilterModal = observer(({ userStore }) => {
         $("#user-filter-modal").modal('hide')
         eventBus.dispatch("SHOW_FULLPAGE_LOADER", { is_loading: false, is_dashboard: true })
     }
-
 
 
     return (
@@ -38,20 +46,24 @@ const UserListFilterModal = observer(({ userStore }) => {
                     <div className="modal-body">
                         <div className="form-group row">
 
-                            <SelectDefault
+                            <SelectFilter
                                 divColumn="col-md-6"
+                                name="filter_online_status"
                                 label="Online Status:"
-                                list={ [ ['1', 'Online'], ['0', 'Offline'] ] }
                                 value={ userStore.filter_online_status }
-                                setter={ (e) => userStore.setFilterOnlineStatus(e.target.value) }
+                                isDisabled={false}
+                                options={ [{value:"", label:"Select"}, {value:1, label:'Online'}, {value:0, label:'Offline'} ] }
+                                onChange={ handleOnlineStatusSelectChange }
                             />
 
-                            <SelectDefault
+                            <SelectFilter
                                 divColumn="col-md-6"
+                                name="filter_su_status"
                                 label="Super User Status:"
-                                list={ [ ['1', 'Super User'], ['0', 'Normal User'] ] }
-                                value={ userStore.filter_su_status }
-                                setter={ (e) => userStore.setFilterSUStatus(e.target.value) }
+                                value={userStore.filter_su_status}
+                                isDisabled={false}
+                                options={ [{value:"", label:"Select"}, {value:1, label:'Super User'}, {value:0, label:'Normal User'} ] }
+                                onChange={ handleSUSelectChange }
                             />
                             
                         </div>
