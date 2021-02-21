@@ -9,6 +9,7 @@ import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
 import UserListFilterModal from './UserListFilterModalComp'
 import UserCreateModal from './UserCreateModalComp'
+import UserUpdateModal from './UserUpdateModalComp'
 
 
 const UserList = observer(({ userStore }) => {
@@ -16,17 +17,14 @@ const UserList = observer(({ userStore }) => {
 
     
     useEffect (() => {
-        
         let is_mounted = true;
-
         if(is_mounted = true){
             userStore.fetch()
+            userStore.setRouteOptions()
         }
-
         return () => {
             is_mounted = false;
         } 
-
     },[])
 
 
@@ -51,7 +49,7 @@ const UserList = observer(({ userStore }) => {
                         <td className="align-middle">{ last_login }</td>
                         <td className="align-middle">{ date_joined }</td>
                         <td className="align-middle">
-                            <button className="btn btn-primary btn-sm" type="button" onClick={ (e) => handleEditButtonClick(e, val.id) }>
+                            <button className="btn btn-primary btn-sm" type="button" onClick={ (e) => handleUpdateButtonClick(e, val.id) }>
                                 <i className="fa fa-pencil ml-1"></i>
                             </button>
                             <button className="btn btn-danger btn-sm ml-1" type="button">
@@ -71,16 +69,18 @@ const UserList = observer(({ userStore }) => {
 
 
 
-    const handleAddButtonClick = (e) => {
+    const handleCreateButtonClick = (e) => {
         e.preventDefault()
         $("#user-create-modal").modal('toggle')
+        userStore.resetForm()
     }
 
 
 
-    const handleEditButtonClick = (e, id) => {
+    const handleUpdateButtonClick = (e, id) => {
         e.preventDefault()
-        $("#user-create-modal").modal('toggle')
+        $("#user-update-modal").modal('toggle')
+        userStore.retrieveUser(id)
     }
 
 
@@ -102,7 +102,7 @@ const UserList = observer(({ userStore }) => {
 
                         {/* Table Header */}
                         <TableHeaderDefault
-                            addButtonClickHandler={ handleAddButtonClick }
+                            addButtonClickHandler={ handleCreateButtonClick }
                             searchInputValue={ userStore.query }
                             searchInputHandler={ (e) => userStore.handleSearch(e) }
                             filterButtonClickHandler={ handleFilterButtonClick }
@@ -167,6 +167,10 @@ const UserList = observer(({ userStore }) => {
 
                         {/* Create Modal */}
                         <UserCreateModal userStore={ userStore } />
+
+
+                        {/* Update Modal */}
+                        <UserUpdateModal userStore={ userStore } />
 
                     </div>
 

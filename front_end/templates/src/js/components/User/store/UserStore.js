@@ -4,6 +4,7 @@ import { makeAutoObservable, runInAction } from "mobx"
 
 class UserStore{
 
+    // List
     list = {};
     total_records = 0;
     page_prev = 0;
@@ -14,22 +15,147 @@ class UserStore{
     query = "";
     filter_online_status = { value:"", label:"Select" }; // filter
     filter_su_status = { value:"", label:"Select" }; // filter
+    
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
     selected_user = 0; // selected user id after create or update
-    is_loading = false;
+    is_list_loading = false;
+    is_form_loading = false;
 
-    // User Create
+    // Form
+    first_name = "";
+    last_name = "";
+    email = "";
+    username = "";
+    password = "";
+    password_confirm = "";
+    error_fields = {};
     user_routes = [];
     user_subroutes = [];
+
     route_options = [];
     subroute_options = [];
-    
 
     constructor(){
         makeAutoObservable(this)
     }
 
 
+    // Form
+    retrieveUser(id){
+
+        this.resetForm();
+
+        runInAction(() => {
+            this.is_form_loading = true;
+        })
+
+        if(id != ""){
+
+            axios.get('api/user/' + id)
+                .then((response) => {
+
+                    let r = response.data.userRoute_user;
+                    let user_r = [];
+                    let user_sr = [];
+
+                    r.forEach( data_r => {
+
+                        let sr = data_r.userSubroute_userRoute;
+
+                        // set subroute options
+                        axios.get('api/route/' + data_r.route.id)
+                            .then((response) => {
+                                let subroutes = response.data.subroute_route;
+                                if(subroutes.length > 0){
+                                    subroutes.forEach(data_subroute => {
+                                        this.subroute_options.push({ value:data_subroute.id, label:data_subroute.name });
+                                    });
+                                }
+                            });
+                        
+                        // push user route
+                        user_r.push({ 
+                            value: data_r.route.id, 
+                            label:data_r.route.name 
+                        })
+
+                        // push user subroute
+                        sr.forEach(data_sr => {
+                            user_sr.push({
+                                value:data_sr.subroute.id, 
+                                label:data_sr.subroute.name
+                            })
+                        })
+
+                    })
+
+                    // set form values
+                    runInAction(() => {
+                        this.first_name = response.data.first_name;
+                        this.last_name = response.data.last_name;
+                        this.email = response.data.email;
+                        this.username = response.data.username;
+                        this.user_routes = user_r;
+                        this.user_subroutes = user_sr;
+                        this.is_form_loading = false;
+                    })
+
+                });
+
+        }
+    }
+
+
+    resetForm(){
+        this.first_name = "";
+        this.last_name = "";
+        this.email = "";
+        this.username = "";
+        this.password = "";
+        this.password_confirm = "";
+        this.error_fields = {};
+        this.user_routes = [];
+        this.user_subroutes = [];
+        this.subroute_options = [];
+    }
+
+    
+    setFirstname(first_name){
+        this.first_name = first_name;
+    }
+
+
+    setLastname(last_name){
+        this.last_name = last_name;
+    }
+
+
+    setEmail(email){
+        this.email = email;
+    }
+
+
+    setUsername(username){
+        this.username = username;
+    }
+
+
+    setPassword(password){
+        this.password = password;
+    }
+
+
+    setPasswordConfirm(password_confirm){
+        this.password_confirm = password_confirm;
+    }
+
+
+    setErrorFields(error_fields){
+        this.error_fields = error_fields;
+    }
+
+
+    // User Routes
     setUserRoutes(array){
 
         let existing = this.getUserRouteValues();
@@ -72,13 +198,11 @@ class UserStore{
     }
 
 
-    
     getUserRouteValues(){
         let array = [];
         this.user_routes.forEach(data => array.push(data.value))
         return array;
     }
-
 
 
     getUserRoutePassedValues(values){
@@ -88,18 +212,10 @@ class UserStore{
     }
 
 
-
-    removeObjectFromSubrouteOptions(value){
-
-        for (var i=0; i < this.subroute_options.length; i++){
-            if (this.subroute_options[i].value === value) {
-                this.subroute_options.splice(i, 1);
-                break;
-            }
-        }
-
+    // User Subroutes
+    setUserSubroutes(array){
+        this.user_subroutes = array;
     }
-
 
 
     removeObjectFromUserSubroutes(value){
@@ -122,13 +238,7 @@ class UserStore{
     }
 
 
-
-    setUserSubroutes(array){
-        this.user_subroutes = array;
-    }
-
-
-
+    // Route Options
     setRouteOptions(){
         axios.get('api/route/get_all')
              .then((response) => {
@@ -146,34 +256,43 @@ class UserStore{
     }
 
 
-
+    // Subroute Options
     setSubrouteOptions(array){
         this.subroute_options = array;
     }
 
 
+    removeObjectFromSubrouteOptions(value){
 
-    setSelectedUser(id){
-        this.selected_user = id;
+        for (var i=0; i < this.subroute_options.length; i++){
+            if (this.subroute_options[i].value === value) {
+                this.subroute_options.splice(i, 1);
+                break;
+            }
+        }
+
     }
 
 
-
+    // List Setters
     setFilterOnlineStatus(online_status){
         this.filter_online_status = online_status;
     }
-
 
 
     setFilterSUStatus(su_status){
         this.filter_su_status = su_status;
     }
 
+    
+    setSelectedUser(id){
+        this.selected_user = id;
+    }
 
 
     fetch(){
 
-        this.is_loading = true;
+        this.is_list_loading = true;
 
         axios.get('api/user', { 
             params: { 
@@ -191,12 +310,12 @@ class UserStore{
             })
         });
 
-        this.is_loading = false;
+        this.is_list_loading = false;
 
     }
 
 
-
+    // List Handlers
     handleSearch(e){
         e.preventDefault()
         this.page_prev = 0;
@@ -205,7 +324,6 @@ class UserStore{
         this.query = e.target.value;
         this.delaySearch();
     }
-
 
 
     handleRefreshClick(e){
@@ -222,7 +340,6 @@ class UserStore{
     }
 
 
-
     handlePageSizeClick(e){
         e.preventDefault()
         if(e.target.value > 0){
@@ -233,7 +350,6 @@ class UserStore{
             this.fetch();
         }
     }
-
 
 
     handlePaginationClick(e, page_current){
@@ -247,7 +363,6 @@ class UserStore{
     }
 
 
-
     handleFilterSubmit(){
         this.page_prev = 0;
         this.page_current = 1;
@@ -256,11 +371,8 @@ class UserStore{
     }
 
 
-
 }
 
-
 const userStore = new UserStore()
-
 
 export default userStore

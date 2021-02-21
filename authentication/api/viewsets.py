@@ -17,6 +17,7 @@ class RouteViewSet(viewsets.ModelViewSet):
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
 
+
     def retrieve(self, request, pk=None):
         route = self.queryset.get(id=pk)
         serializer = self.get_serializer(route)
@@ -42,7 +43,7 @@ class UserRouteViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     
-    queryset = User.objects.only('id', 'username', 'is_active', 'last_login', 'date_joined')
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = UserListPagination
 
@@ -58,17 +59,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
             if search:
                 filter_conditions.add(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search), Q.AND)
-
             if online_status:
                 filter_conditions.add(Q(is_active = online_status), Q.AND) 
-
             if su_status:
                 filter_conditions.add(Q(is_superuser = su_status), Q.AND)
 
             page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by('-date_joined'))
 
         else:
-            
+
             page = self.paginate_queryset(self.queryset.order_by('-date_joined'))
         
         serializer = self.get_serializer(page, many=True)
@@ -81,6 +80,15 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         user = serializer.create(request.data)
         return Response({"id": user.id}, 201)
+
+
+    def retrieve(self, request, pk=None):
+        user = self.queryset.get(id=pk)
+        if user:
+            serializer = self.get_serializer(user)
+            return Response(serializer.data)
+        else:
+            return Response({"message" : "Cannot find data!"}, 400)
 
 
 

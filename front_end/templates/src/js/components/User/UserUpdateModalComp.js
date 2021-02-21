@@ -9,7 +9,7 @@ import DivLoader from '../Utils/DivLoaderComp'
 
 
 
-const UserCreateModal = observer(({ userStore }) => {
+const UserUpdateModal = observer(({ userStore }) => {
 
 
     const [loader, SetLoader] = useState(false);
@@ -25,16 +25,9 @@ const UserCreateModal = observer(({ userStore }) => {
     }
 
 
-    const handleResetForm = (e) =>{
-        e.preventDefault()
-        userStore.resetForm()
-    }
-
-
-    const handleSave = (e, is_save_another) => {
+    const handleSave = (e) => {
 
         e.preventDefault()
-        
         SetLoader(true)
 
         if(userStore.password != userStore.password_confirm){
@@ -107,14 +100,15 @@ const UserCreateModal = observer(({ userStore }) => {
 
     return (
 
-        <div className="modal" id="user-create-modal" role="dialog">
+        <div className="modal" id="user-update-modal" role="dialog">
             <div className="modal-dialog modal-lg" role="document">
                 <div className="modal-content">
 
                     <DivLoader type="Circles" loading={loader}/>
+                    <DivLoader type="ThreeDots" loading={userStore.is_form_loading}/>
 
                     <div className="modal-header">
-                        <h4 className="modal-title">Add User</h4>
+                        <h4 className="modal-title">Update User</h4>
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -162,25 +156,6 @@ const UserCreateModal = observer(({ userStore }) => {
                                 setter={ e => userStore.setUsername(e.target.value) }
                             />
 
-                            <InputTextInline 
-                                secureTextEntry
-                                type="password"
-                                label="Password:"
-                                placeholder="Password"
-                                errorField={ userStore.error_fields.password }
-                                value={ userStore.password }
-                                setter={ e => userStore.setPassword(e.target.value) }
-                            />
-
-                            <InputTextInline 
-                                type="password"
-                                label="Confirm Password:"
-                                placeholder="Confirm Password"
-                                errorField={ userStore.error_fields.password_confirm }
-                                value={ userStore.password_confirm }
-                                setter={ e => userStore.setPasswordConfirm(e.target.value) }
-                            />
-
                         </div>
 
 
@@ -217,9 +192,7 @@ const UserCreateModal = observer(({ userStore }) => {
 
                     <div className="modal-footer">
                         <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleResetForm(e) }>Reset</button>
-                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleSave(e, 0) }>Save</button>
-                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleSave(e, 1) }>Save and add another</button>
+                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleSave(e) }>Save</button>
                     </div>
 
                 </div>
@@ -232,4 +205,4 @@ const UserCreateModal = observer(({ userStore }) => {
 });
 
 
-export default UserCreateModal
+export default UserUpdateModal
