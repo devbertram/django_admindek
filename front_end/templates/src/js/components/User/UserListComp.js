@@ -72,7 +72,11 @@ const UserList = observer(({ userStore }) => {
     const handleCreateButtonClick = (e) => {
         e.preventDefault()
         $("#user-create-modal").modal('toggle')
-        userStore.resetForm()
+        console.log(userStore.is_opened_form)
+        if(userStore.is_opened_form === 1){
+            userStore.resetForm()
+        }
+        userStore.setIsOpenedForm(0)
     }
 
 
@@ -80,7 +84,9 @@ const UserList = observer(({ userStore }) => {
     const handleUpdateButtonClick = (e, id) => {
         e.preventDefault()
         $("#user-update-modal").modal('toggle')
-        userStore.retrieveUser(id)
+        userStore.setIsOpenedForm(1)
+        userStore.setUserId(id)
+        userStore.retrieveUser()
     }
 
 

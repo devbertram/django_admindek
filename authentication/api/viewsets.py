@@ -7,7 +7,14 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .serializers import RouteSerializer, UserRouteSerializer, UserSerializer, UserFormSerializer
+from .serializers import (
+    RouteSerializer,
+    UserRouteSerializer,
+    UserSerializer,
+    UserCreateFormSerializer,
+    UserUpdateFormSerializer,
+)
+
 from .pagination import UserListPagination
 
 
@@ -49,25 +56,21 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
     def list(self, request):
-        
         search = request.GET.get('q', None)
         online_status = request.GET.get('os', None)
         su_status = request.GET.get('sus', None)     
         filter_conditions = Q()
 
         if search or online_status or su_status:
-
             if search:
                 filter_conditions.add(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search), Q.AND)
             if online_status:
                 filter_conditions.add(Q(is_active = online_status), Q.AND) 
             if su_status:
                 filter_conditions.add(Q(is_superuser = su_status), Q.AND)
-
             page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by('-date_joined'))
 
         else:
-
             page = self.paginate_queryset(self.queryset.order_by('-date_joined'))
         
         serializer = self.get_serializer(page, many=True)
@@ -75,8 +78,7 @@ class UserViewSet(viewsets.ModelViewSet):
         
 
     def create(self, request):
-
-        serializer = UserFormSerializer(data=request.data)
+        serializer = UserCreateFormSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.create(request.data)
         return Response({"id": user.id}, 201)
@@ -86,9 +88,24 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.queryset.get(id=pk)
         if user:
             serializer = self.get_serializer(user)
-            return Response(serializer.data)
+            return Response(serializer.data, 200)
         else:
-            return Response({"message" : "Cannot find data!"}, 400)
+            return Response({'message': 'Cannot find user!'}, 404)
+    
+    
+    def update(self, request, pk=None):
+        user = self.queryset.get(id=pk)
+        if user:
+            serializer = UserUpdateFormSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.update(user, request.data)
+            return Response({"id": pk}, 200)
+        else:
+            return Response({'message': 'Cannot find user!'}, 404)
+
+
+    def destroy(self, request, pk=None):
+        pass
 
 
 

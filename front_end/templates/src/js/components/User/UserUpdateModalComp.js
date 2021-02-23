@@ -25,74 +25,61 @@ const UserUpdateModal = observer(({ userStore }) => {
     }
 
 
-    const handleSave = (e) => {
+    const handleUpdate = (e) => {
 
         e.preventDefault()
+        
         SetLoader(true)
 
-        if(userStore.password != userStore.password_confirm){
+        axios.put('api/user/' + userStore.user_id +'/', {
 
-            userStore.setErrorFields({ password : "Password doesn't match!" })
-            SetLoader(false)
+            first_name : userStore.first_name,
+            last_name : userStore.last_name,
+            email : userStore.email,
+            username : userStore.username, 
+            user_routes : userStore.user_routes,
+            user_subroutes : userStore.user_subroutes,
 
-        }else{
+        }).then((response) => {
 
-            axios.post('api/user/', { 
-
-                first_name : userStore.first_name,
-                last_name : userStore.last_name,
-                email : userStore.email,
-                username : userStore.username, 
-                password : userStore.password, 
-                user_routes : userStore.user_routes,
-                user_subroutes : userStore.user_subroutes,
-
-            }).then((response) => {
-
-                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                    message: "User Successfully Created!", type: "inverse" 
-                });
-
-                userStore.fetch();
-                userStore.setSelectedUser(response.data.id);
-                userStore.resetForm()
-                
-                SetLoader(false);
-
-                if (is_save_another == 0){
-                    $("#user-create-modal").modal('hide');
-                }
-
-            }).catch((error) => {
-
-                if(error.response.status == 400){
-
-                    let field_errors = error.response.data;
-    
-                    userStore.setErrorFields({
-                        firstname: field_errors.first_name?.toString(),
-                        lastname: field_errors.last_name?.toString(),
-                        email: field_errors.email?.toString(),
-                        username: field_errors.username?.toString(),
-                        password: field_errors.password?.toString(),
-                        user_routes: field_errors.user_routes?.toString(),
-                        user_subroutes: field_errors.user_subroutes?.toString(),
-                    });
-
-                }
-
-                if(error.response.status == 500){
-                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                        message: "There's an error trying to send data to the server!", type: "danger" 
-                    });
-                }
-    
-                SetLoader(false);
-
+            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                message: "User Successfully Updated!", type: "inverse" 
             });
 
+            userStore.fetch();
+            userStore.setSelectedUser(response.data.id);
+            
+            SetLoader(false);
 
-        }
+        }).catch((error) => {
+
+            if(error.response.status == 400){
+                let field_errors = error.response.data;
+                userStore.setErrorFields({
+                    firstname: field_errors.first_name?.toString(),
+                    lastname: field_errors.last_name?.toString(),
+                    email: field_errors.email?.toString(),
+                    username: field_errors.username?.toString(),
+                    user_routes: field_errors.user_routes?.toString(),
+                    user_subroutes: field_errors.user_subroutes?.toString(),
+                });
+            }
+
+            if(error.response.status == 404){
+                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                    message: "Data Not Found!", type: "danger" 
+                });
+            }
+
+            if(error.response.status == 500){
+                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                    message: "There's an error trying to send data to the server!", type: "danger" 
+                });
+            }
+
+            SetLoader(false);
+
+        });
 
     }
 
@@ -192,7 +179,7 @@ const UserUpdateModal = observer(({ userStore }) => {
 
                     <div className="modal-footer">
                         <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleSave(e) }>Save</button>
+                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleUpdate(e) }>Save</button>
                     </div>
 
                 </div>

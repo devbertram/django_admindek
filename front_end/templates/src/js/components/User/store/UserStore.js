@@ -20,8 +20,10 @@ class UserStore{
     selected_user = 0; // selected user id after create or update
     is_list_loading = false;
     is_form_loading = false;
+    is_opened_form = 0; // 0 = create form, 1 = update form
 
     // Form
+    user_id = "";
     first_name = "";
     last_name = "";
     email = "";
@@ -41,7 +43,7 @@ class UserStore{
 
 
     // Form
-    retrieveUser(id){
+    retrieveUser(){
 
         this.resetForm();
 
@@ -49,9 +51,9 @@ class UserStore{
             this.is_form_loading = true;
         })
 
-        if(id != ""){
+        if(this.user_id != ""){
 
-            axios.get('api/user/' + id)
+            axios.get('api/user/' + this.user_id)
                 .then((response) => {
 
                     let r = response.data.userRoute_user;
@@ -117,6 +119,11 @@ class UserStore{
         this.user_routes = [];
         this.user_subroutes = [];
         this.subroute_options = [];
+    }
+
+    
+    setUserId(user_id){
+        this.user_id = user_id;
     }
 
     
@@ -287,6 +294,11 @@ class UserStore{
     
     setSelectedUser(id){
         this.selected_user = id;
+    }
+
+    
+    setIsOpenedForm(int){
+        this.is_opened_form = int;
     }
 
 

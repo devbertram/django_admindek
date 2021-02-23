@@ -31,7 +31,7 @@ const UserCreateModal = observer(({ userStore }) => {
     }
 
 
-    const handleSave = (e, is_save_another) => {
+    const handleCreate = (e, is_save_another) => {
 
         e.preventDefault()
         
@@ -73,9 +73,7 @@ const UserCreateModal = observer(({ userStore }) => {
             }).catch((error) => {
 
                 if(error.response.status == 400){
-
                     let field_errors = error.response.data;
-    
                     userStore.setErrorFields({
                         firstname: field_errors.first_name?.toString(),
                         lastname: field_errors.last_name?.toString(),
@@ -85,7 +83,12 @@ const UserCreateModal = observer(({ userStore }) => {
                         user_routes: field_errors.user_routes?.toString(),
                         user_subroutes: field_errors.user_subroutes?.toString(),
                     });
+                }
 
+                if(error.response.status == 404){
+                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                        message: "Data Not Found!", type: "danger" 
+                    });
                 }
 
                 if(error.response.status == 500){
@@ -218,8 +221,8 @@ const UserCreateModal = observer(({ userStore }) => {
                     <div className="modal-footer">
                         <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
                         <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleResetForm(e) }>Reset</button>
-                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleSave(e, 0) }>Save</button>
-                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleSave(e, 1) }>Save and add another</button>
+                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleCreate(e, 0) }>Save</button>
+                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ (e) => handleCreate(e, 1) }>Save and add another</button>
                     </div>
 
                 </div>

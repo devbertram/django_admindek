@@ -5,7 +5,6 @@ from django.utils.timezone import now
 
 
 class Route(models.Model):
-
     category = models.CharField(max_length=10)
     name = models.CharField(max_length=100)
     nav_name = models.CharField(max_length=100)
@@ -25,7 +24,6 @@ class Route(models.Model):
 
 
 class Subroute(models.Model):
-
     route = models.ForeignKey(Route, related_name='subroute_route', on_delete=models.CASCADE)
     is_nav = models.BooleanField(default=False)
     name = models.CharField(max_length=100)
@@ -39,7 +37,6 @@ class Subroute(models.Model):
 
 
 class UserRoute(models.Model):
-    
     user = models.ForeignKey(User, related_name='userRoute_user', on_delete=models.CASCADE)
     route = models.ForeignKey(Route, related_name='userRoute_route', on_delete=models.PROTECT)
 
@@ -49,7 +46,6 @@ class UserRoute(models.Model):
 
     
 class UserSubroute(models.Model):
-    
     user = models.ForeignKey(User, related_name='userSubroute_user', on_delete=models.CASCADE)
     user_route = models.ForeignKey(UserRoute, related_name='userSubroute_userRoute', on_delete=models.CASCADE)
     subroute = models.ForeignKey(Subroute, related_name='userSubroute_subroute', on_delete=models.PROTECT)
