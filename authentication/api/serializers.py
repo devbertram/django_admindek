@@ -93,7 +93,7 @@ class UserCreateFormSerializer(serializers.ModelSerializer):
         user.email=validated_data['email']
         user.username=validated_data['username']
         user.is_staff=False
-        user.is_active=False
+        user.is_active=True
         user.is_superuser=False
         user.set_password(validated_data['password'])
         user.save()

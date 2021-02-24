@@ -5,13 +5,24 @@ from .models import UserRoute, UserSubroute
 
 class CheckIfUserRouteExist(MiddlewareMixin):
 
+    route_exceptions = [
+        "dashboard_profile_page",
+        "user-set-username",
+        "user-set-password",
+        "user-route-get-by-user",
+        "route-get-all",
+        "route-detail",
+        "logout_user"
+    ]
+
     def process_request(self, request):
         current_url_name = resolve(request.path_info).url_name
         if request.user.is_authenticated and request.user.is_superuser == False:
-            if self.isUserRouteExist(request.user.id, current_url_name) or self.isUserSubrouteExist(request.user.id, current_url_name):
-                pass
-            else:
-                raise PermissionDenied()
+            if current_url_name not in self.route_exceptions:
+                if self.isUserRouteExist(request.user.id, current_url_name) or self.isUserSubrouteExist(request.user.id, current_url_name):
+                    pass
+                else:
+                    raise PermissionDenied()
 
 
     def isUserRouteExist(self, user_id, current_url_name):

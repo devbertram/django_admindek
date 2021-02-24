@@ -28,13 +28,13 @@ class RouteViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         route = self.queryset.get(id=pk)
         serializer = self.get_serializer(route)
-        return Response(serializer.data)
+        return Response(serializer.data, 200)
 
 
     @action(methods=['get'], detail=False)
     def get_all(self, request):
         serializer = self.get_serializer(self.queryset, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, 200)
 
 
 
@@ -44,7 +44,7 @@ class UserRouteViewSet(viewsets.ModelViewSet):
     def get_by_user(self, request):
         user_route = UserRoute.objects.all().filter(user_id=request.user.id).prefetch_related('route').select_related('route')
         serializer =  UserRouteSerializer(user_route, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, 200)
 
 
 
@@ -90,7 +90,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(user)
             return Response(serializer.data, 200)
         else:
-            return Response({'message': 'Cannot find user!'}, 404)
+            return Response({}, 404)
     
     
     def update(self, request, pk=None):
@@ -101,11 +101,16 @@ class UserViewSet(viewsets.ModelViewSet):
             user = serializer.update(user, request.data)
             return Response({"id": pk}, 200)
         else:
-            return Response({'message': 'Cannot find user!'}, 404)
+            return Response({}, 404)
 
 
     def destroy(self, request, pk=None):
-        pass
+        user = self.queryset.get(id=pk)
+        if user:
+            user.delete()
+            return Response({}, 200)
+        else:
+            return Response({}, 404)
 
 
 

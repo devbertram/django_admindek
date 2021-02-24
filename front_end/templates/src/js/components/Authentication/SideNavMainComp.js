@@ -3,14 +3,14 @@ require('../../config');
 
 import React , { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import eventBus from "../Utils/EventBus";
-
 import SideNavMenu from "./SideNavMenuComp";
 import SideNavMenuWithLevel from "./SideNavMenuWithLevelComp";
 
 function SideNavMain(props){
 
     const [routes, setRoutes] = useState({});
+    const [current_route, setCurrentRoute] = useState({});
+
 
 
     useEffect(() => {
@@ -18,22 +18,35 @@ function SideNavMain(props){
         let is_mounted = true;
 
         if(is_mounted == true){
-            axios.get('api/user_route/get_by_user/')
-                 .then((response) => {
-                    eventBus.dispatch("GET_ROUTES", { routes: response.data });
-                 });
+            getRoutes()
+            getCurrentRoute()
         }
 
         return () => {
             is_mounted = false;
-            eventBus.remove("GET_ROUTES");
         } 
 
     }, []);
 
-    
-    
-    eventBus.on("GET_ROUTES", (data) => setRoutes(data.routes));
+
+
+    const getRoutes = () => {
+        
+        axios.get('api/user_route/get_by_user/')
+        .then((response) => {
+            setRoutes(response.data)
+        });
+
+    }
+
+
+
+    const getCurrentRoute = () => {
+        
+        let url = window.location.toString();
+        setCurrentRoute(url.replace(window.location.origin, ""))
+
+    }
 
 
 
@@ -53,6 +66,7 @@ function SideNavMain(props){
                                     menu_name={val.route.nav_name} 
                                     menu_icon={val.route.icon} 
                                     url={val.route.url}
+                                    current_route={current_route}
                                 />
                             )
                         }else{
@@ -62,6 +76,7 @@ function SideNavMain(props){
                                     menu_name={val.route.nav_name} 
                                     menu_icon={val.route.icon} 
                                     submenus={val.userSubroute_userRoute}
+                                    current_route={current_route}
                                 />
                             )
                         }
@@ -86,7 +101,7 @@ function SideNavMain(props){
 
                     <div className="pcoded-navigation-label">App</div>
                     <ul className="pcoded-item pcoded-left-item">
-                        <li className="">
+                        <li className={ current_route == "/dashboard" ? "active" : "" }>
                             <a href="/dashboard" className="waves-effect waves-dark">
                                 <span className="pcoded-micon">
                                     <i className="ti-home"></i>

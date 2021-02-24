@@ -10,6 +10,7 @@ import { TableFooterDefault } from '../Utils/Table/TableFooters'
 import UserListFilterModal from './UserListFilterModalComp'
 import UserCreateModal from './UserCreateModalComp'
 import UserUpdateModal from './UserUpdateModalComp'
+import UserDeleteModal from './UserDeleteModalComp'
 
 
 const UserList = observer(({ userStore }) => {
@@ -52,7 +53,7 @@ const UserList = observer(({ userStore }) => {
                             <button className="btn btn-primary btn-sm" type="button" onClick={ (e) => handleUpdateButtonClick(e, val.id) }>
                                 <i className="fa fa-pencil ml-1"></i>
                             </button>
-                            <button className="btn btn-danger btn-sm ml-1" type="button">
+                            <button className="btn btn-danger btn-sm ml-1" type="button" onClick={ (e) => handleDeleteButtonClick(e, val.id) }>
                                 <i className="fa fa-trash ml-1"></i>
                             </button>
                         </td>
@@ -87,6 +88,14 @@ const UserList = observer(({ userStore }) => {
         userStore.setIsOpenedForm(1)
         userStore.setUserId(id)
         userStore.retrieveUser()
+    }
+
+
+
+    const handleDeleteButtonClick = (e, id) => {
+        e.preventDefault()
+        $("#user-delete-modal").modal('toggle')
+        userStore.setUserId(id)
     }
 
 
@@ -177,6 +186,10 @@ const UserList = observer(({ userStore }) => {
 
                         {/* Update Modal */}
                         <UserUpdateModal userStore={ userStore } />
+
+
+                        {/* Delete Modal */}
+                        <UserDeleteModal userStore={ userStore } />
 
                     </div>
 
