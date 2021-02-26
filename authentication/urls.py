@@ -12,7 +12,8 @@ urlpatterns = [
 
     path('dashboard', views.dashboardHomePage, name='dashboard_home_page'),
     path('dashboard/profile', views.dashboardProfilePage, name='dashboard_profile_page'),
-    path('dashboard/users', views.dashboardUserPage, name='dashboard_user_page'),
+    path('dashboard/users', views.dashboardUsersPage, name='dashboard_user_page'),
+    path('dashboard/menus', views.dashboardMenusPage, name='dashboard_menu_page'),
 
 
     #djoser

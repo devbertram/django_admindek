@@ -57,8 +57,14 @@ def dashboardProfilePage(request):
 
 
 @login_required
-def dashboardUserPage(request):
+def dashboardUsersPage(request):
     return render(request, 'dashboard/user/index.html')
+
+
+
+@login_required
+def dashboardMenusPage(request):
+    return render(request, 'dashboard/menu/index.html')
     
 
         

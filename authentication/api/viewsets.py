@@ -15,7 +15,10 @@ from .serializers import (
     UserUpdateFormSerializer,
 )
 
-from .pagination import UserListPagination
+from .pagination import (
+    UserListPagination, 
+    RouteListPagination
+)
 
 
 
@@ -23,18 +26,38 @@ class RouteViewSet(viewsets.ModelViewSet):
     
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
-
-
-    def retrieve(self, request, pk=None):
-        route = self.queryset.get(id=pk)
-        serializer = self.get_serializer(route)
-        return Response(serializer.data, 200)
+    pagination_class = RouteListPagination
 
 
     @action(methods=['get'], detail=False)
     def get_all(self, request):
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data, 200)
+
+
+    def list(self, request):
+        search = request.GET.get('q', None)  
+        filter_conditions = Q()
+
+        if search:
+            if search:
+                filter_conditions.add(Q(name__icontains=search) | Q(category__icontains=search), Q.AND)
+            page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by('-updated_at'))
+
+        else:
+            page = self.paginate_queryset(self.queryset.order_by('-updated_at'))
+        
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+
+    def retrieve(self, request, pk=None):
+        route = self.queryset.get(id=pk)
+        if route:
+            serializer = self.get_serializer(route)
+            return Response(serializer.data, 200)
+        else:
+            return Response({}, 404)
 
 
 

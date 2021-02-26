@@ -8,3 +8,4 @@ mix.js('src/js/components/Utils/FullPageLoaderComp.js', 'static/build/js/Utils')
 mix.js('src/js/components/Utils/ToastNotificationComp.js', 'static/build/js/Utils').react();
 
 mix.js('src/js/components/User/UserMain.js', 'static/build/js/User').react();
+mix.js('src/js/components/Menu/MenuMain.js', 'static/build/js/Menu').react();
