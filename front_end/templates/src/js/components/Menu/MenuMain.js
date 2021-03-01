@@ -19,7 +19,7 @@ function MenuMain(props){
 
 
     return (
-        <HashRouter basename="/menus/">
+        <HashRouter>
             <Switch>
 
                 <Route exact path="/">
