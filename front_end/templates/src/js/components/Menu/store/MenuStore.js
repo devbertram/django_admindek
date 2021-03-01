@@ -4,6 +4,7 @@ import { makeAutoObservable, runInAction } from "mobx"
 
 class MenuStore{
 
+    page_type = "LIST";
     // List
     list = {};
     total_records = 0;

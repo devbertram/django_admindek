@@ -1,19 +1,18 @@
 
 
-import React, { useEffect } from 'react'
-
-import moment from 'moment'
+import React, { useEffect, useCallback } from 'react'
+import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react'
 
 import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
 import MenuCreateModal from './MenuCreateModalComp'
-// import UserUpdateModal from './UserUpdateModalComp'
-// import UserDeleteModal from './UserDeleteModalComp'
 
 
 const MenuList = observer(({ menuStore }) => {
 
+    const history = useHistory();
+    const handleCreateButtonClick = useCallback(() => history.push('/create'), [history]);
 
     
     useEffect (() => {
@@ -54,18 +53,6 @@ const MenuList = observer(({ menuStore }) => {
 
         return table_rows
 
-    }
-
-
-
-    const handleCreateButtonClick = (e) => {
-        e.preventDefault()
-        $("#menu-create-modal").modal('toggle')
-        console.log(menuStore.is_opened_form)
-        if(menuStore.is_opened_form === 1){
-            menuStore.resetForm()
-        }
-        menuStore.setIsOpenedForm(0)
     }
 
 
