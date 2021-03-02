@@ -56,7 +56,7 @@ function SideNavMenuWithLevel(props){
 
     return (
         <li className={is_menu_open === true ? "pcoded-hasmenu active pcoded-trigger" : "pcoded-hasmenu"} dropdown-icon="style1" subitem-icon="style1" onClick={handleOpen}>
-            <a href="#" className="waves-effect waves-dark">
+            <a href className="waves-effect waves-dark">
                 <span className="pcoded-micon"><i className={ props.menu_icon }></i></span>
                 <span className="pcoded-mtext">{ props.menu_name }</span>
             </a>

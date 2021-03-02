@@ -50,10 +50,10 @@ const UserList = observer(({ userStore }) => {
                         <td className="align-middle">{ last_login }</td>
                         <td className="align-middle">{ date_joined }</td>
                         <td className="align-middle">
-                            <button className="btn btn-primary btn-sm" type="button" onClick={ (e) => handleUpdateButtonClick(e, val.id) }>
+                            <button className="btn btn-sm btn-primary" type="button" onClick={ (e) => handleUpdateButtonClick(e, val.id) }>
                                 <i className="fa fa-pencil ml-1"></i>
                             </button>
-                            <button className="btn btn-danger btn-sm ml-1" type="button" onClick={ (e) => handleDeleteButtonClick(e, val.id) }>
+                            <button className="btn btn-sm btn-danger ml-1" type="button" onClick={ (e) => handleDeleteButtonClick(e, val.id) }>
                                 <i className="fa fa-trash ml-1"></i>
                             </button>
                         </td>
@@ -111,11 +111,11 @@ const UserList = observer(({ userStore }) => {
 
         <div className="row">
             <div className="col-sm-12">
-                <div className="card">
-                    
-                    <div className="card-block table-border-style">
+                <div className="card table-card">
 
-                        {/* Table Header */}
+
+                    {/* Table Header */}
+                    <div className="card-header"> 
                         <TableHeaderDefault
                             addButtonClickHandler={ handleCreateButtonClick }
                             searchInputValue={ userStore.query }
@@ -129,12 +129,14 @@ const UserList = observer(({ userStore }) => {
                             paginationPageLimit={ userStore.page_limit }
                             paginationPrevClickHandler={ (e) => userStore.handlePaginationClick(e, userStore.page_prev) }
                             paginationNextClickHandler={ (e) => userStore.handlePaginationClick(e, userStore.page_next) }
-                        />
+                        /> 
+                    </div>
 
 
-                        {/* TABLE BODY */}
-                        <div className="table-responsive mt-3">
-                            <table className="table table-striped table-bordered table-de">
+                    {/* TABLE BODY */}
+                    <div className="card-block table-border-style pb-0 pt-0">
+                        <div className="table-responsive">
+                            <table className="table table-xs table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th>Username</th>
@@ -150,19 +152,19 @@ const UserList = observer(({ userStore }) => {
                                 </tbody>
                             </table>
                         </div>
-
                         <div className="table-responsive mt-3" 
                              style={ userStore.is_loading == true ? {} : { display:"none", }}>
                             <center><h4>Loading ...</h4></center>
                         </div>
-        
                         <div className="table-responsive mt-3" 
                              style={ userStore.is_loading == false && userStore.list.length == 0 ? {} : { display:"none", }}>
                             <center><h4>No records found!</h4></center>
                         </div>
+                    </div>
 
 
-                        {/* Table Footer */}
+                    {/* Table Footer */}
+                    <div className="card-footer">
                         <TableFooterDefault
                             counterPageSize={ userStore.page_size }
                             counterPageCurrent={ userStore.page_current }
@@ -174,26 +176,22 @@ const UserList = observer(({ userStore }) => {
                             paginationPrevClickHandler={ (e) => userStore.handlePaginationClick(e, userStore.page_prev) }
                             paginationNextClickHandler={ (e) => userStore.handlePaginationClick(e, userStore.page_next) }  
                         />
-
-
-                        {/* Filter Modal */}
-                        <UserListFilterModal userStore={ userStore } />
-
-
-                        {/* Create Modal */}
-                        <UserCreateModal userStore={ userStore } />
-
-
-                        {/* Update Modal */}
-                        <UserUpdateModal userStore={ userStore } />
-
-
-                        {/* Delete Modal */}
-                        <UserDeleteModal userStore={ userStore } />
-
                     </div>
 
                 </div>
+
+                {/* Filter Modal */}
+                <UserListFilterModal userStore={ userStore } />
+
+                {/* Create Modal */}
+                <UserCreateModal userStore={ userStore } />
+
+                {/* Update Modal */}
+                <UserUpdateModal userStore={ userStore } />
+
+                {/* Delete Modal */}
+                <UserDeleteModal userStore={ userStore } />
+
             </div>
         </div>
 

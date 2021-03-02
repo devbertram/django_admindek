@@ -22,8 +22,17 @@ class MenuStore{
     is_opened_form = 0; // 0 = create form, 1 = update form
 
     // Form
-    menu_id = "";
+    route_id = "";
+    category = "";
     name = "";
+    nav_name = "";
+    url = "";
+    url_name = "";
+    icon = "";
+    is_menu = false;
+    is_dropdown = false;
+    is_dropdown = false;
+    subroutes = [{ name:"", is_nav:false, nav_name:"", url:"", url_name:"" }];
     error_fields = {};
 
     constructor(){
@@ -37,9 +46,44 @@ class MenuStore{
         this.error_fields = {};
     }
 
+    setCategory(cat){
+        this.category = cat;
+    }
 
     setName(name){
         this.name = name;
+    }
+
+    setNavName(nav_name){
+        this.nav_name = nav_name;
+    }
+
+    setUrl(url){
+        this.url = url;
+    }
+
+    setUrlName(url_name){
+        this.url_name = url_name;
+    }
+
+    setIcon(icon){
+        this.icon = icon;
+    }
+
+    setIsMenu(is_menu){
+        this.is_menu = is_menu;
+    }
+
+    setIsDropdown(is_dropdown){
+        this.is_dropdown = is_dropdown;
+    }
+
+    setSubroutes(subroutes){
+        this.subroutes = subroutes;
+    }
+
+    setErrorFields(obj){
+        this.error_fields = obj;
     }
 
 

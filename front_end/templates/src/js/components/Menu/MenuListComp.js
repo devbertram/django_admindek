@@ -85,12 +85,11 @@ const MenuList = observer(({ menuStore }) => {
     return (
 
         <div className="row">
-            <div className="col-sm-12">
-                <div className="card">
-                    
-                    <div className="card-block table-border-style">
+            <div className="col-md-12">
+                <div className="card table-card">
 
-                        {/* Table Header */}
+                    {/* Table Header */}
+                    <div className="card-header p-b-0"> 
                         <TableHeaderDefault
                             addButtonClickHandler={ handleCreateButtonClick }
                             searchInputValue={ menuStore.query }
@@ -104,12 +103,13 @@ const MenuList = observer(({ menuStore }) => {
                             paginationPageLimit={ menuStore.page_limit }
                             paginationPrevClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_prev) }
                             paginationNextClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_next) }
-                        />
-
-
-                        {/* TABLE BODY */}
-                        <div className="table-responsive mt-3">
-                            <table className="table table-striped table-bordered table-de">
+                        />  
+                    </div>
+                    
+                    {/* TABLE BODY */}
+                    <div className="card-block table-border-style pb-0 pt-0">
+                        <div className="table-responsive">
+                            <table className="table table-xs table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th>Name</th>
@@ -123,18 +123,11 @@ const MenuList = observer(({ menuStore }) => {
                             </table>
                         </div>
 
-                        <div className="table-responsive mt-3" 
-                             style={ menuStore.is_loading == true ? {} : { display:"none", }}>
-                            <center><h4>Loading ...</h4></center>
-                        </div>
-        
-                        <div className="table-responsive mt-3" 
-                             style={ menuStore.is_loading == false && menuStore.list.length == 0 ? {} : { display:"none", }}>
-                            <center><h4>No records found!</h4></center>
-                        </div>
+                    </div>
+                    
 
-
-                        {/* Table Footer */}
+                    {/* Table Footer */}
+                    <div className="card-footer">
                         <TableFooterDefault
                             counterPageSize={ menuStore.page_size }
                             counterPageCurrent={ menuStore.page_current }
@@ -146,26 +139,22 @@ const MenuList = observer(({ menuStore }) => {
                             paginationPrevClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_prev) }
                             paginationNextClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_next) }  
                         />
-
-
-                        {/* Filter Modal */}
-                        {/* <MenuListFilterModal menuStore={ menuStore } /> */}
-
-
-                        {/* Create Modal */}
-                        <MenuCreateModal menuStore={ menuStore } />
-
-
-                        {/* Update Modal */}
-                        {/* <UserUpdateModal menuStore={ menuStore } /> */}
-
-
-                        {/* Delete Modal */}
-                        {/* <UserDeleteModal menuStore={ menuStore } /> */}
-
                     </div>
 
                 </div>
+
+                {/* Filter Modal */}
+                {/* <MenuListFilterModal menuStore={ menuStore } /> */}
+
+                {/* Create Modal */}
+                <MenuCreateModal menuStore={ menuStore } />
+
+                {/* Update Modal */}
+                {/* <UserUpdateModal menuStore={ menuStore } /> */}
+
+                {/* Delete Modal */}
+                {/* <UserDeleteModal menuStore={ menuStore } /> */}
+
             </div>
         </div>
 

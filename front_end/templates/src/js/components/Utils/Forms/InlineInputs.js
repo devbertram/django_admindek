@@ -2,6 +2,8 @@
 import React from "react";
 import Select from "react-select";
 
+
+
 function InputTextInline(props){ 
     return (
         <div className={ props.errorField ? "form-group row has-danger" : "form-group row"}>
@@ -20,6 +22,7 @@ function InputTextInline(props){
         </div>
     );
 }
+
 
 
 function SelectMultiInline(props){ 
@@ -48,4 +51,40 @@ function SelectMultiInline(props){
 }
 
 
-export { InputTextInline, SelectMultiInline };
+
+function RadioButton(props){ 
+
+    const getOptions = () => {
+        let options = props.options;
+        let buttons = [];
+        if(options.length > 0){
+            options.forEach((val, key) => {
+                buttons.push(
+                    <div className="radio radio-inline" key={key}>
+                        <label>
+                            <input type="radio" value={ val.value } name={ props.name } onChange={ props.onChange }/>
+                            <i className="helper"></i> { val.label }
+                        </label>
+                    </div>
+                )
+            })
+        };
+        return buttons;
+    }
+
+    return (
+        <div className={ props.errorField ? "form-group row has-danger" : "form-group row"}>
+            <label className="col-sm-2 col-form-label">{ props.label }</label>
+            <div className="col-sm-10 form-radio">
+                { getOptions() }
+                <div className="col-form-label" style={ props.errorField ? {} : {display:"none"} }> 
+                    { props.errorField ? props.errorField : ""}
+                </div>
+            </div>
+        </div>
+    );
+
+}
+
+
+export { InputTextInline, SelectMultiInline, RadioButton };

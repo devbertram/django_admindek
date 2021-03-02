@@ -56,7 +56,7 @@ function FooterPaginationDefault (props){
 // Table Footer
 function TableFooterDefault(props){
     return (
-        <div className="row mt-4">
+        <div className="row">
             <div className="col-md-5 mt-1">
                 <Counter
                     pageSize={ props.counterPageSize }
