@@ -29,10 +29,9 @@ class MenuStore{
     url = "";
     url_name = "";
     icon = "";
-    is_menu = false;
-    is_dropdown = false;
-    is_dropdown = false;
-    subroutes = [{ name:"", is_nav:false, nav_name:"", url:"", url_name:"" }];
+    is_menu = null;
+    is_dropdown = null;
+    subroutes = [];
     error_fields = {};
 
     constructor(){
@@ -42,7 +41,14 @@ class MenuStore{
 
     // Form
     resetForm(){
+        this.route_id = "";
+        this.category = "";
         this.name = "";
+        this.nav_name = "";
+        this.url = "";
+        this.url_name = "";
+        this.icon = "";
+        this.subroutes = [];
         this.error_fields = {};
     }
 
@@ -78,8 +84,20 @@ class MenuStore{
         this.is_dropdown = is_dropdown;
     }
 
-    setSubroutes(subroutes){
-        this.subroutes = subroutes;
+    addSubroutes(){
+        this.subroutes = [...this.subroutes, { name:"", is_nav:"", nav_name:"", url:"", url_name:"" }]
+    }
+
+    modifySubroutes(index, e){
+        const list = [...this.subroutes];
+        list[index][e.target.name] = e.target.value;
+        this.subroutes = list;
+    }
+
+    deleteSubroutes(index){
+        const list = [...this.subroutes];
+        list.splice(index, 1);
+        this.subroutes = list;
     }
 
     setErrorFields(obj){

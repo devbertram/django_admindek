@@ -1,38 +1,80 @@
 
 
-import React, { useState} from 'react'
-import { observer } from 'mobx-react'
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { observer } from 'mobx-react';
+import { Link } from 'react-router-dom';
 
+import eventBus from '../Utils/EventBus'
 import { InputTextInline, RadioButton } from '../Utils/Forms/InlineInputs'
+import DivLoader from '../Utils/DivLoaderComp'
 
 
 
 const MenuCreate = observer(({ menuStore }) => {
 
 
-    const addPermissionRows = () =>{
-        menuStore.setSubroutes([...menuStore.subroutes, { name:"", is_nav:false, nav_name:"", url:"", url_name:"" }])
-    }
-
-
-    const deletePermissionRows = (index) =>{
-        const list = [...menuStore.subroutes];
-        list.splice(index, 1);
-        menuStore.setSubroutes(list);
-    }
-
-
-    const modifyPermissionRows = (index, e) =>{
-        const list = [...menuStore.subroutes];
-        list[index][e.target.name] = e.target.value;
-        menuStore.setSubroutes(list);
-    }
+    const [loader, SetLoader] = useState(false);
 
 
     const handleSave = (e, isa) => {
+
         e.preventDefault();
-        console.log(menuStore.subroutes)
+
+        SetLoader(true)
+
+        axios.post('api/route/', { 
+
+            category : menuStore.category,
+            name : menuStore.name,
+            nav_name : menuStore.nav_name,
+            url : menuStore.url,
+            url_name : menuStore.url_name,
+            icon : menuStore.icon,
+            is_menu : menuStore.is_menu,
+            is_dropdown : menuStore.is_dropdown,
+            subroutes : menuStore.subroutes,
+
+        }).then((response) => {
+
+            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                message: "Menu / Permission Successfully Created!", type: "inverse" 
+            });
+
+            menuStore.resetForm()
+            menuStore.fetch()
+
+            SetLoader(false);
+
+        }).catch((error) => {
+
+            if(error.response.status === 400){
+                let field_errors = error.response.data;
+                menuStore.setErrorFields({
+                    category: field_errors.category?.toString(),
+                    name: field_errors.name?.toString(),
+                    nav_name: field_errors.nav_name?.toString(),
+                    url: field_errors.url?.toString(),
+                    url_name: field_errors.url_name?.toString(),
+                    icon: field_errors.icon?.toString(),
+                    is_menu: field_errors.is_menu?.toString(),
+                    is_dropdown: field_errors.is_dropdown?.toString(),
+                    subroutes: field_errors.subroutes?.toString(),
+                });
+            }
+
+            if(error.response.status === 500){
+                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                    message: "There's an error trying to send data to the server!", type: "danger" 
+                });
+            }
+
+            SetLoader(false);
+
+        });
+
+
+
+
     }
     
 
@@ -42,6 +84,7 @@ const MenuCreate = observer(({ menuStore }) => {
             <div className="col-sm-12">
                 <div className="card">
 
+                    <DivLoader type="Circles" loading={loader}/>
                     <div className="card-header">
                         <h5>Create Menu and Permissions</h5>
                         <div className="card-header-right pt-0">
@@ -113,7 +156,7 @@ const MenuCreate = observer(({ menuStore }) => {
                             <RadioButton
                                 label="Is Side Navigation:"
                                 name="is_menu"
-                                options={ [{value:true, label:"True"}, {value:false, label:"False"}] }
+                                options={ [{value:true, label:"Yes"}, {value:false, label:"No"}] }
                                 onChange={ (e) => menuStore.setIsMenu(e.target.value) }
                                 errorField={ menuStore.error_fields.is_menu }
                             />
@@ -121,7 +164,7 @@ const MenuCreate = observer(({ menuStore }) => {
                             <RadioButton
                                 label="Is Side Navigation Dropdown"
                                 name="is_dropdown"
-                                options={ [{value:true, label:"True"}, {value:false, label:"False"}] }
+                                options={ [{value:true, label:"Yes"}, {value:false, label:"No"}] }
                                 onChange={ (e) => menuStore.setIsDropdown(e.target.value) }
                                 errorField={ menuStore.error_fields.is_dropdown }
                             />
@@ -135,7 +178,7 @@ const MenuCreate = observer(({ menuStore }) => {
 
                             <div className="table-responsive">
                             
-                                <button className="btn btn-sm btn-outline-primary mb-2" onClick={ () => addPermissionRows() }>
+                                <button className="btn btn-sm btn-outline-primary mb-2" onClick={ () => menuStore.addSubroutes() }>
                                     <i className="fa fa-plus"></i> Add Permission
                                 </button>
 
@@ -143,8 +186,8 @@ const MenuCreate = observer(({ menuStore }) => {
                                     <thead>
                                         <tr>
                                             <th>Permission Name</th>
-                                            <th>Is Navigation Sub Item</th>
-                                            <th>Navigation Sub Item Name</th>
+                                            <th>Is Navigation Subitem</th>
+                                            <th>Navigation Subitem Name</th>
                                             <th>Url</th>
                                             <th>Url Name</th>
                                             <th>Action</th>
@@ -161,17 +204,15 @@ const MenuCreate = observer(({ menuStore }) => {
                                                             value={val.name}
                                                             className="form-control" 
                                                             placeholder="Ex: Can View User List" 
-                                                            onChange={(e) => modifyPermissionRows(key, e)}
+                                                            onChange={(e) => menuStore.modifySubroutes(key, e)}
                                                         />
                                                     </td>
                                                     <td>
-                                                        <input 
-                                                            name="is_nav" 
-                                                            value={val.is_nav}
-                                                            className="form-control" 
-                                                            placeholder=""
-                                                            onChange={(e) => modifyPermissionRows(key, e)}
-                                                        />
+                                                        <select name="is_nav" value={val.is_nav} class="form-control form-control-inverse fill" onChange={(e) => menuStore.modifySubroutes(key, e)}>
+                                                            <option value="">Select</option>
+                                                            <option value={false}>Api</option>
+                                                            <option value={true}>Nav Subitem</option>
+                                                        </select>
                                                     </td>
                                                     <td>
                                                         <input 
@@ -179,7 +220,7 @@ const MenuCreate = observer(({ menuStore }) => {
                                                             value={val.nav_name}
                                                             className="form-control" 
                                                             placeholder="Ex: User Manage"
-                                                            onChange={(e) => modifyPermissionRows(key, e)}
+                                                            onChange={(e) => menuStore.modifySubroutes(key, e)}
                                                         />
                                                     </td>
                                                     <td>
@@ -188,7 +229,7 @@ const MenuCreate = observer(({ menuStore }) => {
                                                             value={val.url}
                                                             className="form-control" 
                                                             placeholder="Ex: /user/list/"
-                                                            onChange={(e) => modifyPermissionRows(key, e)}
+                                                            onChange={(e) => menuStore.modifySubroutes(key, e)}
                                                         />
                                                     </td>
                                                     <td>
@@ -197,11 +238,11 @@ const MenuCreate = observer(({ menuStore }) => {
                                                             value={val.url_name}
                                                             className="form-control" 
                                                             placeholder="Ex: user_list"
-                                                            onChange={(e) => modifyPermissionRows(key, e)}
+                                                            onChange={(e) => menuStore.modifySubroutes(key, e)}
                                                         />
                                                     </td>
                                                     <td>
-                                                        <button className="btn btn-sm btn-danger" type="button" onClick={ () => deletePermissionRows(key) }>
+                                                        <button className="btn btn-sm btn-danger" type="button" onClick={ () => menuStore.deleteSubroutes(key) }>
                                                             <i className="fa fa-trash ml-1"></i>
                                                         </button>
                                                     </td>
@@ -225,7 +266,7 @@ const MenuCreate = observer(({ menuStore }) => {
                                 <button type="submit" className="btn btn-primary float-right mr-2" onClick={ (e) => handleSave(e, 1)}>
                                     Save and add another
                                 </button>
-                                <button type="submit" className="btn btn-primary float-right mr-2">
+                                <button type="submit" className="btn btn-primary float-right mr-2" onClick={ () => menuStore.resetForm()}>
                                     Reset
                                 </button>
                             </div>

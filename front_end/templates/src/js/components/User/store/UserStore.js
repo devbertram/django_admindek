@@ -247,6 +247,7 @@ class UserStore{
 
     // Route Options
     setRouteOptions(){
+
         axios.get('api/route/get_all')
              .then((response) => {
                 let routes = response.data; 

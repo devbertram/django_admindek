@@ -1,14 +1,16 @@
 
-from authentication.models import Route, UserRoute
+from authentication.models import Route, Subroute, UserRoute
 from django.contrib.auth.models import User
 
 from django.db.models import Q
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.db import connection
 
 from .serializers import (
     RouteSerializer,
+    RouteCreateFormSerializer,
     UserRouteSerializer,
     UserSerializer,
     UserCreateFormSerializer,
@@ -32,6 +34,7 @@ class RouteViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def get_all(self, request):
         serializer = self.get_serializer(self.queryset, many=True)
+        print(connection.queries)
         return Response(serializer.data, 200)
 
 
@@ -49,6 +52,41 @@ class RouteViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+        
+
+    def create(self, request):
+        serializer = RouteCreateFormSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        subroutes = serializer.data['subroutes']
+
+        # Create Route   
+        route = Route()
+        route.name = serializer.data['name']
+        route.category = serializer.data['category']
+        route.nav_name = serializer.data['nav_name']
+        route.url = serializer.data['url']
+        route.url_name = serializer.data['url_name']
+        route.icon = serializer.data['icon']
+        route.is_menu = serializer.data['is_menu']
+        route.is_dropdown = serializer.data['is_dropdown']
+        route.created_by_id = request.user.id
+        route.updated_by_id = request.user.id
+        route.save()
+        
+        # Create Subroute
+        if subroutes:
+            for data in subroutes:
+                subroute = Subroute()
+                subroute.route_id = route.id
+                subroute.is_nav = data['is_nav']
+                subroute.name = data['name']
+                subroute.nav_name = data['nav_name']
+                subroute.url = data['url']
+                subroute.url_name = data['url_name']
+                subroute.save()
+
+        return Response({"id": route.id}, 201)
 
 
     def retrieve(self, request, pk=None):

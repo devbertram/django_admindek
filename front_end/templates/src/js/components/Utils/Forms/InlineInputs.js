@@ -62,7 +62,10 @@ function RadioButton(props){
                 buttons.push(
                     <div className="radio radio-inline" key={key}>
                         <label>
-                            <input type="radio" value={ val.value } name={ props.name } onChange={ props.onChange }/>
+                            <input type="radio" 
+                                   value={ val.value } 
+                                   name={ props.name } 
+                                   onChange={ props.onChange }/>
                             <i className="helper"></i> { val.label }
                         </label>
                     </div>

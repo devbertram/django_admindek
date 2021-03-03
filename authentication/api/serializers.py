@@ -20,12 +20,30 @@ class SubrouteSerializer(serializers.ModelSerializer):
 
 
 
+class SubrouteCreateFormSerializer(serializers.Serializer):
+    name = serializers.CharField(required=True, max_length=100)
+    is_nav = serializers.BooleanField(required=True)
+    nav_name = serializers.CharField(required=True, max_length=100)
+    url = serializers.CharField(required=True, max_length=100)
+    url_name = serializers.CharField(required=True, max_length=100)
+
+
+
 class RouteSerializer(serializers.ModelSerializer):
     subroute_route = SubrouteSerializer(many=True)
     
     class Meta:
         model = Route
         fields = ('id', 'category', 'name', 'nav_name', 'url', 'url_name', 'icon', 'is_menu', 'is_dropdown', 'subroute_route')
+
+
+
+class RouteCreateFormSerializer(serializers.ModelSerializer):
+    subroutes = SubrouteCreateFormSerializer(many=True)
+
+    class Meta:
+        model = Route
+        fields = ('category', 'name', 'nav_name', 'url', 'url_name', 'icon', 'is_menu', 'is_dropdown', 'subroutes')
 
 
 

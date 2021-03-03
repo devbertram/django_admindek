@@ -8,7 +8,7 @@ function DivLoader(props){
     
     const parent_style = {
         display: props.loading == true ? "" : "none",
-        opacity:"0.7",
+        opacity:"0.9",
         backgroundColor:"white",
         position:"absolute",
         width:"100%",
