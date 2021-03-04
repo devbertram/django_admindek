@@ -31,13 +31,6 @@ class RouteViewSet(viewsets.ModelViewSet):
     pagination_class = RouteListPagination
 
 
-    @action(methods=['get'], detail=False)
-    def get_all(self, request):
-        serializer = self.get_serializer(self.queryset, many=True)
-        print(connection.queries)
-        return Response(serializer.data, 200)
-
-
     def list(self, request):
         search = request.GET.get('q', None)  
         filter_conditions = Q()
@@ -46,7 +39,6 @@ class RouteViewSet(viewsets.ModelViewSet):
             if search:
                 filter_conditions.add(Q(name__icontains=search) | Q(category__icontains=search), Q.AND)
             page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by('-updated_at'))
-
         else:
             page = self.paginate_queryset(self.queryset.order_by('-updated_at'))
         
@@ -98,6 +90,13 @@ class RouteViewSet(viewsets.ModelViewSet):
             return Response({}, 404)
 
 
+    @action(methods=['get'], detail=False)
+    def get_all(self, request):
+        routes_queryset = Route.objects.all()
+        serializer = self.get_serializer(routes_queryset, many=True)
+        return Response(serializer.data, 200)
+
+
 
 class UserRouteViewSet(viewsets.ModelViewSet):
     
@@ -130,7 +129,6 @@ class UserViewSet(viewsets.ModelViewSet):
             if su_status:
                 filter_conditions.add(Q(is_superuser = su_status), Q.AND)
             page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by('-date_joined'))
-
         else:
             page = self.paginate_queryset(self.queryset.order_by('-date_joined'))
         

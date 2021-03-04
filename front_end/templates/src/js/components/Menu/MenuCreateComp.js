@@ -1,8 +1,8 @@
 
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { observer } from 'mobx-react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import eventBus from '../Utils/EventBus'
 import { InputTextInline, RadioButton } from '../Utils/Forms/InlineInputs'
@@ -14,6 +14,9 @@ const MenuCreate = observer(({ menuStore }) => {
 
 
     const [loader, SetLoader] = useState(false);
+
+    const history = useHistory();
+    const redirectBackToMenuList = useCallback(() => history.push('/'), [history]);
 
 
     const handleSave = (e, isa) => {
@@ -41,7 +44,11 @@ const MenuCreate = observer(({ menuStore }) => {
             });
 
             menuStore.resetForm()
-            menuStore.fetch()
+            menuStore.setRouteId(response.data.id)
+
+            if(isa === 0){
+                redirectBackToMenuList()
+            }
 
             SetLoader(false);
 
@@ -88,7 +95,9 @@ const MenuCreate = observer(({ menuStore }) => {
                     <div className="card-header">
                         <h5>Create Menu and Permissions</h5>
                         <div className="card-header-right pt-0">
-                            <Link to="/" className="btn btn-sm btn-primary btn-outline-primary">Back to List</Link>
+                            <Link to="/" className="btn btn-inverse btn-outline-inverse">
+                                Back to List
+                            </Link>
                         </div>
                     </div>
 
@@ -117,10 +126,26 @@ const MenuCreate = observer(({ menuStore }) => {
                                 setter={ e => menuStore.setName(e.target.value) }
                             />
 
+                            <RadioButton
+                                label="Is Side Navigation:"
+                                name="is_menu"
+                                options={ [{value:true, label:"Yes"}, {value:false, label:"No"}] }
+                                onChange={ (e) => menuStore.setIsMenu(e.target.value) }
+                                errorField={ menuStore.error_fields.is_menu }
+                            />
+
+                            <RadioButton
+                                label="Is Side Navigation Dropdown"
+                                name="is_dropdown"
+                                options={ [{value:true, label:"Yes"}, {value:false, label:"No"}] }
+                                onChange={ (e) => menuStore.setIsDropdown(e.target.value) }
+                                errorField={ menuStore.error_fields.is_dropdown }
+                            />
+
                             <InputTextInline 
                                 type="text"
-                                label="Display Name:"
-                                placeholder="Display Name"
+                                label="Side Navigation Name:"
+                                placeholder="Side Navigation Name"
                                 errorField={ menuStore.error_fields.nav_name }
                                 value={ menuStore.nav_name }
                                 setter={ e => menuStore.setNavName(e.target.value) }
@@ -128,8 +153,8 @@ const MenuCreate = observer(({ menuStore }) => {
 
                             <InputTextInline 
                                 type="text"
-                                label="Display Icon:"
-                                placeholder="Display Icon"
+                                label="Side Navigation Icon:"
+                                placeholder="Side Navigation Icon"
                                 errorField={ menuStore.error_fields.icon }
                                 value={ menuStore.icon }
                                 setter={ e => menuStore.setIcon(e.target.value) }
@@ -153,22 +178,6 @@ const MenuCreate = observer(({ menuStore }) => {
                                 setter={ e => menuStore.setUrlName(e.target.value) }
                             />
 
-                            <RadioButton
-                                label="Is Side Navigation:"
-                                name="is_menu"
-                                options={ [{value:true, label:"Yes"}, {value:false, label:"No"}] }
-                                onChange={ (e) => menuStore.setIsMenu(e.target.value) }
-                                errorField={ menuStore.error_fields.is_menu }
-                            />
-
-                            <RadioButton
-                                label="Is Side Navigation Dropdown"
-                                name="is_dropdown"
-                                options={ [{value:true, label:"Yes"}, {value:false, label:"No"}] }
-                                onChange={ (e) => menuStore.setIsDropdown(e.target.value) }
-                                errorField={ menuStore.error_fields.is_dropdown }
-                            />
-
                         </div>
 
 
@@ -178,7 +187,7 @@ const MenuCreate = observer(({ menuStore }) => {
 
                             <div className="table-responsive">
                             
-                                <button className="btn btn-sm btn-outline-primary mb-2" onClick={ () => menuStore.addSubroutes() }>
+                                <button className="btn btn-md btn-primary btn-outline-primary mb-2 float-right" onClick={ () => menuStore.addSubroutes() }>
                                     <i className="fa fa-plus"></i> Add Permission
                                 </button>
 
@@ -186,8 +195,8 @@ const MenuCreate = observer(({ menuStore }) => {
                                     <thead>
                                         <tr>
                                             <th>Permission Name</th>
-                                            <th>Is Navigation Subitem</th>
-                                            <th>Navigation Subitem Name</th>
+                                            <th>Type</th>
+                                            <th>Subitem Name</th>
                                             <th>Url</th>
                                             <th>Url Name</th>
                                             <th>Action</th>

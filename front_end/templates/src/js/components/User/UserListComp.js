@@ -46,7 +46,13 @@ const UserList = observer(({ userStore }) => {
                     <tr key={key} className={ val.id == userStore.selected_user ? "table-success" : "" }>
                         <td className="align-middle">{ val.username }</td>
                         <td className="align-middle">{ val.fullname }</td>
-                        <td className="align-middle">{ val.is_active == true ? <label className="label label-success">online</label> : <label className="label label-danger">offline</label> }</td>
+                        <td className="align-middle">
+                            { val.is_active == true ? 
+                                <label className="label label-success">online</label> 
+                                : 
+                                <label className="label label-danger">offline</label> 
+                            }
+                        </td>
                         <td className="align-middle">{ last_login }</td>
                         <td className="align-middle">{ date_joined }</td>
                         <td className="align-middle">
@@ -136,7 +142,7 @@ const UserList = observer(({ userStore }) => {
                     {/* TABLE BODY */}
                     <div className="card-block table-border-style pb-0 pt-0">
                         <div className="table-responsive">
-                            <table className="table table-xs table-striped table-bordered">
+                            <table className="table table-sm table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th>Username</th>

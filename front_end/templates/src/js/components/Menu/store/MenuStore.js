@@ -16,7 +16,7 @@ class MenuStore{
     query = "";
 
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
-    selected_menu = 0; // selected menu id after create or update
+    selected_route = 0; // selected menu id after create or update
     is_list_loading = false;
     is_form_loading = false;
     is_opened_form = 0; // 0 = create form, 1 = update form
@@ -25,17 +25,22 @@ class MenuStore{
     route_id = "";
     category = "";
     name = "";
-    nav_name = "";
-    url = "";
-    url_name = "";
-    icon = "";
     is_menu = null;
     is_dropdown = null;
+    nav_name = "";
+    icon = "";
+    url = "";
+    url_name = "";
     subroutes = [];
     error_fields = {};
 
     constructor(){
         makeAutoObservable(this)
+    }
+
+
+    setSelectedRoute(selected_route){
+        this.selected_route = selected_route;
     }
 
 
@@ -45,11 +50,15 @@ class MenuStore{
         this.category = "";
         this.name = "";
         this.nav_name = "";
+        this.icon = "";
         this.url = "";
         this.url_name = "";
-        this.icon = "";
         this.subroutes = [];
         this.error_fields = {};
+    }
+
+    setRouteId(route_id){
+        this.route_id = route_id;
     }
 
     setCategory(cat){
@@ -60,8 +69,20 @@ class MenuStore{
         this.name = name;
     }
 
+    setIsMenu(is_menu){
+        this.is_menu = is_menu;
+    }
+
+    setIsDropdown(is_dropdown){
+        this.is_dropdown = is_dropdown;
+    }
+
     setNavName(nav_name){
         this.nav_name = nav_name;
+    }
+
+    setIcon(icon){
+        this.icon = icon;
     }
 
     setUrl(url){
@@ -70,18 +91,6 @@ class MenuStore{
 
     setUrlName(url_name){
         this.url_name = url_name;
-    }
-
-    setIcon(icon){
-        this.icon = icon;
-    }
-
-    setIsMenu(is_menu){
-        this.is_menu = is_menu;
-    }
-
-    setIsDropdown(is_dropdown){
-        this.is_dropdown = is_dropdown;
     }
 
     addSubroutes(){
@@ -142,7 +151,7 @@ class MenuStore{
         this.page_next = 2;
         this.page_size = 10;
         this.query = "";
-        this.selected_menu = 0;
+        this.selected_route = 0;
         this.fetch();
     }
 
