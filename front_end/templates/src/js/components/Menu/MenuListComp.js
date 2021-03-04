@@ -36,11 +36,11 @@ const MenuList = observer(({ menuStore }) => {
             menu_list.forEach((val, key) => {
                 table_rows.push(
                     <tr key={key} className={ val.id == menuStore.selected_route ? "table-success" : "" }>
-                        <td className="align-middle">
+                        <th scope="row" className="align-middle">
                             <a href="#" onClick={ (e) => handleClickRow(e, val.id) }>
                                 <ins className="text-info">{ val.name }</ins>
                             </a>
-                        </td>
+                        </th>
                         <td className="align-middle">{ val.category }</td>
                         <td className="align-middle">
                             { val.is_menu == true ? 
@@ -73,7 +73,6 @@ const MenuList = observer(({ menuStore }) => {
 
     const handleClickRow = (e, id) => {
         e.preventDefault()
-        menuStore.setRouteId(id)
         redirectToMenuDetails(id)
     }
 

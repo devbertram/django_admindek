@@ -44,7 +44,7 @@ const MenuCreate = observer(({ menuStore }) => {
             });
 
             menuStore.resetForm()
-            menuStore.setRouteId(response.data.id)
+            menuStore.setSelectedRoute(response.data.id)
 
             if(isa === 0){
                 redirectBackToMenuList()
@@ -94,11 +94,9 @@ const MenuCreate = observer(({ menuStore }) => {
                     <DivLoader type="Circles" loading={loader}/>
                     <div className="card-header">
                         <h5>Create Menu and Permissions</h5>
-                        <div className="card-header-right pt-0">
-                            <Link to="/" className="btn btn-inverse btn-outline-inverse">
-                                Back to List
-                            </Link>
-                        </div>
+                        <Link to="/" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2">
+                            <i className="fa fa-navicon"></i> Back to List
+                        </Link>
                     </div>
 
                     <div className="card-block">
@@ -187,7 +185,7 @@ const MenuCreate = observer(({ menuStore }) => {
 
                             <div className="table-responsive">
                             
-                                <button className="btn btn-md btn-primary btn-outline-primary mb-2 float-right" onClick={ () => menuStore.addSubroutes() }>
+                                <button className="btn btn-md btn-success btn-outline-success float-right mb-2  pt-2 pb-2" onClick={ () => menuStore.addSubroutes() }>
                                     <i className="fa fa-plus"></i> Add Permission
                                 </button>
 
@@ -217,7 +215,7 @@ const MenuCreate = observer(({ menuStore }) => {
                                                         />
                                                     </td>
                                                     <td>
-                                                        <select name="is_nav" value={val.is_nav} class="form-control form-control-inverse fill" onChange={(e) => menuStore.modifySubroutes(key, e)}>
+                                                        <select name="is_nav" value={val.is_nav} className="form-control form-control-primary" onChange={(e) => menuStore.modifySubroutes(key, e)}>
                                                             <option value="">Select</option>
                                                             <option value={false}>Api</option>
                                                             <option value={true}>Nav Subitem</option>

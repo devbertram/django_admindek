@@ -121,7 +121,7 @@ function MenuMain(props){
                                                 <Link to="/">Menus</Link>
                                             </li>
                                             <li className="breadcrumb-item">
-                                                <Link to={ "/" + menuStore.route_id }>{ menuStore.route_id }</Link>
+                                                <Link to={ "/" + menuStore.route_id }>Menu Details</Link>
                                             </li>
                                         </ul>
                                     </div>

@@ -109,6 +109,10 @@ class MenuStore{
         this.subroutes = list;
     }
 
+    setSubroutes(subroutes){
+        this.subroutes = subroutes;
+    }
+
     setErrorFields(obj){
         this.error_fields = obj;
     }
