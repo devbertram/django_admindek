@@ -79,7 +79,6 @@ const UserList = observer(({ userStore }) => {
     const handleCreateButtonClick = (e) => {
         e.preventDefault()
         $("#user-create-modal").modal('toggle')
-        console.log(userStore.is_opened_form)
         if(userStore.is_opened_form === 1){
             userStore.resetForm()
         }

@@ -1,8 +1,8 @@
 
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { observer } from 'mobx-react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 
 import eventBus from '../Utils/EventBus'
 import { InputTextInline, RadioButton } from '../Utils/Forms/InlineInputs'
@@ -10,83 +10,95 @@ import DivLoader from '../Utils/DivLoaderComp'
 
 
 
-const MenuCreate = observer(({ menuStore }) => {
+const MenuEdit = observer(({ menuStore }) => {
 
 
     const [loader, SetLoader] = useState(false);
     const history = useHistory();
-
-
+    const { param_id } = useParams();
     
+    
+    useEffect (() => {
+        let is_mounted = true;
+        if(is_mounted = true){
+            SetLoader(true)
+            menuStore.setIsOpenedForm(1)
+            menuStore.retrieve(param_id)
+            SetLoader(false)
+        }
+        return () => {
+            is_mounted = false;
+        } 
+    },[])
+
+
     const redirectBackToMenuList = useCallback(() => {
         history.push('/'), [history]
     });
 
 
-
-    const handleSave = (e, isa) => {
+    const handleSave = (e) => {
 
         e.preventDefault();
         SetLoader(true)
 
-        axios.post('api/route/', { 
+        // axios.post('api/route/', { 
 
-            category : menuStore.category,
-            name : menuStore.name,
-            nav_name : menuStore.nav_name,
-            url : menuStore.url,
-            url_name : menuStore.url_name,
-            icon : menuStore.icon,
-            is_menu : menuStore.is_menu,
-            is_dropdown : menuStore.is_dropdown,
-            subroutes : menuStore.subroutes,
+        //     category : menuStore.category,
+        //     name : menuStore.name,
+        //     nav_name : menuStore.nav_name,
+        //     url : menuStore.url,
+        //     url_name : menuStore.url_name,
+        //     icon : menuStore.icon,
+        //     is_menu : menuStore.is_menu,
+        //     is_dropdown : menuStore.is_dropdown,
+        //     subroutes : menuStore.subroutes,
 
-        }).then((response) => {
+        // }).then((response) => {
 
-            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                message: "Menu / Permission Successfully Created!", type: "inverse" 
-            });
+        //     eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+        //         message: "Menu / Permission Successfully Created!", type: "inverse" 
+        //     });
 
-            menuStore.resetForm()
-            menuStore.setSelectedRoute(response.data.id)
+        //     menuStore.resetForm()
+        //     menuStore.setSelectedRoute(response.data.id)
 
-            if(isa === 0){
-                redirectBackToMenuList()
-            }
+        //     if(isa === 0){
+        //         redirectBackToMenuList()
+        //     }
 
-            SetLoader(false);
+        //     SetLoader(false);
 
-        }).catch((error) => {
+        // }).catch((error) => {
 
-            if(error.response.status === 400){
-                let field_errors = error.response.data;
-                menuStore.setErrorFields({
-                    category: field_errors.category?.toString(),
-                    name: field_errors.name?.toString(),
-                    nav_name: field_errors.nav_name?.toString(),
-                    url: field_errors.url?.toString(),
-                    url_name: field_errors.url_name?.toString(),
-                    icon: field_errors.icon?.toString(),
-                    is_menu: field_errors.is_menu?.toString(),
-                    is_dropdown: field_errors.is_dropdown?.toString(),
-                    subroutes: field_errors.subroutes?.toString(),
-                });
-            }
+        //     if(error.response.status === 400){
+        //         let field_errors = error.response.data;
+        //         menuStore.setErrorFields({
+        //             category: field_errors.category?.toString(),
+        //             name: field_errors.name?.toString(),
+        //             nav_name: field_errors.nav_name?.toString(),
+        //             url: field_errors.url?.toString(),
+        //             url_name: field_errors.url_name?.toString(),
+        //             icon: field_errors.icon?.toString(),
+        //             is_menu: field_errors.is_menu?.toString(),
+        //             is_dropdown: field_errors.is_dropdown?.toString(),
+        //             subroutes: field_errors.subroutes?.toString(),
+        //         });
+        //     }
 
-            if(error.response.status === 500){
-                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                    message: "There's an error trying to send data to the server!", type: "danger" 
-                });
-            }
+        //     if(error.response.status === 500){
+        //         eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+        //             message: "There's an error trying to send data to the server!", type: "danger" 
+        //         });
+        //     }
 
-            SetLoader(false);
+        //     SetLoader(false);
 
-        });
-
-
+        // });
 
     }
     
+
 
     return (
 
@@ -96,7 +108,7 @@ const MenuCreate = observer(({ menuStore }) => {
 
                     <DivLoader type="Circles" loading={loader}/>
                     <div className="card-header">
-                        <h5>Create Menu and Permissions</h5>
+                        <h5>Edit Menu and Permissions</h5>
                         <Link to="/" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2">
                             <i className="fa fa-navicon"></i> Back to List
                         </Link>
@@ -275,14 +287,8 @@ const MenuCreate = observer(({ menuStore }) => {
                         {/* BUTTON / FOOTERS */}
                         <div className="form-group row">
                             <div className="col-sm-12">
-                                <button type="submit" className="btn btn-primary float-right mr-2" onClick={ (e) => handleSave(e, 0)}>
+                                <button type="submit" className="btn btn-primary float-right mr-2" onClick={ handleSave }>
                                     Save
-                                </button>
-                                <button type="submit" className="btn btn-primary float-right mr-2" onClick={ (e) => handleSave(e, 1)}>
-                                    Save and add another
-                                </button>
-                                <button type="submit" className="btn btn-primary float-right mr-2" onClick={ () => menuStore.resetForm()}>
-                                    Reset
                                 </button>
                             </div>
                         </div>
@@ -300,4 +306,4 @@ const MenuCreate = observer(({ menuStore }) => {
 });
 
 
-export default MenuCreate
+export default MenuEdit

@@ -11,8 +11,6 @@ import { TableFooterDefault } from '../Utils/Table/TableFooters'
 const MenuList = observer(({ menuStore }) => {
 
     const history = useHistory();
-    const redirectToMenuCreate = useCallback(() => history.push('/create'), [history]);
-    const redirectToMenuDetails = useCallback((id) => history.push('/' + id), [history]);
 
     
     useEffect (() => {
@@ -24,6 +22,24 @@ const MenuList = observer(({ menuStore }) => {
             is_mounted = false;
         } 
     },[])
+
+
+
+    const redirectToMenuCreate = useCallback(() => {
+        if(menuStore.is_opened_form === 1){
+            menuStore.resetForm()
+        }
+        menuStore.setIsOpenedForm(0)
+        history.push('/create'), [history]
+    });
+
+
+
+    const redirectToMenuDetails = useCallback((id) => {
+        menuStore.setRouteId(id)
+        menuStore.setIsOpenedForm(1)
+        history.push('/' + id), [history]
+    });
 
 
 

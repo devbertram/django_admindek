@@ -54,32 +54,26 @@ function SelectMultiInline(props){
 
 function RadioButton(props){ 
 
-    const getOptions = () => {
-        let options = props.options;
-        let buttons = [];
-        if(options.length > 0){
-            options.forEach((val, key) => {
-                buttons.push(
-                    <div className="radio radio-inline" key={key}>
-                        <label>
-                            <input type="radio" 
-                                   value={ val.value } 
-                                   name={ props.name } 
-                                   onChange={ props.onChange }/>
-                            <i className="helper"></i> { val.label }
-                        </label>
-                    </div>
-                )
-            })
-        };
-        return buttons;
-    }
-
     return (
         <div className={ props.errorField ? "form-group row has-danger" : "form-group row"}>
             <label className="col-sm-2 col-form-label">{ props.label }</label>
             <div className="col-sm-10 form-radio">
-                { getOptions() }
+                {
+                    props.options.map((val, key) => {
+                        return (
+                            <div className="radio radio-inline" key={key}>
+                                <label>
+                                    <input type="radio" 
+                                           value={ val.value } 
+                                           name={ props.name } 
+                                           onChange={ props.onChange }
+                                           defaultChecked={ val.value === props.selected ? true : false }/>
+                                    <i className="helper"></i> { val.label }
+                                </label>
+                            </div>
+                        )
+                    })
+                }
                 <div className="col-form-label" style={ props.errorField ? {} : {display:"none"} }> 
                     { props.errorField ? props.errorField : ""}
                 </div>

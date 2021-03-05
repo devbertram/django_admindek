@@ -39,8 +39,52 @@ class MenuStore{
     }
 
 
+    fetch(){
+        this.is_list_loading = true;
+        axios.get('api/route', { 
+            params: { 
+                q: this.query, 
+                page_size: this.page_size, 
+                page: this.page_current, 
+            }
+        }).then((response) => {
+            runInAction(() => {
+                this.list = response.data.results;
+                this.total_records = response.data.count
+                this.page_limit = Math.ceil(response.data.count / this.page_size);
+            })
+        });
+        this.is_list_loading = false;
+    }
+
+
+    retrieve(id){
+        axios.get('api/route/' + id)
+        .then((response) => {
+            let route = response.data;
+            runInAction(() => {
+                this.route_id = route.id
+                this.category = route.category
+                this.name = route.name
+                this.is_menu = route.is_menu
+                this.is_dropdown = route.is_dropdown
+                this.nav_name = route.nav_name
+                this.icon= route.icon
+                this.url = route.url
+                this.url_name = route.url_name
+                this.subroutes = route.subroute_route
+            })
+        });
+    }
+
+
     setSelectedRoute(selected_route){
         this.selected_route = selected_route;
+    }
+
+
+    setIsOpenedForm(is_opened_form){
+        this.is_opened_form = is_opened_form;
     }
 
 
@@ -50,6 +94,8 @@ class MenuStore{
         this.category = "";
         this.name = "";
         this.nav_name = "";
+        this.is_menu = null;
+        this.is_dropdown = null;
         this.icon = "";
         this.url = "";
         this.url_name = "";
@@ -118,26 +164,8 @@ class MenuStore{
     }
 
 
+
     // List Handlers
-    fetch(){
-        this.is_list_loading = true;
-        axios.get('api/route', { 
-            params: { 
-                q: this.query, 
-                page_size: this.page_size, 
-                page: this.page_current, 
-            }
-        }).then((response) => {
-            runInAction(() => {
-                this.list = response.data.results;
-                this.total_records = response.data.count
-                this.page_limit = Math.ceil(response.data.count / this.page_size);
-            })
-        });
-        this.is_list_loading = false;
-    }
-
-
     handleSearch(e){
         e.preventDefault()
         this.page_prev = 0;

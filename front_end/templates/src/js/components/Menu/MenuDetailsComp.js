@@ -1,8 +1,8 @@
 
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { Link, useParams} from 'react-router-dom';
 
 import DivLoader from '../Utils/DivLoaderComp'
 
@@ -11,52 +11,22 @@ import DivLoader from '../Utils/DivLoaderComp'
 const MenuDetails = observer(({ menuStore }) => {
 
     const [loader, SetLoader] = useState(false);
-
     const { param_id } = useParams();
-    const history = useHistory();
-    const redirectToList = useCallback(() => history.push('/'), [history]);
     
     
     useEffect (() => {
         let is_mounted = true;
         if(is_mounted = true){
-            retrieveRoute()
+            SetLoader(true)
+            menuStore.setIsOpenedForm(1)
+            menuStore.retrieve(param_id)
+            SetLoader(false)
         }
         return () => {
             is_mounted = false;
         } 
     },[])
 
-
-    const retrieveRoute = () => {
-
-        SetLoader(true)
-
-        axios.get('api/route/' + param_id)
-
-        .then((response) => {
-
-            let route = response.data;
-
-            menuStore.setRouteId(route.id)
-            menuStore.setCategory(route.category)
-            menuStore.setName(route.name)
-            menuStore.setIsMenu(route.is_menu)
-            menuStore.setIsDropdown(route.is_dropdown)
-            menuStore.setNavName(route.nav_name)
-            menuStore.setIcon(route.icon)
-            menuStore.setUrl(route.url)
-            menuStore.setUrlName(route.url_name)
-            menuStore.setSubroutes(route.subroute_route)
-
-            console.log(menuStore.subroutes)
-
-        });
-        
-        SetLoader(false)
-
-    }
-    
 
     return (
 
@@ -70,9 +40,9 @@ const MenuDetails = observer(({ menuStore }) => {
                         <Link to="/" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
                             <i className="fa fa-navicon"></i> Back to List
                         </Link>
-                        <button className="btn btn-md btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
+                        <Link to={`/${param_id}/edit`} className="btn btn-md btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
                             <i className="fa fa-pencil-square-o"></i> Edit
-                        </button>
+                        </Link>
                         <button className="btn btn-md btn-danger btn-outline-danger float-right pt-2 pb-2">
                             <i className="fa fa-trash"></i> Delete
                         </button>
