@@ -29,6 +29,14 @@ class SubrouteCreateFormSerializer(serializers.Serializer):
 
 
 
+class SubrouteUpdateFormSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subroute
+        fields = ('route', 'is_nav', 'name', 'nav_name', 'url', 'url_name')
+
+
+
 class RouteSerializer(serializers.ModelSerializer):
     subroute_route = SubrouteSerializer(many=True)
     
@@ -44,6 +52,14 @@ class RouteCreateFormSerializer(serializers.ModelSerializer):
     class Meta:
         model = Route
         fields = ('category', 'name', 'nav_name', 'url', 'url_name', 'icon', 'is_menu', 'is_dropdown', 'subroutes')
+
+
+
+class RouteUpdateFormSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Route
+        fields = ('category', 'name', 'nav_name', 'url', 'url_name', 'icon', 'is_menu', 'is_dropdown')
 
 
 

@@ -11,6 +11,8 @@ from django.db import connection
 from .serializers import (
     RouteSerializer,
     RouteCreateFormSerializer,
+    RouteUpdateFormSerializer,
+    SubrouteUpdateFormSerializer,
     UserRouteSerializer,
     UserSerializer,
     UserCreateFormSerializer,
@@ -88,6 +90,25 @@ class RouteViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, 200)
         else:
             return Response({}, 404)
+    
+    
+    def update(self, request, pk=None):
+        serializer = RouteUpdateFormSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        route = self.queryset.get(id=pk)
+        route.name = serializer.data['name']
+        route.category = serializer.data['category']
+        route.nav_name = serializer.data['nav_name']
+        route.url = serializer.data['url']
+        route.url_name = serializer.data['url_name']
+        route.icon = serializer.data['icon']
+        route.is_menu = serializer.data['is_menu']
+        route.is_dropdown = serializer.data['is_dropdown']
+        route.updated_by_id = request.user.id
+        route.save()
+
+        return Response({"id":route.id}, 200)
 
 
     @action(methods=['get'], detail=False)
@@ -95,6 +116,26 @@ class RouteViewSet(viewsets.ModelViewSet):
         routes_queryset = Route.objects.all()
         serializer = self.get_serializer(routes_queryset, many=True)
         return Response(serializer.data, 200)
+
+
+
+class SubrouteViewSet(viewsets.ModelViewSet):
+
+    def update(self, request, pk=None):
+        serializer = SubrouteUpdateFormSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        subroute = Subroute.objects.get(route_id=serializer.data['route'], id=pk)
+
+        if subroute:
+            subroute.is_nav = serializer.data['is_nav']
+            subroute.name = serializer.data['name']
+            subroute.nav_name = serializer.data['nav_name']
+            subroute.url = serializer.data['url']
+            subroute.url_name = serializer.data['url_name']
+            subroute.save()
+
+        return Response({"id":subroute.id}, 200)
 
 
 

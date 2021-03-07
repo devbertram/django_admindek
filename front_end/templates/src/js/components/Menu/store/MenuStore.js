@@ -4,7 +4,6 @@ import { makeAutoObservable, runInAction } from "mobx"
 
 class MenuStore{
 
-    page_type = "LIST";
     // List
     list = {};
     total_records = 0;
@@ -34,6 +33,7 @@ class MenuStore{
     subroutes = [];
     error_fields = {};
 
+
     constructor(){
         makeAutoObservable(this)
     }
@@ -61,18 +61,17 @@ class MenuStore{
     retrieve(id){
         axios.get('api/route/' + id)
         .then((response) => {
-            let route = response.data;
             runInAction(() => {
-                this.route_id = route.id
-                this.category = route.category
-                this.name = route.name
-                this.is_menu = route.is_menu
-                this.is_dropdown = route.is_dropdown
-                this.nav_name = route.nav_name
-                this.icon= route.icon
-                this.url = route.url
-                this.url_name = route.url_name
-                this.subroutes = route.subroute_route
+                this.route_id = response.data.id
+                this.category = response.data.category
+                this.name = response.data.name
+                this.is_menu = response.data.is_menu
+                this.is_dropdown = response.data.is_dropdown
+                this.nav_name = response.data.nav_name
+                this.icon= response.data.icon
+                this.url = response.data.url
+                this.url_name = response.data.url_name
+                this.subroutes = response.data.subroute_route
             })
         });
     }
@@ -157,6 +156,14 @@ class MenuStore{
 
     setSubroutes(subroutes){
         this.subroutes = subroutes;
+    }
+
+    findSubrouteById(value){
+        const subroutes = this.subroutes;
+        subroutes.find((data)=>{
+            return data.id === value;
+        })
+        return subroutes;
     }
 
     setErrorFields(obj){

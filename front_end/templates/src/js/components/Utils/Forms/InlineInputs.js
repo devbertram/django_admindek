@@ -60,6 +60,7 @@ function RadioButton(props){
             <div className="col-sm-10 form-radio">
                 {
                     props.options.map((val, key) => {
+                        var isChecked = (val.value.toString() === props.value?.toString());
                         return (
                             <div className="radio radio-inline" key={key}>
                                 <label>
@@ -67,7 +68,7 @@ function RadioButton(props){
                                            value={ val.value } 
                                            name={ props.name } 
                                            onChange={ props.onChange }
-                                           defaultChecked={ val.value === props.selected ? true : false }/>
+                                           checked={ isChecked }/>
                                     <i className="helper"></i> { val.label }
                                 </label>
                             </div>

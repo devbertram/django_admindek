@@ -24,6 +24,35 @@ const MenuCreate = observer(({ menuStore }) => {
 
 
 
+    const getSubrouteInputField = (name, value, placeholder, key) => {
+        return(
+            <input 
+                name={ name } 
+                value={ value }
+                className="form-control" 
+                placeholder={ placeholder }
+                onChange={ (e) => menuStore.modifySubroutes(key, e) }
+            />
+        )
+    };
+
+
+
+    const getSubrouteFieldError = (key, field_name) => {
+        if(menuStore.error_fields.subroutes){
+            let errors = [...menuStore.error_fields.subroutes];
+            if(errors[key]){
+                return (
+                    <div className="col-form-label">
+                        <p className="text-danger">{ errors[key][field_name] }</p>
+                    </div>
+                )
+            }else{ return ""; }
+        }else{ return ""; }
+    };
+
+
+
     const handleSave = (e, isa) => {
 
         e.preventDefault();
@@ -50,9 +79,7 @@ const MenuCreate = observer(({ menuStore }) => {
             menuStore.resetForm()
             menuStore.setSelectedRoute(response.data.id)
 
-            if(isa === 0){
-                redirectBackToMenuList()
-            }
+            if(isa === 0){ redirectBackToMenuList() }
 
             SetLoader(false);
 
@@ -69,7 +96,7 @@ const MenuCreate = observer(({ menuStore }) => {
                     icon: field_errors.icon?.toString(),
                     is_menu: field_errors.is_menu?.toString(),
                     is_dropdown: field_errors.is_dropdown?.toString(),
-                    subroutes: field_errors.subroutes?.toString(),
+                    subroutes: field_errors.subroutes,
                 });
             }
 
@@ -130,7 +157,7 @@ const MenuCreate = observer(({ menuStore }) => {
                             <RadioButton
                                 label="Is Side Navigation:"
                                 name="is_menu"
-                                selected={ menuStore.is_menu }
+                                value={ menuStore.is_menu }
                                 options={ [{value:true, label:"Yes"}, {value:false, label:"No"}] }
                                 onChange={ (e) => menuStore.setIsMenu(e.target.value) }
                                 errorField={ menuStore.error_fields.is_menu }
@@ -139,7 +166,7 @@ const MenuCreate = observer(({ menuStore }) => {
                             <RadioButton
                                 label="Is Side Navigation Dropdown"
                                 name="is_dropdown"
-                                selected={ menuStore.is_dropdown }
+                                value={ menuStore.is_dropdown }
                                 options={ [{value:true, label:"Yes"}, {value:false, label:"No"}] }
                                 onChange={ (e) => menuStore.setIsDropdown(e.target.value) }
                                 errorField={ menuStore.error_fields.is_dropdown }
@@ -211,13 +238,8 @@ const MenuCreate = observer(({ menuStore }) => {
                                             return (
                                                 <tr key={key}>
                                                     <td>
-                                                        <input 
-                                                            name="name" 
-                                                            value={val.name}
-                                                            className="form-control" 
-                                                            placeholder="Ex: Can View User List" 
-                                                            onChange={(e) => menuStore.modifySubroutes(key, e)}
-                                                        />
+                                                        { getSubrouteInputField('name', val.name, 'Ex: Can View User List', key) }
+                                                        { getSubrouteFieldError(key, 'name') }
                                                     </td>
                                                     <td>
                                                         <select name="is_nav" 
@@ -228,33 +250,19 @@ const MenuCreate = observer(({ menuStore }) => {
                                                             <option value={false}>Api</option>
                                                             <option value={true}>Nav Subitem</option>
                                                         </select>
+                                                        { getSubrouteFieldError(key, 'is_nav') }
                                                     </td>
                                                     <td>
-                                                        <input 
-                                                            name="nav_name" 
-                                                            value={val.nav_name}
-                                                            className="form-control" 
-                                                            placeholder="Ex: User Manage"
-                                                            onChange={(e) => menuStore.modifySubroutes(key, e)}
-                                                        />
+                                                        { getSubrouteInputField('nav_name', val.nav_name, 'Ex: User Manage', key) }
+                                                        { getSubrouteFieldError(key, 'nav_name') }
                                                     </td>
                                                     <td>
-                                                        <input 
-                                                            name="url" 
-                                                            value={val.url}
-                                                            className="form-control" 
-                                                            placeholder="Ex: /user/list/"
-                                                            onChange={(e) => menuStore.modifySubroutes(key, e)}
-                                                        />
+                                                        { getSubrouteInputField('url', val.url, 'Ex: /user/list/', key) }
+                                                        { getSubrouteFieldError(key, 'url') }
                                                     </td>
                                                     <td>
-                                                        <input 
-                                                            name="url_name" 
-                                                            value={val.url_name}
-                                                            className="form-control" 
-                                                            placeholder="Ex: user_list"
-                                                            onChange={(e) => menuStore.modifySubroutes(key, e)}
-                                                        />
+                                                        { getSubrouteInputField('url_name', val.url_name, 'Ex: user_list', key) }
+                                                        { getSubrouteFieldError(key, 'url_name') }
                                                     </td>
                                                     <td>
                                                         <button className="btn btn-sm btn-danger" type="button" onClick={ () => menuStore.deleteSubroutes(key) }>
