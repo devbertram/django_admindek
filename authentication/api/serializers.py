@@ -20,7 +20,7 @@ class SubrouteSerializer(serializers.ModelSerializer):
 
 
 
-class SubrouteCreateFormSerializer(serializers.Serializer):
+class SubrouteCreateMultiFormSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, max_length=100)
     is_nav = serializers.BooleanField(required=True)
     nav_name = serializers.CharField(required=True, max_length=100)
@@ -29,7 +29,7 @@ class SubrouteCreateFormSerializer(serializers.Serializer):
 
 
 
-class SubrouteUpdateFormSerializer(serializers.ModelSerializer):
+class SubrouteFormSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subroute
@@ -47,7 +47,7 @@ class RouteSerializer(serializers.ModelSerializer):
 
 
 class RouteCreateFormSerializer(serializers.ModelSerializer):
-    subroutes = SubrouteCreateFormSerializer(many=True)
+    subroutes = SubrouteCreateMultiFormSerializer(many=True)
 
     class Meta:
         model = Route
@@ -72,7 +72,7 @@ class UserSubrouteSerializer(serializers.ModelSerializer):
         
 
 
-class UserSubrouteCreateFormSerializer(serializers.Serializer):
+class UserSubrouteCreateMultiFormSerializer(serializers.Serializer):
     value = serializers.IntegerField(required=True)
     label = serializers.CharField(required=True, max_length=100)
 
@@ -88,7 +88,7 @@ class UserRouteSerializer(serializers.ModelSerializer):
 
 
 
-class UserRouteCreateFormSerializer(serializers.Serializer):
+class UserRouteCreateMultiFormSerializer(serializers.Serializer):
     value = serializers.IntegerField(required=True)
     label = serializers.CharField(required=True, max_length=100)
 
@@ -108,8 +108,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserCreateFormSerializer(serializers.ModelSerializer): 
-    user_routes = UserRouteCreateFormSerializer(many=True, required=True)
-    user_subroutes = UserSubrouteCreateFormSerializer(many=True, required=True)
+    user_routes = UserRouteCreateMultiFormSerializer(many=True, required=True)
+    user_subroutes = UserSubrouteCreateMultiFormSerializer(many=True, required=True)
     password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -156,8 +156,8 @@ class UserCreateFormSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateFormSerializer(serializers.ModelSerializer): 
-    user_routes = UserRouteCreateFormSerializer(many=True, required=True)
-    user_subroutes = UserSubrouteCreateFormSerializer(many=True, required=True)
+    user_routes = UserRouteCreateMultiFormSerializer(many=True, required=True)
+    user_subroutes = UserSubrouteCreateMultiFormSerializer(many=True, required=True)
 
     class Meta:
         model = User

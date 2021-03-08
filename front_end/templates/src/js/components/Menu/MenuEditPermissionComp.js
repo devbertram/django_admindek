@@ -11,8 +11,10 @@ import DivLoader from '../Utils/DivLoaderComp'
 
 const MenuEditPermission = observer(({ menuStore }) => {
 
-    const [loader, SetLoader] = useState(false);
     const { param_id } = useParams();
+    const [loader, SetLoader] = useState(false);
+    const [selected_subroute_id, SetSelectedSubrouteId] = useState("");
+    const [subroute_delete_id, SetSubrouteDeleteId] = useState("");
     
     
 
@@ -60,46 +62,98 @@ const MenuEditPermission = observer(({ menuStore }) => {
 
 
 
-    const handleSaveSubroute = (e, key, id) => {
-
+    const handleCreateSubroute = (e, key) => {
         e.preventDefault();
-        
+        SetLoader(true)
+        const subroute = menuStore.findSubrouteByKey(key)
+        axios.post('api/subroute/', { 
+            route: param_id,
+            name: subroute.name,
+            is_nav: subroute.is_nav,
+            nav_name: subroute.nav_name,
+            url: subroute.url,
+            url_name: subroute.url_name,
+        }).then((response) => {
+            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                message: "Permission Successfully Created!", type: "inverse" 
+            });
+            SetSelectedSubrouteId(response.data.id)
+            menuStore.setSelectedRoute(param_id)
+            menuStore.retrieve(param_id)
+            SetLoader(false);
+        }).catch((error) => {
+            if(error.response.status === 500){
+                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                    message: "There's an error trying to send data to the server!", type: "danger" 
+                });
+            }
+            SetLoader(false);
+        });
+    }
+
+
+
+    const handleUpdateSubroute = (e, key, id) => {
+        e.preventDefault();
         SetLoader(true)
         const subroute = menuStore.findSubrouteById(id)
-
-        console.log(subroute[key]['id'])
-
-        axios.put('api/subroute/'+id+"/", { 
-
+        axios.put('api/subroute/'+id+'/', { 
             route: param_id,
             name: subroute[key]['name'],
             is_nav: subroute[key]['is_nav'],
             nav_name: subroute[key]['nav_name'],
             url: subroute[key]['url'],
             url_name: subroute[key]['url_name'],
-
         }).then((response) => {
-
             eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                message: "Permission Successfully Saved!", type: "inverse" 
+                message: "Permission Successfully Updated!", type: "inverse" 
             });
-
+            SetSelectedSubrouteId(response.data.id)
             menuStore.setSelectedRoute(param_id)
-
+            menuStore.retrieve(param_id)
             SetLoader(false);
-
         }).catch((error) => {
-
             if(error.response.status === 500){
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                     message: "There's an error trying to send data to the server!", type: "danger" 
                 });
             }
-
             SetLoader(false);
-
         });
 
+    }
+
+
+
+    const handleDeleteSubrouteModal = (e, id) => {
+        e.preventDefault()
+        SetSubrouteDeleteId(id)
+        $("#subroute-delete-modal").modal('toggle')
+    }
+
+
+
+    const handleDeleteSubrouteSubmit = (e, subroute_delete_id) => {
+        e.preventDefault()
+        axios.delete('api/subroute/'+subroute_delete_id+"/")
+             .then((response) => {
+                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                    message: "Permission Successfully Deleted!", type: "inverse" 
+                });
+                menuStore.retrieve(param_id)
+                $("#subroute-delete-modal").modal('hide');
+             }).catch((error) => {
+                if(error.response.status == 404){
+                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                        message: "Data Not Found!", type: "danger" 
+                    });
+                }
+                if(error.response.status == 500){
+                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                        message: "There's an error trying to send data to the server!", type: "danger" 
+                    });
+                }
+            });
     }
     
 
@@ -107,6 +161,8 @@ const MenuEditPermission = observer(({ menuStore }) => {
     return (
 
         <div className="row">
+
+
             <div className="col-sm-12">
                 <div className="card">
 
@@ -122,7 +178,6 @@ const MenuEditPermission = observer(({ menuStore }) => {
                     </div>
 
                     <div className="card-block">
-
 
                         {/* MENU DETAILS */}
                         <div className="col-md-12">
@@ -149,7 +204,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                                     {
                                         menuStore.subroutes.map((val, key) => {
                                             return (
-                                                <tr key={key}>
+                                                <tr key={key} className={ val.id === selected_subroute_id ? "table-success" : "" }>
                                                     <td className="align-middle">
                                                         { getSubrouteInputField('name', val.name, 'Ex: Can View User List', key) }
                                                         { getSubrouteFieldError(key, 'name') }
@@ -161,7 +216,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                                                                 onChange={(e) => menuStore.modifySubroutes(key, e)}>
                                                             <option value="">Select</option>
                                                             <option value={false}>Api</option>
-                                                            <option value={true}>Nav Subitem</option>
+                                                            <option value={true}>Subitem</option>
                                                         </select>
                                                         { getSubrouteFieldError(key, 'is_nav') }
                                                     </td>
@@ -177,14 +232,36 @@ const MenuEditPermission = observer(({ menuStore }) => {
                                                         { getSubrouteInputField('url_name', val.url_name, 'Ex: user_list', key) }
                                                         { getSubrouteFieldError(key, 'url_name') }
                                                     </td>
-                                                    <td className="align-middle">
-                                                        <button className="btn btn-primary pb-2 pt-2" type="button" onClick={ e => handleSaveSubroute(e, key, val.id) }>
-                                                            Save
-                                                        </button>
-                                                        <button className="btn btn-danger pb-2 pt-2 ml-2" type="button" onClick={ () => menuStore.deleteSubroutes(key) }>
-                                                            <i className="fa fa-trash ml-1"></i>
-                                                        </button>
-                                                    </td>
+                                                        { val.is_from_query === true ? 
+                                                            (
+                                                                <td className="align-middle">
+                                                                    <button className="btn btn-primary pb-2 pt-2" 
+                                                                            type="button" 
+                                                                            onClick={ e => handleUpdateSubroute(e, key, val.id) }>
+                                                                        Update
+                                                                    </button>
+                                                                    <button className="btn btn-danger pb-2 pt-2 ml-2" 
+                                                                            type="button" 
+                                                                            onClick={ e => handleDeleteSubrouteModal(e, val.id) }>
+                                                                        <i className="fa fa-trash ml-1"></i>
+                                                                    </button>
+                                                                </td>
+                                                            ) : 
+                                                            (
+                                                                <td className="align-middle">
+                                                                    <button className="btn btn-success pb-2 pt-2" 
+                                                                            type="button" 
+                                                                            onClick={ e => handleCreateSubroute(e, key) }>
+                                                                        Create
+                                                                    </button>
+                                                                    <button className="btn btn-danger pb-2 pt-2 ml-2" 
+                                                                            type="button" 
+                                                                            onClick={ () => menuStore.deleteSubroutes(key) }>
+                                                                        <i className="fa fa-trash ml-1"></i>
+                                                                    </button>
+                                                                </td>
+                                                            )
+                                                        }
                                                 </tr>
                                             )
                                         }) 
@@ -199,6 +276,30 @@ const MenuEditPermission = observer(({ menuStore }) => {
 
                 </div>
             </div>
+                    
+
+            {/* DELETE MODAL */}
+            <div className="modal" id="subroute-delete-modal" role="dialog">
+                <div className="modal-dialog modal-lg" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h4 className="modal-title">Delete Subroute</h4>
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <h4>Are you sure you want to permanently delete this record?</h4>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                            <button type="button" className="btn btn-danger waves-effect waves-light" onClick={ e => handleDeleteSubrouteSubmit(e, subroute_delete_id) }>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
 
     );

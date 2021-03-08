@@ -12,7 +12,8 @@ from .serializers import (
     RouteSerializer,
     RouteCreateFormSerializer,
     RouteUpdateFormSerializer,
-    SubrouteUpdateFormSerializer,
+    SubrouteSerializer,
+    SubrouteFormSerializer,
     UserRouteSerializer,
     UserSerializer,
     UserCreateFormSerializer,
@@ -111,6 +112,15 @@ class RouteViewSet(viewsets.ModelViewSet):
         return Response({"id":route.id}, 200)
 
 
+    def destroy(self, request, pk=None):
+        route = self.queryset.get(id=pk)
+        if route:
+            route.delete()
+            return Response({}, 200)
+        else:
+            return Response({}, 404)
+
+
     @action(methods=['get'], detail=False)
     def get_all(self, request):
         routes_queryset = Route.objects.all()
@@ -120,13 +130,31 @@ class RouteViewSet(viewsets.ModelViewSet):
 
 
 class SubrouteViewSet(viewsets.ModelViewSet):
+    
+    queryset = Subroute.objects.all()
+    serializer_class = SubrouteSerializer
+        
+
+    def create(self, request):
+        serializer = SubrouteFormSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        subroute = Subroute()
+        subroute.route_id = serializer.data['route']
+        subroute.is_nav = serializer.data['is_nav']
+        subroute.name = serializer.data['name']
+        subroute.nav_name = serializer.data['nav_name']
+        subroute.url = serializer.data['url']
+        subroute.url_name = serializer.data['url_name']
+        subroute.save()
+        return Response({"id":subroute.id}, 200)
+
 
     def update(self, request, pk=None):
-        serializer = SubrouteUpdateFormSerializer(data=request.data)
+        serializer = SubrouteFormSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        subroute = Subroute.objects.get(route_id=serializer.data['route'], id=pk)
-
+        subroute = self.queryset.get(route_id=serializer.data['route'], id=pk)
         if subroute:
             subroute.is_nav = serializer.data['is_nav']
             subroute.name = serializer.data['name']
@@ -134,8 +162,18 @@ class SubrouteViewSet(viewsets.ModelViewSet):
             subroute.url = serializer.data['url']
             subroute.url_name = serializer.data['url_name']
             subroute.save()
+            return Response({"id":subroute.id}, 200)
+        else:
+            return Response({}, 404)
 
-        return Response({"id":subroute.id}, 200)
+
+    def destroy(self, request, pk=None):
+        subroute = self.queryset.get(id=pk)
+        if subroute:
+            subroute.delete()
+            return Response({}, 200)
+        else:
+            return Response({}, 404)
 
 
 

@@ -1,9 +1,10 @@
 
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { observer } from 'mobx-react';
-import { Link, useParams} from 'react-router-dom';
+import { Link, useParams, useHistory} from 'react-router-dom';
 
+import eventBus from '../Utils/EventBus'
 import DivLoader from '../Utils/DivLoaderComp'
 
 
@@ -12,6 +13,14 @@ const MenuDetails = observer(({ menuStore }) => {
 
     const [loader, SetLoader] = useState(false);
     const { param_id } = useParams();
+    const history = useHistory();
+
+
+    
+    const redirectBackToMenuList = useCallback(() => {
+        history.push('/'), [history]
+    });
+
     
     
     useEffect (() => {
@@ -20,6 +29,7 @@ const MenuDetails = observer(({ menuStore }) => {
             SetLoader(true)
             menuStore.setIsOpenedForm(1)
             menuStore.retrieve(param_id)
+            menuStore.setSelectedRoute(param_id)
             SetLoader(false)
         }
         return () => {
@@ -28,9 +38,43 @@ const MenuDetails = observer(({ menuStore }) => {
     },[])
 
 
+
+    const handleDeleteRouteModal = (e) => {
+        e.preventDefault()
+        $("#route-delete-modal").modal('toggle')
+    }
+
+
+
+    const handleDeleteRouteSubmit = (e) => {
+        e.preventDefault()
+        axios.delete('api/route/'+param_id+'/')
+             .then((response) => {
+                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                    message: "Menu has been successfully Deleted!", type: "inverse"
+                });
+                $("#route-delete-modal").modal('hide');
+                redirectBackToMenuList()
+             }).catch((error) => {
+                if(error.response.status == 404){
+                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                        message: "Data Not Found!", type: "danger" 
+                    });
+                }
+                if(error.response.status == 500){
+                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                        message: "There's an error trying to send data to the server!", type: "danger" 
+                    });
+                }
+            });
+    }
+
+
+
     return (
 
         <div className="row">
+
 
             <div className="col-sm-12">
                 <div className="card">
@@ -41,7 +85,8 @@ const MenuDetails = observer(({ menuStore }) => {
                         <Link to="/" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
                             <i className="fa fa-navicon"></i> Back to List
                         </Link>
-                        <button className="btn btn-md btn-danger btn-outline-danger float-right pt-2 pb-2">
+                        <button className="btn btn-md btn-danger btn-outline-danger float-right pt-2 pb-2" 
+                                onClick={ handleDeleteRouteModal }>
                             <i className="fa fa-trash"></i> Delete
                         </button>
                     </div>
@@ -150,6 +195,29 @@ const MenuDetails = observer(({ menuStore }) => {
 
                 </div>
             </div>
+
+                                                    
+            {/* DELETE MODAL */}
+            <div className="modal" id="route-delete-modal" role="dialog">
+                <div className="modal-dialog modal-lg" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h4 className="modal-title">Delete Subroute</h4>
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <h4>Are you sure you want to permanently delete this record?</h4>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                            <button type="button" className="btn btn-danger waves-effect waves-light" onClick={ handleDeleteRouteSubmit }>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     );

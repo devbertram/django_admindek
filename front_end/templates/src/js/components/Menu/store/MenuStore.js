@@ -62,6 +62,10 @@ class MenuStore{
         axios.get('api/route/' + id)
         .then((response) => {
             runInAction(() => {
+
+                const res_subroutes = response.data.subroute_route;
+                let subroutes = []
+
                 this.route_id = response.data.id
                 this.category = response.data.category
                 this.name = response.data.name
@@ -71,7 +75,22 @@ class MenuStore{
                 this.icon= response.data.icon
                 this.url = response.data.url
                 this.url_name = response.data.url_name
-                this.subroutes = response.data.subroute_route
+
+                // Set Subroutes
+                res_subroutes.forEach(data => {
+                    subroutes.push({
+                        id: data.id,
+                        is_nav: data.is_nav, 
+                        name: data.name, 
+                        nav_name: data.nav_name, 
+                        url: data.url, 
+                        url_name: data.url_name, 
+                        is_from_query: true, 
+                    })
+                });
+
+                this.subroutes = subroutes;
+
             })
         });
     }
@@ -164,6 +183,11 @@ class MenuStore{
             return data.id === value;
         })
         return subroutes;
+    }
+
+    findSubrouteByKey(key){
+        const subroutes = this.subroutes;
+        return subroutes[key];
     }
 
     setErrorFields(obj){

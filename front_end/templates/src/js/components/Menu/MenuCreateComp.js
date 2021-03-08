@@ -248,7 +248,7 @@ const MenuCreate = observer(({ menuStore }) => {
                                                                 onChange={(e) => menuStore.modifySubroutes(key, e)}>
                                                             <option value="">Select</option>
                                                             <option value={false}>Api</option>
-                                                            <option value={true}>Nav Subitem</option>
+                                                            <option value={true}>Subitem</option>
                                                         </select>
                                                         { getSubrouteFieldError(key, 'is_nav') }
                                                     </td>
