@@ -239,7 +239,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                                                     {
                                                         menuStore.subroutes.map((val, key) => {
                                                             return (
-                                                                <tr key={key} className={ val.id === selected_subroute_id ? "table-success" : "" }>
+                                                                <tr key={key} className={ val.id === selected_subroute_id ? "table-info" : "" }>
                                                                     <td className="align-middle">
                                                                         { getSubrouteInputField('name', val.name, 'Ex: Can View User List', key) }
                                                                         { getSubrouteFieldError(key, 'name') }

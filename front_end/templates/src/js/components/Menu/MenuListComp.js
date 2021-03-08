@@ -49,7 +49,7 @@ const MenuList = observer(({ menuStore }) => {
         if(menu_list.length > 0){
             menu_list.forEach((val, key) => {
                 table_rows.push(
-                    <tr key={key} className={ val.id == menuStore.selected_route ? "table-success" : "" }>
+                    <tr key={key} className={ val.id == menuStore.selected_route ? "table-info" : "" }>
                         <th scope="row" className="align-middle">
                             <a href="#" onClick={ (e) => handleClickRow(e, val.id) }>
                                 <ins className="text-info">{ val.name }</ins>
@@ -140,6 +140,7 @@ const MenuList = observer(({ menuStore }) => {
                                             addButtonClickHandler={ redirectToMenuCreate }
                                             searchInputValue={ menuStore.query }
                                             searchInputHandler={ (e) => menuStore.handleSearch(e) }
+                                            filterButton={false}
                                             filterButtonClickHandler={ handleFilterButtonClick }
                                             refreshButtonClickHandler={ (e) => menuStore.handleRefreshClick(e) }
                                             entriesSelectPageSize={ menuStore.page_size }
@@ -156,7 +157,7 @@ const MenuList = observer(({ menuStore }) => {
                                     {/* TABLE BODY */}
                                     <div className="card-block table-border-style pb-0 pt-0">
                                         <div className="table-responsive">
-                                            <table className="table table-sm table-striped table-bordered">
+                                            <table className="table table-de table-hover">
                                                 <thead>
                                                     <tr>
                                                         <th>Name</th>

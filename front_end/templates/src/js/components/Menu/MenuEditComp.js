@@ -55,7 +55,7 @@ const MenuEdit = observer(({ menuStore }) => {
         }).then((response) => {
 
             eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                message: "Menu / Permission Successfully Created!", type: "inverse" 
+                message: "Menu Details Successfully Updated!", type: "inverse" 
             });
 
             menuStore.setSelectedRoute(response.data.id)

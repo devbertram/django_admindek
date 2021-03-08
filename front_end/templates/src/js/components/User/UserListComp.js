@@ -43,7 +43,7 @@ const UserList = observer(({ userStore }) => {
                 let date_joined = moment(val.date_joined).format("MM/DD/YYYY hh:mm A")
                 
                 table_rows.push(
-                    <tr key={key} className={ val.id == userStore.selected_user ? "table-success" : "" }>
+                    <tr key={key} className={ val.id == userStore.selected_user ? "table-info" : "" }>
                         <td className="align-middle">{ val.username }</td>
                         <td className="align-middle">{ val.fullname }</td>
                         <td className="align-middle">
@@ -125,6 +125,7 @@ const UserList = observer(({ userStore }) => {
                             addButtonClickHandler={ handleCreateButtonClick }
                             searchInputValue={ userStore.query }
                             searchInputHandler={ (e) => userStore.handleSearch(e) }
+                            filterButton={true}
                             filterButtonClickHandler={ handleFilterButtonClick }
                             refreshButtonClickHandler={ (e) => userStore.handleRefreshClick(e) }
                             entriesSelectPageSize={ userStore.page_size }
@@ -141,7 +142,7 @@ const UserList = observer(({ userStore }) => {
                     {/* TABLE BODY */}
                     <div className="card-block table-border-style pb-0 pt-0">
                         <div className="table-responsive">
-                            <table className="table table-sm table-striped table-bordered">
+                            <table className="table table-de table-hover">
                                 <thead>
                                     <tr>
                                         <th>Username</th>

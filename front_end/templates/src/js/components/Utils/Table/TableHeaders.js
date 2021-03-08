@@ -102,9 +102,13 @@ function TableHeaderDefault(props){
                 <div className="pl-4" style={{ width : '40%' }}>
                     <SearchInput searchValue={ props.searchInputValue } searchHandler={ props.searchInputHandler } />
                 </div>
-                <div className="pl-4">
-                    <FilterButton clickHandler={ props.filterButtonClickHandler } />
-                </div>
+                { props.filterButton === true ?
+                    (
+                        <div className="pl-4">
+                            <FilterButton clickHandler={ props.filterButtonClickHandler } />
+                        </div>
+                    ) : ""
+                }
                 <div className="pl-4">
                     <RefreshButton clickHandler={ props.refreshButtonClickHandler } />
                 </div>
