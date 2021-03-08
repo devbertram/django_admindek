@@ -117,14 +117,14 @@ const MenuEdit = observer(({ menuStore }) => {
                             <li className="breadcrumb-item">
                                 <a href="/dashboard"><i className="feather icon-home"></i></a>
                             </li>
-                            <li className="breadcrumb-item"> 
+                            <li className="breadcrumb-item">
                                 <Link to="/">Menus</Link>
                             </li>
                             <li className="breadcrumb-item">
                                 <Link to={`/${menuStore.route_id}`}>Details</Link>
                             </li>
                             <li className="breadcrumb-item">
-                                Edit Permissions
+                                Edit
                             </li>
                         </ul>
                     </div>
@@ -135,7 +135,6 @@ const MenuEdit = observer(({ menuStore }) => {
             <div className="main-body">
                 <div className="page-wrapper">
                     <div className="page-body">
-
                         <div className="row">
                             <div className="col-sm-12">
                                 <div className="card">
@@ -247,6 +246,7 @@ const MenuEdit = observer(({ menuStore }) => {
 
 
                                     </div>
+
                                 </div>
                             </div>
                         </div>
