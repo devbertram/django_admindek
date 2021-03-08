@@ -44,10 +44,8 @@ const MenuList = observer(({ menuStore }) => {
 
 
     const getTableRows = () => {
-        
         let table_rows = []
         let menu_list = menuStore.list
-
         if(menu_list.length > 0){
             menu_list.forEach((val, key) => {
                 table_rows.push(
@@ -80,9 +78,7 @@ const MenuList = observer(({ menuStore }) => {
                 )
             })
         }
-
         return table_rows
-
     }
 
 
@@ -103,78 +99,108 @@ const MenuList = observer(({ menuStore }) => {
 
     return (
 
-        <div className="row">
-            <div className="col-md-12">
-                <div className="card table-card">
-
-                    {/* Table Header */}
-                    <div className="card-header p-b-0"> 
-                        <TableHeaderDefault
-                            addButtonClickHandler={ redirectToMenuCreate }
-                            searchInputValue={ menuStore.query }
-                            searchInputHandler={ (e) => menuStore.handleSearch(e) }
-                            filterButtonClickHandler={ handleFilterButtonClick }
-                            refreshButtonClickHandler={ (e) => menuStore.handleRefreshClick(e) }
-                            entriesSelectPageSize={ menuStore.page_size }
-                            entriesSelectChangeHandler={ (e) => menuStore.handlePageSizeClick(e) }
-                            paginationPagePrev={ menuStore.page_prev }
-                            paginationPageNext={ menuStore.page_next }
-                            paginationPageLimit={ menuStore.page_limit }
-                            paginationPrevClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_prev) }
-                            paginationNextClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_next) }
-                        />  
-                    </div>
-                    
-                    {/* TABLE BODY */}
-                    <div className="card-block table-border-style pb-0 pt-0">
-                        <div className="table-responsive">
-                            <table className="table table-sm table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Category</th>
-                                        <th>Is Side Nav.</th>
-                                        <th>Is Side Nav. Dropdown</th>
-                                        <th>Side Nav. Name</th>
-                                        <th>Side Nav. Icon</th>
-                                        <th>Url</th>
-                                        <th>Url Name</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    { getTableRows() }
-                                </tbody>
-                            </table>
+    <div className="pcoded-content">
+        <div className="page-header card">
+            <div className="row align-items-end">
+                <div className="col-lg-8">
+                    <div className="page-header-title">
+                        <i className="feather icon-user bg-c-blue"></i>
+                        <div className="d-inline">
+                            <h5>Menus and Permissions</h5>
+                            <span>Manage Menus and Permissions</span>
                         </div>
-
                     </div>
-                    
-
-                    {/* Table Footer */}
-                    <div className="card-footer">
-                        <TableFooterDefault
-                            counterPageSize={ menuStore.page_size }
-                            counterPageCurrent={ menuStore.page_current }
-                            counterPageLimit={ menuStore.page_limit }
-                            counterTotalRecords={ menuStore.total_records }
-                            paginationPagePrev={ menuStore.page_prev }
-                            paginationPageNext={ menuStore.page_next }
-                            paginationPageLimit={ menuStore.page_limit }
-                            paginationPrevClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_prev) }
-                            paginationNextClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_next) }  
-                        />
-                    </div>
-
                 </div>
-
-                {/* Filter Modal */}
-                {/* <MenuListFilterModal menuStore={ menuStore } /> */}
-
-                {/* Delete Modal */}
-                {/* <UserDeleteModal menuStore={ menuStore } /> */}
-
+                <div className="col-lg-4">
+                    <div className="page-header-breadcrumb">
+                        <ul className=" breadcrumb breadcrumb-title">
+                            <li className="breadcrumb-item">
+                                <a href="/dashboard"><i className="feather icon-home"></i></a>
+                            </li>
+                            <li className="breadcrumb-item">
+                                Menus
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
+        <div className="pcoded-inner-content">
+            <div className="main-body">
+                <div className="page-wrapper">
+                    <div className="page-body">
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="card table-card">
+
+
+                                    {/* Table Header */}
+                                    <div className="card-header p-b-0"> 
+                                        <TableHeaderDefault
+                                            addButtonClickHandler={ redirectToMenuCreate }
+                                            searchInputValue={ menuStore.query }
+                                            searchInputHandler={ (e) => menuStore.handleSearch(e) }
+                                            filterButtonClickHandler={ handleFilterButtonClick }
+                                            refreshButtonClickHandler={ (e) => menuStore.handleRefreshClick(e) }
+                                            entriesSelectPageSize={ menuStore.page_size }
+                                            entriesSelectChangeHandler={ (e) => menuStore.handlePageSizeClick(e) }
+                                            paginationPagePrev={ menuStore.page_prev }
+                                            paginationPageNext={ menuStore.page_next }
+                                            paginationPageLimit={ menuStore.page_limit }
+                                            paginationPrevClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_prev) }
+                                            paginationNextClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_next) }
+                                        />  
+                                    </div>
+                                    
+
+                                    {/* TABLE BODY */}
+                                    <div className="card-block table-border-style pb-0 pt-0">
+                                        <div className="table-responsive">
+                                            <table className="table table-sm table-striped table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Category</th>
+                                                        <th>Is Side Nav.</th>
+                                                        <th>Is Side Nav. Dropdown</th>
+                                                        <th>Side Nav. Name</th>
+                                                        <th>Side Nav. Icon</th>
+                                                        <th>Url</th>
+                                                        <th>Url Name</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    { getTableRows() }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+
+                                    {/* Table Footer */}
+                                    <div className="card-footer">
+                                        <TableFooterDefault
+                                            counterPageSize={ menuStore.page_size }
+                                            counterPageCurrent={ menuStore.page_current }
+                                            counterPageLimit={ menuStore.page_limit }
+                                            counterTotalRecords={ menuStore.total_records }
+                                            paginationPagePrev={ menuStore.page_prev }
+                                            paginationPageNext={ menuStore.page_next }
+                                            paginationPageLimit={ menuStore.page_limit }
+                                            paginationPrevClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_prev) }
+                                            paginationNextClickHandler={ (e) => menuStore.handlePaginationClick(e, menuStore.page_next) }  
+                                        />
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     );
     
