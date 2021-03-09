@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react'
 
@@ -11,6 +11,7 @@ import { TableFooterDefault } from '../Utils/Table/TableFooters'
 const MenuList = observer(({ menuStore }) => {
 
     const history = useHistory();
+    const [rows_for_delete, SetRowsForDelete] = useState([]);
 
     
     useEffect (() => {
@@ -24,7 +25,6 @@ const MenuList = observer(({ menuStore }) => {
     },[])
 
 
-
     const redirectToMenuCreate = useCallback(() => {
         if(menuStore.is_opened_form === 1){
             menuStore.resetForm()
@@ -34,12 +34,32 @@ const MenuList = observer(({ menuStore }) => {
     });
 
 
-
     const redirectToMenuDetails = useCallback((id) => {
         menuStore.setRouteId(id)
         menuStore.setIsOpenedForm(1)
         history.push('/' + id), [history]
     });
+
+
+    const handleClickRow = (e, id) => {
+        e.preventDefault()
+        redirectToMenuDetails(id)
+    }
+
+
+    const handleSelectDelete = (e, id) => {
+        e.preventDefault()
+        SetRowsForDelete([...rows_for_delete, {id: id, status: e.target.checked}])
+    }
+
+
+    function userExists(id) {
+        let is_checked = rows_for_delete.some(function(data) {
+          return data.id === id && data.status === true;
+        }); 
+        return is_checked;
+    }
+
 
 
 
@@ -50,6 +70,18 @@ const MenuList = observer(({ menuStore }) => {
             menu_list.forEach((val, key) => {
                 table_rows.push(
                     <tr key={key} className={ val.id == menuStore.selected_route ? "table-info" : "" }>
+                        <td className="p-0">
+                            <div className="checkbox-fade fade-in-primary ml-3 mt-3">
+                                <label>
+                                    <input type="checkbox"
+                                           onChange={ e => handleSelectDelete(e, val.id) }
+                                           defaultChecked={ userExists(val.id) == true ? true : false}/>
+                                    <span className="cr">
+                                        <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </td>
                         <th scope="row" className="align-middle">
                             <a href="#" onClick={ (e) => handleClickRow(e, val.id) }>
                                 <ins className="text-info">{ val.name }</ins>
@@ -79,20 +111,6 @@ const MenuList = observer(({ menuStore }) => {
             })
         }
         return table_rows
-    }
-
-
-
-    const handleClickRow = (e, id) => {
-        e.preventDefault()
-        redirectToMenuDetails(id)
-    }
-
-
-
-    const handleFilterButtonClick = (e) => {
-        e.preventDefault()
-        $("#menu-filter-modal").modal('toggle')
     }
 
 
@@ -140,8 +158,7 @@ const MenuList = observer(({ menuStore }) => {
                                             addButtonClickHandler={ redirectToMenuCreate }
                                             searchInputValue={ menuStore.query }
                                             searchInputHandler={ (e) => menuStore.handleSearch(e) }
-                                            filterButton={false}
-                                            filterButtonClickHandler={ handleFilterButtonClick }
+                                            filterButton={ false }
                                             refreshButtonClickHandler={ (e) => menuStore.handleRefreshClick(e) }
                                             entriesSelectPageSize={ menuStore.page_size }
                                             entriesSelectChangeHandler={ (e) => menuStore.handlePageSizeClick(e) }
@@ -160,6 +177,7 @@ const MenuList = observer(({ menuStore }) => {
                                             <table className="table table-de table-hover">
                                                 <thead>
                                                     <tr>
+                                                        <th></th>
                                                         <th>Name</th>
                                                         <th>Category</th>
                                                         <th>Is Side Nav.</th>

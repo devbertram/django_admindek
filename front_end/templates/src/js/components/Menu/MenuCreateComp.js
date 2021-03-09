@@ -54,10 +54,8 @@ const MenuCreate = observer(({ menuStore }) => {
 
 
     const handleCreate = (e, isa) => {
-
         e.preventDefault();
         SetLoader(true)
-
         axios.post('api/route/', { 
             category : menuStore.category,
             name : menuStore.name,
@@ -98,9 +96,6 @@ const MenuCreate = observer(({ menuStore }) => {
             }
             SetLoader(false);
         });
-
-
-
     }
     
 

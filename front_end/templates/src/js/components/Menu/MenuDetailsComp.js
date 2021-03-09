@@ -124,7 +124,6 @@ const MenuDetails = observer(({ menuStore }) => {
                                     </div>
 
                                     <div className="card-block">
-
                                         <div className="col-md-12">
 
                                             <ul className="nav nav-tabs  tabs" role="tablist">
@@ -224,7 +223,6 @@ const MenuDetails = observer(({ menuStore }) => {
                                             </div>
 
                                         </div>
-
                                     </div>
                                     
                                 </div>
