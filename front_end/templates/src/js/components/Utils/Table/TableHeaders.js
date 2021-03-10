@@ -46,6 +46,28 @@ function RefreshButton(props){
 }
 
 
+// Delete Button
+function DeleteButton(props){
+    return (
+        <>
+            { props.isDisabled === true ? 
+                (
+                    <button className="btn btn-danger disabled" type="button" disabled>
+                        <i className="fa fa-trash"></i> Delete
+                    </button>
+                )
+                : 
+                (
+                    <button className="btn btn-danger" type="button" onClick={ props.onClick }>
+                        <i className="fa fa-trash"></i> Delete
+                    </button>
+                )
+            }
+        </>
+    );
+}
+
+
 // Entries
 function EntriesSelect(props){
     return (
@@ -112,6 +134,13 @@ function TableHeaderDefault(props){
                 <div className="pl-4">
                     <RefreshButton clickHandler={ props.refreshButtonClickHandler } />
                 </div>
+                { props.deleteButton === true ?
+                    (
+                        <div className="pl-4">
+                            <DeleteButton isDisabled={ !props.deleteButtonDisable } onClick={ props.deleteButtonClickHandler } />
+                        </div>
+                    ) : ""
+                }
             </div>
 
             <div className="col-md-3 d-flex flex-row mt-1">

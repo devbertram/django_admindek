@@ -19,6 +19,7 @@ class MenuStore{
     is_list_loading = false;
     is_form_loading = false;
     is_opened_form = 0; // 0 = create form, 1 = update form
+    selected_rows = []; // rows that are selected via checkbox
 
     // Form
     route_id = "";
@@ -49,9 +50,16 @@ class MenuStore{
             }
         }).then((response) => {
             runInAction(() => {
-                this.list = response.data.results;
+
+                const routes = response.data.results;
+                let array = [];
+
+                this.list = routes
                 this.total_records = response.data.count
                 this.page_limit = Math.ceil(response.data.count / this.page_size);
+                routes.forEach(data => array.push({id:data.id, status:false}))
+                this.selected_rows = array;
+
             })
         });
         this.is_list_loading = false;
@@ -103,6 +111,11 @@ class MenuStore{
 
     setIsOpenedForm(is_opened_form){
         this.is_opened_form = is_opened_form;
+    }
+
+    setSelectedRowObject(e, id){
+        let obj_index = this.selected_rows.findIndex(data => data.id === id)
+        this.selected_rows[obj_index].status = e.target.checked;
     }
 
 

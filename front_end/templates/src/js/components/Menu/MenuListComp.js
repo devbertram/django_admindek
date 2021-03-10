@@ -11,9 +11,8 @@ import { TableFooterDefault } from '../Utils/Table/TableFooters'
 const MenuList = observer(({ menuStore }) => {
 
     const history = useHistory();
-    const [rows_for_delete, SetRowsForDelete] = useState([]);
 
-    
+
     useEffect (() => {
         let is_mounted = true;
         if(is_mounted = true){
@@ -47,20 +46,16 @@ const MenuList = observer(({ menuStore }) => {
     }
 
 
-    const handleSelectDelete = (e, id) => {
-        e.preventDefault()
-        SetRowsForDelete([...rows_for_delete, {id: id, status: e.target.checked}])
+    const handleSelectCheckbox = (e, id) => {
+        menuStore.setSelectedRowObject(e, id)
     }
 
+    
+    const handleDeleteClick = (e) => {
 
-    function userExists(id) {
-        let is_checked = rows_for_delete.some(function(data) {
-          return data.id === id && data.status === true;
-        }); 
-        return is_checked;
+        console.log(test);
+
     }
-
-
 
 
     const getTableRows = () => {
@@ -69,13 +64,13 @@ const MenuList = observer(({ menuStore }) => {
         if(menu_list.length > 0){
             menu_list.forEach((val, key) => {
                 table_rows.push(
-                    <tr key={key} className={ val.id == menuStore.selected_route ? "table-info" : "" }>
+                    <tr key={key} className={ val.id == menuStore.selected_route || menuStore.selected_rows.some(data => data.id === val.id && data.status === true) ? "table-info" : "" }>
                         <td className="p-0">
                             <div className="checkbox-fade fade-in-primary ml-3 mt-3">
                                 <label>
                                     <input type="checkbox"
-                                           onChange={ e => handleSelectDelete(e, val.id) }
-                                           defaultChecked={ userExists(val.id) == true ? true : false}/>
+                                           defaultChecked={ menuStore.selected_rows.some(data => data.id === val.id && data.status === true) }
+                                           onChange={ e => handleSelectCheckbox(e, val.id) }/>
                                     <span className="cr">
                                         <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
                                     </span>
@@ -112,7 +107,6 @@ const MenuList = observer(({ menuStore }) => {
         }
         return table_rows
     }
-
 
 
     return (
@@ -160,6 +154,9 @@ const MenuList = observer(({ menuStore }) => {
                                             searchInputHandler={ (e) => menuStore.handleSearch(e) }
                                             filterButton={ false }
                                             refreshButtonClickHandler={ (e) => menuStore.handleRefreshClick(e) }
+                                            deleteButton={true}
+                                            deleteButtonDisable= { menuStore.selected_rows.some(data => data.status === true) }
+                                            deleteButtonClickHandler={ (e) => handleDeleteClick(e) }
                                             entriesSelectPageSize={ menuStore.page_size }
                                             entriesSelectChangeHandler={ (e) => menuStore.handlePageSizeClick(e) }
                                             paginationPagePrev={ menuStore.page_prev }
@@ -177,7 +174,17 @@ const MenuList = observer(({ menuStore }) => {
                                             <table className="table table-de table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <th></th>
+                                                        <th className="p-0">
+                                                            <div className="checkbox-fade fade-in-primary ml-3 mt-3">
+                                                                <label>
+                                                                    <input type="checkbox"
+                                                                        defaultChecked={false}/>
+                                                                    <span className="cr">
+                                                                        <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
+                                                                    </span>
+                                                                </label>
+                                                            </div>
+                                                        </th>
                                                         <th>Name</th>
                                                         <th>Category</th>
                                                         <th>Is Side Nav.</th>
