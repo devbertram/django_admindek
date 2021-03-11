@@ -118,12 +118,15 @@ function TableHeaderDefault(props){
         <div className="row">
             
             <div className="col-md-9 d-flex flex-row">
+
                 <div>
                     <AddButton displayText="Add" clickHandler={ props.addButtonClickHandler }/>
                 </div>
+
                 <div className="pl-4" style={{ width : '40%' }}>
                     <SearchInput searchValue={ props.searchInputValue } searchHandler={ props.searchInputHandler } />
                 </div>
+
                 { props.filterButton === true ?
                     (
                         <div className="pl-4">
@@ -131,9 +134,11 @@ function TableHeaderDefault(props){
                         </div>
                     ) : ""
                 }
+
                 <div className="pl-4">
                     <RefreshButton clickHandler={ props.refreshButtonClickHandler } />
                 </div>
+
                 { props.deleteButton === true ?
                     (
                         <div className="pl-4">
@@ -141,12 +146,15 @@ function TableHeaderDefault(props){
                         </div>
                     ) : ""
                 }
+
             </div>
 
             <div className="col-md-3 d-flex flex-row mt-1">
+
                 <div style={{ width:'50%' }}>
                     <EntriesSelect pageSize={ props.entriesSelectPageSize } changeHandler={ props.entriesSelectChangeHandler } />
                 </div>
+
                 <div className="pl-4 mt-1 float-right">
                     <HeaderPaginationDefault
                         pagePrev={ props.paginationPagePrev }
@@ -156,6 +164,7 @@ function TableHeaderDefault(props){
                         nextClickHandler={ props.paginationNextClickHandler }
                     />
                 </div>
+                
             </div>
 
         </div>

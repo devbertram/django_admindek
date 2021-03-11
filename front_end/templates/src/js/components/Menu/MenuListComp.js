@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react'
 
+import eventBus from '../Utils/EventBus'
+import DivLoader from '../Utils/DivLoaderComp'
 import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
 
@@ -11,6 +13,7 @@ import { TableFooterDefault } from '../Utils/Table/TableFooters'
 const MenuList = observer(({ menuStore }) => {
 
     const history = useHistory();
+    const [is_delete_modal_loading, SetDeleteModalLoading] = useState(false);
 
 
     useEffect (() => {
@@ -40,7 +43,7 @@ const MenuList = observer(({ menuStore }) => {
     });
 
 
-    const handleClickRow = (e, id) => {
+    const handleOpenMenuDetails = (e, id) => {
         e.preventDefault()
         redirectToMenuDetails(id)
     }
@@ -51,10 +54,61 @@ const MenuList = observer(({ menuStore }) => {
     }
 
     
-    const handleDeleteClick = (e) => {
+    const handleBulkDeleteModal = (e) => {
+        e.preventDefault()
+        $("#route-bulk-delete-modal").modal('toggle')
+    }
 
-        console.log(test);
 
+    const handleBulkDeleteSumbmit = () => {
+        let ids_for_delete = [];
+        let is_success = false;
+        SetDeleteModalLoading(true)
+        menuStore.selected_rows.forEach(data => {
+            if(data.status === true){
+                ids_for_delete.push(data.id)
+            }
+        })
+        if(ids_for_delete.length > 0){
+            ids_for_delete.map(data => {
+                is_success = deleteMenu(data).then()
+            })
+        }
+        SetDeleteModalLoading(false)
+        $("#route-bulk-delete-modal").modal('hide');
+        if(is_success){
+            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                message: "The menus has been successfully Deleted!", type: "inverse"
+            });
+            menuStore.fetch()
+        }
+    }
+
+
+    const deleteMenu = (id) => {
+        return axios.delete('api/route/'+id+'/')
+                    .then((response) => {
+                        return true;
+                    })
+                    .catch((error) => {
+                        if(error.response.status == 404){
+                            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                                message: "Data Not Found!", type: "danger" 
+                            });
+                        }
+                        if(error.response.status == 500){
+                            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                                message: "There's an error trying to send data to the server!", type: "danger" 
+                            });
+                        }
+                    });
+    }
+
+
+    const rowIsChecked = (id) => {
+        return menuStore.selected_rows.some(data => {
+            return data.id === id && data.status === true;
+        })
     }
 
 
@@ -64,12 +118,13 @@ const MenuList = observer(({ menuStore }) => {
         if(menu_list.length > 0){
             menu_list.forEach((val, key) => {
                 table_rows.push(
-                    <tr key={key} className={ val.id == menuStore.selected_route || menuStore.selected_rows.some(data => data.id === val.id && data.status === true) ? "table-info" : "" }>
+                    <tr key={key} className={ val.id == menuStore.selected_route || rowIsChecked(val.id) ? "table-info" : "" }>
                         <td className="p-0">
                             <div className="checkbox-fade fade-in-primary ml-3 mt-3">
                                 <label>
-                                    <input type="checkbox"
-                                           defaultChecked={ menuStore.selected_rows.some(data => data.id === val.id && data.status === true) }
+                                    <input key={key}
+                                           type="checkbox"
+                                           checked={ rowIsChecked(val.id) }
                                            onChange={ e => handleSelectCheckbox(e, val.id) }/>
                                     <span className="cr">
                                         <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
@@ -78,7 +133,7 @@ const MenuList = observer(({ menuStore }) => {
                             </div>
                         </td>
                         <th scope="row" className="align-middle">
-                            <a href="#" onClick={ (e) => handleClickRow(e, val.id) }>
+                            <a href="#" onClick={ (e) => handleOpenMenuDetails(e, val.id) }>
                                 <ins className="text-info">{ val.name }</ins>
                             </a>
                         </th>
@@ -156,7 +211,7 @@ const MenuList = observer(({ menuStore }) => {
                                             refreshButtonClickHandler={ (e) => menuStore.handleRefreshClick(e) }
                                             deleteButton={true}
                                             deleteButtonDisable= { menuStore.selected_rows.some(data => data.status === true) }
-                                            deleteButtonClickHandler={ (e) => handleDeleteClick(e) }
+                                            deleteButtonClickHandler={ (e) => handleBulkDeleteModal(e) }
                                             entriesSelectPageSize={ menuStore.page_size }
                                             entriesSelectChangeHandler={ (e) => menuStore.handlePageSizeClick(e) }
                                             paginationPagePrev={ menuStore.page_prev }
@@ -226,6 +281,29 @@ const MenuList = observer(({ menuStore }) => {
                 </div>
             </div>
         </div>
+                                                                    
+        {/* BULK DELETE MODAL */}
+        <div className="modal" id="route-bulk-delete-modal" role="dialog">
+            <div className="modal-dialog modal-lg" role="document">
+                <div className="modal-content">
+                    <DivLoader type="Circles" loading={is_delete_modal_loading}/>
+                    <div className="modal-header">
+                        <h4 className="modal-title">Delete Menus</h4>
+                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        <h4>Are you sure you want to permanently delete the selected records?</h4>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                        <button type="button" className="btn btn-danger waves-effect waves-light" onClick={ handleBulkDeleteSumbmit }>Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     );

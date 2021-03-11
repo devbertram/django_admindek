@@ -234,7 +234,7 @@ const MenuDetails = observer(({ menuStore }) => {
                                 <div className="modal-dialog modal-lg" role="document">
                                     <div className="modal-content">
                                         <div className="modal-header">
-                                            <h4 className="modal-title">Delete Subroute</h4>
+                                            <h4 className="modal-title">Delete Menu</h4>
                                             <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>

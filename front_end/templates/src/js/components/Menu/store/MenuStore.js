@@ -41,7 +41,9 @@ class MenuStore{
 
 
     fetch(){
+        console.log('fetch')
         this.is_list_loading = true;
+        this.selected_rows = [];
         axios.get('api/route', { 
             params: { 
                 q: this.query, 
