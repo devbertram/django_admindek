@@ -5,25 +5,25 @@ import { observer } from 'mobx-react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 
 import eventBus from '../Utils/EventBus'
-import { InputTextInline, RadioButton } from '../Utils/Forms/InlineInputs'
 import DivLoader from '../Utils/DivLoaderComp'
+import { InputTextInline, RadioButton } from '../Utils/Forms/InlineInputs'
 
 
 
 const MenuEdit = observer(({ menuStore }) => {
 
-    const [loader, SetLoader] = useState(false);
     const history = useHistory();
     const { param_id } = useParams();
+    const [is_page_loading, SetIsPageLoading] = useState(false);
     
     
     useEffect (() => {
         let is_mounted = true;
         if(is_mounted = true){
-            SetLoader(true)
+            SetIsPageLoading(true)
             menuStore.setIsOpenedForm(1)
             menuStore.retrieve(param_id)
-            SetLoader(false)
+            SetIsPageLoading(false)
         }
         return () => {
             is_mounted = false;
@@ -37,12 +37,9 @@ const MenuEdit = observer(({ menuStore }) => {
 
 
     const handleSave = (e, btl) => {
-
         e.preventDefault();
-        SetLoader(true)
-
-        axios.put('api/route/'+param_id+"/", { 
-
+        SetIsPageLoading(true)
+        axios.put('api/route/'+param_id+'/', { 
             category : menuStore.category,
             name : menuStore.name,
             nav_name : menuStore.nav_name,
@@ -51,23 +48,13 @@ const MenuEdit = observer(({ menuStore }) => {
             icon : menuStore.icon,
             is_menu : menuStore.is_menu,
             is_dropdown : menuStore.is_dropdown,
-
         }).then((response) => {
-
             eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                 message: "Menu Details Successfully Updated!", type: "inverse" 
             });
-
             menuStore.setSelectedRoute(response.data.id)
-
-            if(btl === 1){
-                redirectBackToMenuList()
-            }
-
-            SetLoader(false);
-
+            if(btl === 1){ redirectBackToMenuList() }
         }).catch((error) => {
-
             if(error.response.status === 400){
                 let field_errors = error.response.data;
                 menuStore.setErrorFields({
@@ -82,20 +69,15 @@ const MenuEdit = observer(({ menuStore }) => {
                     subroutes: field_errors.subroutes?.toString(),
                 });
             }
-
             if(error.response.status === 500){
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                     message: "There's an error trying to send data to the server!", type: "danger" 
                 });
             }
-
-            SetLoader(false);
-
         });
-
+        SetIsPageLoading(false);
     }
     
-
 
     return (
 
@@ -106,7 +88,7 @@ const MenuEdit = observer(({ menuStore }) => {
                     <div className="page-header-title">
                         <i className="feather icon-user bg-c-blue"></i>
                         <div className="d-inline">
-                            <h5>Menus and Permissions</h5>
+                            <h5>Menus</h5>
                             <span>Manage Menus and Permissions</span>
                         </div>
                     </div>
@@ -139,7 +121,7 @@ const MenuEdit = observer(({ menuStore }) => {
                             <div className="col-sm-12">
                                 <div className="card">
 
-                                    <DivLoader type="Circles" loading={loader}/>
+                                    <DivLoader type="Circles" loading={is_page_loading}/>
                                     <div className="card-header">
                                         <h5>Edit Menu </h5>
                                         <Link to={`/${param_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">

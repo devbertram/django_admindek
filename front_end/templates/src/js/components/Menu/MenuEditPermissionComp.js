@@ -12,25 +12,23 @@ import DivLoader from '../Utils/DivLoaderComp'
 const MenuEditPermission = observer(({ menuStore }) => {
 
     const { param_id } = useParams();
-    const [loader, SetLoader] = useState(false);
+    const [is_page_loading, SetIsPageLoading] = useState(false);
     const [selected_subroute_id, SetSelectedSubrouteId] = useState("");
     const [subroute_delete_id, SetSubrouteDeleteId] = useState("");
     
     
-
     useEffect (() => {
         let is_mounted = true;
         if(is_mounted = true){
-            SetLoader(true)
+            SetIsPageLoading(true)
             menuStore.setIsOpenedForm(1)
             menuStore.retrieve(param_id)
-            SetLoader(false)
+            SetIsPageLoading(false)
         }
         return () => {
             is_mounted = false;
         } 
     },[])
-
 
 
     const getSubrouteInputField = (name, value, placeholder, key) => {
@@ -46,25 +44,26 @@ const MenuEditPermission = observer(({ menuStore }) => {
     };
 
 
-
-    const getSubrouteFieldError = (key, field_name) => {
-        if(menuStore.error_fields.subroutes){
-            let errors = [...menuStore.error_fields.subroutes];
-            if(errors[key]){
-                return (
-                    <div className="col-form-label">
-                        <p className="text-danger">{ errors[key][field_name] }</p>
-                    </div>
-                )
-            }else{ return ""; }
-        }else{ return ""; }
+    const getErrorFields = () => {
+        return(
+            <div class="alert alert-danger">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <i class="icofont icofont-close-line-circled"></i>
+                </button>
+                <p>Field Errors!</p>
+                { menuStore.error_fields.subroutes['name'][0] ? (<p>Name:<code>{ menuStore.error_fields.subroutes['name'][0] }</code></p>) : "" }
+                { menuStore.error_fields.subroutes['is_nav'][0] ? (<p>Type:<code>{ menuStore.error_fields.subroutes['is_nav'][0] }</code></p>) : "" }
+                { menuStore.error_fields.subroutes['nav_name'][0] ? (<p>Subitem Name:<code>{ menuStore.error_fields.subroutes['nav_name'][0] }</code></p>) : "" }
+                { menuStore.error_fields.subroutes['url'][0] ? (<p>Url:<code>{ menuStore.error_fields.subroutes['url'][0] }</code></p>) : "" }
+                { menuStore.error_fields.subroutes['url_name'][0] ? (<p>Url Name:<code>{ menuStore.error_fields.subroutes['url_name'][0] }</code></p>) : "" }
+            </div>
+        )
     };
-
 
 
     const handleCreateSubroute = (e, key) => {
         e.preventDefault();
-        SetLoader(true)
+        SetIsPageLoading(true)
         const subroute = menuStore.findSubrouteByKey(key)
         axios.post('api/subroute/', { 
             route: param_id,
@@ -80,22 +79,27 @@ const MenuEditPermission = observer(({ menuStore }) => {
             SetSelectedSubrouteId(response.data.id)
             menuStore.setSelectedRoute(param_id)
             menuStore.retrieve(param_id)
-            SetLoader(false);
+            SetIsPageLoading(false);
         }).catch((error) => {
+            if(error.response.status === 400){
+                let field_errors = error.response.data;
+                menuStore.setErrorFields({
+                    subroutes: field_errors ,
+                });
+            }
             if(error.response.status === 500){
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                     message: "There's an error trying to send data to the server!", type: "danger" 
                 });
             }
-            SetLoader(false);
+            SetIsPageLoading(false);
         });
     }
 
 
-
     const handleUpdateSubroute = (e, key, id) => {
         e.preventDefault();
-        SetLoader(true)
+        SetIsPageLoading(true)
         const subroute = menuStore.findSubrouteById(id)
         axios.put('api/subroute/'+id+'/', { 
             route: param_id,
@@ -111,18 +115,23 @@ const MenuEditPermission = observer(({ menuStore }) => {
             SetSelectedSubrouteId(response.data.id)
             menuStore.setSelectedRoute(param_id)
             menuStore.retrieve(param_id)
-            SetLoader(false);
+            SetIsPageLoading(false);
         }).catch((error) => {
+            if(error.response.status === 400){
+                let field_errors = error.response.data;
+                menuStore.setErrorFields({
+                    subroutes: field_errors ,
+                });
+            }
             if(error.response.status === 500){
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                     message: "There's an error trying to send data to the server!", type: "danger" 
                 });
             }
-            SetLoader(false);
+            SetIsPageLoading(false);
         });
 
     }
-
 
 
     const handleDeleteSubrouteModal = (e, id) => {
@@ -130,7 +139,6 @@ const MenuEditPermission = observer(({ menuStore }) => {
         SetSubrouteDeleteId(id)
         $("#subroute-delete-modal").modal('toggle')
     }
-
 
 
     const handleDeleteSubrouteSubmit = (e, subroute_delete_id) => {
@@ -155,7 +163,6 @@ const MenuEditPermission = observer(({ menuStore }) => {
                 }
             });
     }
-    
 
 
     return (
@@ -167,7 +174,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                     <div className="page-header-title">
                         <i className="feather icon-user bg-c-blue"></i>
                         <div className="d-inline">
-                            <h5>Menus and Permissions</h5>
+                            <h5>Menus</h5>
                             <span>Manage Menus and Permissions</span>
                         </div>
                     </div>
@@ -201,7 +208,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                             <div className="col-sm-12">
                                 <div className="card">
 
-                                    <DivLoader type="Circles" loading={loader}/>
+                                    <DivLoader type="Circles" loading={is_page_loading}/>
                                     <div className="card-header">
                                         <h5>Edit Menu Permissions</h5>
                                         <Link to={`/${param_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
@@ -216,6 +223,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
 
                                         {/* MENU DETAILS */}
                                         <div className="col-md-12">
+                                            { menuStore.error_fields.subroutes ? getErrorFields() : "" }
                                             <h4 className="sub-title">Menu Permissions</h4>
         
                                             <div className="table-responsive">
@@ -236,71 +244,64 @@ const MenuEditPermission = observer(({ menuStore }) => {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                    {
-                                                        menuStore.subroutes.map((val, key) => {
-                                                            return (
-                                                                <tr key={key} className={ val.id === selected_subroute_id ? "table-info" : "" }>
-                                                                    <td className="align-middle">
-                                                                        { getSubrouteInputField('name', val.name, 'Ex: Can View User List', key) }
-                                                                        { getSubrouteFieldError(key, 'name') }
-                                                                    </td>
-                                                                    <td className="align-middle">
-                                                                        <select name="is_nav" 
-                                                                                value={val.is_nav} 
-                                                                                className="form-control form-control-primary" 
-                                                                                onChange={(e) => menuStore.modifySubroutes(key, e)}>
-                                                                            <option value="">Select</option>
-                                                                            <option value={false}>Api</option>
-                                                                            <option value={true}>Subitem</option>
-                                                                        </select>
-                                                                        { getSubrouteFieldError(key, 'is_nav') }
-                                                                    </td>
-                                                                    <td className="align-middle">
-                                                                        { getSubrouteInputField('nav_name', val.nav_name, 'Ex: User Manage', key) }
-                                                                        { getSubrouteFieldError(key, 'nav_name') }
-                                                                    </td>
-                                                                    <td className="align-middle">
-                                                                        { getSubrouteInputField('url', val.url, 'Ex: /user/list/', key) }
-                                                                        { getSubrouteFieldError(key, 'url') }
-                                                                    </td>
-                                                                    <td className="align-middle">
-                                                                        { getSubrouteInputField('url_name', val.url_name, 'Ex: user_list', key) }
-                                                                        { getSubrouteFieldError(key, 'url_name') }
-                                                                    </td>
-                                                                        { val.is_from_query === true ? 
-                                                                            (
-                                                                                <td className="align-middle">
-                                                                                    <button className="btn btn-primary pb-2 pt-2" 
-                                                                                            type="button" 
-                                                                                            onClick={ e => handleUpdateSubroute(e, key, val.id) }>
-                                                                                        Update
-                                                                                    </button>
-                                                                                    <button className="btn btn-danger pb-2 pt-2 ml-2" 
-                                                                                            type="button" 
-                                                                                            onClick={ e => handleDeleteSubrouteModal(e, val.id) }>
-                                                                                        <i className="fa fa-trash ml-1"></i>
-                                                                                    </button>
-                                                                                </td>
-                                                                            ) : 
-                                                                            (
-                                                                                <td className="align-middle">
-                                                                                    <button className="btn btn-success pb-2 pt-2" 
-                                                                                            type="button" 
-                                                                                            onClick={ e => handleCreateSubroute(e, key) }>
-                                                                                        Create
-                                                                                    </button>
-                                                                                    <button className="btn btn-danger pb-2 pt-2 ml-2" 
-                                                                                            type="button" 
-                                                                                            onClick={ () => menuStore.deleteSubroutes(key) }>
-                                                                                        <i className="fa fa-trash ml-1"></i>
-                                                                                    </button>
-                                                                                </td>
-                                                                            )
-                                                                        }
-                                                                </tr>
-                                                            )
-                                                        }) 
-                                                    }
+                                                    { menuStore.subroutes.map((val, key) => {
+                                                        return (
+                                                            <tr key={key} className={ val.id === selected_subroute_id ? "table-info" : "" }>
+                                                                <td className="align-middle">
+                                                                    { getSubrouteInputField('name', val.name, 'Ex: Can View User List', key) }
+                                                                </td>
+                                                                <td className="align-middle">
+                                                                    <select name="is_nav" 
+                                                                            value={val.is_nav} 
+                                                                            className="form-control form-control-primary" 
+                                                                            onChange={(e) => menuStore.modifySubroutes(key, e)}>
+                                                                        <option value="">Select</option>
+                                                                        <option value={false}>Api</option>
+                                                                        <option value={true}>Subitem</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td className="align-middle">
+                                                                    { getSubrouteInputField('nav_name', val.nav_name, 'Ex: User Manage', key) }
+                                                                </td>
+                                                                <td className="align-middle">
+                                                                    { getSubrouteInputField('url', val.url, 'Ex: /user/list/', key) }
+                                                                </td>
+                                                                <td className="align-middle">
+                                                                    { getSubrouteInputField('url_name', val.url_name, 'Ex: user_list', key) }
+                                                                </td>
+                                                                { val.is_from_query === true ? 
+                                                                    (
+                                                                        <td className="align-middle">
+                                                                            <button className="btn btn-primary pb-2 pt-2" 
+                                                                                    type="button" 
+                                                                                    onClick={ e => handleUpdateSubroute(e, key, val.id) }>
+                                                                                Update
+                                                                            </button>
+                                                                            <button className="btn btn-danger pb-2 pt-2 ml-2" 
+                                                                                    type="button" 
+                                                                                    onClick={ e => handleDeleteSubrouteModal(e, val.id) }>
+                                                                                <i className="fa fa-trash ml-1"></i>
+                                                                            </button>
+                                                                        </td>
+                                                                    ) : 
+                                                                    (
+                                                                        <td className="align-middle">
+                                                                            <button className="btn btn-success pb-2 pt-2" 
+                                                                                    type="button" 
+                                                                                    onClick={ e => handleCreateSubroute(e, key) }>
+                                                                                Create
+                                                                            </button>
+                                                                            <button className="btn btn-danger pb-2 pt-2 ml-2" 
+                                                                                    type="button" 
+                                                                                    onClick={ () => menuStore.deleteSubroutes(key) }>
+                                                                                <i className="fa fa-trash ml-1"></i>
+                                                                            </button>
+                                                                        </td>
+                                                                    )
+                                                                }
+                                                            </tr>
+                                                        )
+                                                    }) }
                                                     </tbody>
                                                 </table>
                                                 

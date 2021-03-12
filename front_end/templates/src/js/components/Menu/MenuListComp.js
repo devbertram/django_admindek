@@ -13,16 +13,20 @@ import { TableFooterDefault } from '../Utils/Table/TableFooters'
 const MenuList = observer(({ menuStore }) => {
 
     const history = useHistory();
-    const [is_delete_modal_loading, SetDeleteModalLoading] = useState(false);
+    const [is_delete_modal_loading, SetIsDeleteModalLoading] = useState(false);
+    const [is_page_loading, SetIsPageLoading] = useState(false);
+    const [select_all_checkbox, SetSelectAllCheckbox] = useState(false);
 
 
     useEffect (() => {
         let is_mounted = true;
         if(is_mounted = true){
             menuStore.fetch()
+            SetIsPageLoading(true)
         }
+        SetIsPageLoading(false)
         return () => {
-            is_mounted = false;
+            is_mounted = false
         } 
     },[])
 
@@ -43,6 +47,13 @@ const MenuList = observer(({ menuStore }) => {
     });
 
 
+    const tableRowIsChecked = (id) => {
+        return menuStore.selected_rows.some(data => {
+            return data.id === id && data.status === true;
+        })
+    }
+
+
     const handleOpenMenuDetails = (e, id) => {
         e.preventDefault()
         redirectToMenuDetails(id)
@@ -50,117 +61,54 @@ const MenuList = observer(({ menuStore }) => {
 
 
     const handleSelectCheckbox = (e, id) => {
-        menuStore.setSelectedRowObject(e, id)
+        menuStore.setSelectedRowObject(e.target.checked, id)
+    }
+
+
+    const handleSelectAllCheckbox = (e) => {
+        SetSelectAllCheckbox(e.target.checked)
+        menuStore.selected_rows.map(data => {
+            menuStore.setSelectedRowObject(e.target.checked, data.id)
+        })
     }
 
     
-    const handleBulkDeleteModal = (e) => {
+    const handleOpenBulkDeleteModal = (e) => {
         e.preventDefault()
         $("#route-bulk-delete-modal").modal('toggle')
     }
 
 
-    const handleBulkDeleteSumbmit = () => {
+    const handleBulkDeleteSumbmit = (e) => {
+        e.preventDefault()
         let ids_for_delete = [];
-        let is_success = false;
-        SetDeleteModalLoading(true)
-        menuStore.selected_rows.forEach(data => {
+        SetIsDeleteModalLoading(true)
+        menuStore.selected_rows.map(data => {
             if(data.status === true){
                 ids_for_delete.push(data.id)
             }
         })
         if(ids_for_delete.length > 0){
-            ids_for_delete.map(data => {
-                is_success = deleteMenu(data).then()
-            })
-        }
-        SetDeleteModalLoading(false)
-        $("#route-bulk-delete-modal").modal('hide');
-        if(is_success){
-            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                message: "The menus has been successfully Deleted!", type: "inverse"
-            });
-            menuStore.fetch()
-        }
-    }
-
-
-    const deleteMenu = (id) => {
-        return axios.delete('api/route/'+id+'/')
-                    .then((response) => {
-                        return true;
-                    })
-                    .catch((error) => {
-                        if(error.response.status == 404){
-                            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                                message: "Data Not Found!", type: "danger" 
-                            });
-                        }
-                        if(error.response.status == 500){
-                            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                                message: "There's an error trying to send data to the server!", type: "danger" 
-                            });
-                        }
+            axios.delete('api/route/bulk_destroy/', {
+                data: { 
+                    ids:ids_for_delete 
+                }
+            }).then((response) => {
+                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                    message: "The menus has been successfully Deleted!", type: "inverse"
+                });
+                menuStore.fetch()
+            }).catch((error) => {
+                if(error.response.status == 500){
+                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                        message: "There's an error trying to send data to the server!", type: "danger" 
                     });
-    }
-
-
-    const rowIsChecked = (id) => {
-        return menuStore.selected_rows.some(data => {
-            return data.id === id && data.status === true;
-        })
-    }
-
-
-    const getTableRows = () => {
-        let table_rows = []
-        let menu_list = menuStore.list
-        if(menu_list.length > 0){
-            menu_list.forEach((val, key) => {
-                table_rows.push(
-                    <tr key={key} className={ val.id == menuStore.selected_route || rowIsChecked(val.id) ? "table-info" : "" }>
-                        <td className="p-0">
-                            <div className="checkbox-fade fade-in-primary ml-3 mt-3">
-                                <label>
-                                    <input key={key}
-                                           type="checkbox"
-                                           checked={ rowIsChecked(val.id) }
-                                           onChange={ e => handleSelectCheckbox(e, val.id) }/>
-                                    <span className="cr">
-                                        <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
-                                    </span>
-                                </label>
-                            </div>
-                        </td>
-                        <th scope="row" className="align-middle">
-                            <a href="#" onClick={ (e) => handleOpenMenuDetails(e, val.id) }>
-                                <ins className="text-info">{ val.name }</ins>
-                            </a>
-                        </th>
-                        <td className="align-middle">{ val.category }</td>
-                        <td className="align-middle">
-                            { val.is_menu == true ? 
-                                <label className="label label-success">Yes</label> 
-                                : 
-                                <label className="label label-danger">No</label> 
-                            }
-                        </td>
-                        <td className="align-middle">
-                            { val.is_dropdown == true ? 
-                                <label className="label label-success">Yes</label> 
-                                : 
-                                <label className="label label-danger">No</label> 
-                            }
-                        </td>
-                        <td className="align-middle">{ val.nav_name }</td>
-                        <td className="align-middle"><i className={ val.icon }></i></td>
-                        <td className="align-middle">{ val.url }</td>
-                        <td className="align-middle">{ val.url_name }</td>
-                    </tr>
-                )
-            })
+                }
+            });
         }
-        return table_rows
+        SetIsDeleteModalLoading(false)
+        SetSelectAllCheckbox(false)
+        $("#route-bulk-delete-modal").modal('hide');
     }
 
 
@@ -173,7 +121,7 @@ const MenuList = observer(({ menuStore }) => {
                     <div className="page-header-title">
                         <i className="feather icon-user bg-c-blue"></i>
                         <div className="d-inline">
-                            <h5>Menus and Permissions</h5>
+                            <h5>Menus</h5>
                             <span>Manage Menus and Permissions</span>
                         </div>
                     </div>
@@ -200,6 +148,7 @@ const MenuList = observer(({ menuStore }) => {
                             <div className="col-md-12">
                                 <div className="card table-card">
 
+                                    <DivLoader type="Circles" loading={is_page_loading}/>
 
                                     {/* Table Header */}
                                     <div className="card-header p-b-0"> 
@@ -211,7 +160,7 @@ const MenuList = observer(({ menuStore }) => {
                                             refreshButtonClickHandler={ (e) => menuStore.handleRefreshClick(e) }
                                             deleteButton={true}
                                             deleteButtonDisable= { menuStore.selected_rows.some(data => data.status === true) }
-                                            deleteButtonClickHandler={ (e) => handleBulkDeleteModal(e) }
+                                            deleteButtonClickHandler={ (e) => handleOpenBulkDeleteModal(e) }
                                             entriesSelectPageSize={ menuStore.page_size }
                                             entriesSelectChangeHandler={ (e) => menuStore.handlePageSizeClick(e) }
                                             paginationPagePrev={ menuStore.page_prev }
@@ -232,8 +181,7 @@ const MenuList = observer(({ menuStore }) => {
                                                         <th className="p-0">
                                                             <div className="checkbox-fade fade-in-primary ml-3 mt-3">
                                                                 <label>
-                                                                    <input type="checkbox"
-                                                                        defaultChecked={false}/>
+                                                                    <input type="checkbox" checked={select_all_checkbox} onChange={ handleSelectAllCheckbox }/>
                                                                     <span className="cr">
                                                                         <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
                                                                     </span>
@@ -251,7 +199,50 @@ const MenuList = observer(({ menuStore }) => {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    { getTableRows() }
+                                                { menuStore.list.map((val, key) => {
+                                                    return (
+                                                        <tr key={key} 
+                                                            className={ val.id == menuStore.selected_route || tableRowIsChecked(val.id) ? "table-info" : "" }>
+
+                                                            <td className="p-0">
+                                                                <div className="checkbox-fade fade-in-primary ml-3 mt-3">
+                                                                    <label>
+                                                                        <input key={key}
+                                                                               type="checkbox"
+                                                                               checked={ tableRowIsChecked(val.id) }
+                                                                               onChange={ e => handleSelectCheckbox(e, val.id) }/>
+                                                                        <span className="cr">
+                                                                            <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                            </td>
+                                                            <th scope="row" className="align-middle">
+                                                                <a href="#" onClick={ (e) => handleOpenMenuDetails(e, val.id) }>
+                                                                    <ins className="text-info">{ val.name }</ins>
+                                                                </a>
+                                                            </th>
+                                                            <td className="align-middle">{ val.category }</td>
+                                                            <td className="align-middle">
+                                                                { val.is_menu == true ? 
+                                                                    <label className="label label-success">Yes</label> 
+                                                                    : <label className="label label-danger">No</label> 
+                                                                }
+                                                            </td>
+                                                            <td className="align-middle">
+                                                                { val.is_dropdown == true ? 
+                                                                    <label className="label label-success">Yes</label> 
+                                                                    : <label className="label label-danger">No</label> 
+                                                                }
+                                                            </td>
+                                                            <td className="align-middle">{ val.nav_name }</td>
+                                                            <td className="align-middle"><i className={ val.icon }></i></td>
+                                                            <td className="align-middle">{ val.url }</td>
+                                                            <td className="align-middle">{ val.url_name }</td>
+                                                            
+                                                        </tr>
+                                                    )
+                                                }) }
                                                 </tbody>
                                             </table>
                                         </div>

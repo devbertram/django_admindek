@@ -12,6 +12,7 @@ from .serializers import (
     RouteSerializer,
     RouteCreateFormSerializer,
     RouteUpdateFormSerializer,
+    RouteBulkDeleteSerializer,
     SubrouteSerializer,
     SubrouteFormSerializer,
     UserRouteSerializer,
@@ -52,7 +53,6 @@ class RouteViewSet(viewsets.ModelViewSet):
     def create(self, request):
         serializer = RouteCreateFormSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         subroutes = serializer.data['subroutes']
 
         # Create Route   
@@ -96,7 +96,6 @@ class RouteViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         serializer = RouteUpdateFormSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         route = self.queryset.get(id=pk)
         route.name = serializer.data['name']
         route.category = serializer.data['category']
@@ -108,7 +107,6 @@ class RouteViewSet(viewsets.ModelViewSet):
         route.is_dropdown = serializer.data['is_dropdown']
         route.updated_by_id = request.user.id
         route.save()
-
         return Response({"id":route.id}, 200)
 
 
@@ -119,6 +117,18 @@ class RouteViewSet(viewsets.ModelViewSet):
             return Response({}, 200)
         else:
             return Response({}, 404)
+
+
+    @action(methods=['delete'], detail=False)
+    def bulk_destroy(self, request):
+        serializer = RouteBulkDeleteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        ids = serializer.data['ids']
+        for data in ids:
+            route = self.queryset.get(id=data)
+            if route:
+                route.delete()
+        return Response({}, 200)
 
 
     @action(methods=['get'], detail=False)
@@ -138,7 +148,6 @@ class SubrouteViewSet(viewsets.ModelViewSet):
     def create(self, request):
         serializer = SubrouteFormSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
         subroute = Subroute()
         subroute.route_id = serializer.data['route']
         subroute.is_nav = serializer.data['is_nav']
@@ -153,7 +162,6 @@ class SubrouteViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         serializer = SubrouteFormSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         subroute = self.queryset.get(route_id=serializer.data['route'], id=pk)
         if subroute:
             subroute.is_nav = serializer.data['is_nav']

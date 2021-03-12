@@ -5,7 +5,7 @@ import { makeAutoObservable, runInAction } from "mobx"
 class MenuStore{
 
     // List
-    list = {};
+    list = [];
     total_records = 0;
     page_prev = 0;
     page_current = 1;
@@ -16,8 +16,6 @@ class MenuStore{
 
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
     selected_route = 0; // selected menu id after create or update
-    is_list_loading = false;
-    is_form_loading = false;
     is_opened_form = 0; // 0 = create form, 1 = update form
     selected_rows = []; // rows that are selected via checkbox
 
@@ -41,8 +39,6 @@ class MenuStore{
 
 
     fetch(){
-        console.log('fetch')
-        this.is_list_loading = true;
         this.selected_rows = [];
         axios.get('api/route', { 
             params: { 
@@ -52,30 +48,23 @@ class MenuStore{
             }
         }).then((response) => {
             runInAction(() => {
-
                 const routes = response.data.results;
                 let array = [];
-
                 this.list = routes
                 this.total_records = response.data.count
                 this.page_limit = Math.ceil(response.data.count / this.page_size);
                 routes.forEach(data => array.push({id:data.id, status:false}))
                 this.selected_rows = array;
-
             })
         });
-        this.is_list_loading = false;
     }
-
 
     retrieve(id){
         axios.get('api/route/' + id)
         .then((response) => {
             runInAction(() => {
-
                 const res_subroutes = response.data.subroute_route;
-                let subroutes = []
-
+                let subroutes = [];
                 this.route_id = response.data.id
                 this.category = response.data.category
                 this.name = response.data.name
@@ -85,7 +74,6 @@ class MenuStore{
                 this.icon= response.data.icon
                 this.url = response.data.url
                 this.url_name = response.data.url_name
-
                 // Set Subroutes
                 res_subroutes.forEach(data => {
                     subroutes.push({
@@ -98,26 +86,23 @@ class MenuStore{
                         is_from_query: true, 
                     })
                 });
-
                 this.subroutes = subroutes;
-
+                this.error_fields = {};
             })
         });
     }
-
 
     setSelectedRoute(selected_route){
         this.selected_route = selected_route;
     }
 
-
     setIsOpenedForm(is_opened_form){
         this.is_opened_form = is_opened_form;
     }
 
-    setSelectedRowObject(e, id){
+    setSelectedRowObject(status, id){
         let obj_index = this.selected_rows.findIndex(data => data.id === id)
-        this.selected_rows[obj_index].status = e.target.checked;
+        this.selected_rows[obj_index].status = status;
     }
 
 
@@ -210,7 +195,6 @@ class MenuStore{
     }
 
 
-
     // List Handlers
     handleSearch(e){
         e.preventDefault()
@@ -220,7 +204,6 @@ class MenuStore{
         this.query = e.target.value;
         this.delaySearch();
     }
-
 
     handleRefreshClick(e){
         e.preventDefault()
@@ -233,7 +216,6 @@ class MenuStore{
         this.fetch();
     }
 
-
     handlePageSizeClick(e){
         e.preventDefault()
         if(e.target.value > 0){
@@ -245,7 +227,6 @@ class MenuStore{
         }
     }
 
-
     handlePaginationClick(e, page_current){
         e.preventDefault()
         if(page_current > 0 && page_current <= this.page_limit){
@@ -254,14 +235,6 @@ class MenuStore{
             this.page_next = page_current + 1;
             this.fetch();
         }
-    }
-
-
-    handleFilterSubmit(){
-        this.page_prev = 0;
-        this.page_current = 1;
-        this.page_next = 2;
-        this.fetch();
     }
 
 

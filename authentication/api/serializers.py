@@ -63,6 +63,11 @@ class RouteUpdateFormSerializer(serializers.ModelSerializer):
 
 
 
+class RouteBulkDeleteSerializer(serializers.Serializer):
+    ids = serializers.ListField(child=serializers.IntegerField(min_value=1))
+
+
+
 class UserSubrouteSerializer(serializers.ModelSerializer):
     subroute = SubrouteSerializer()
 
@@ -155,7 +160,7 @@ class UserCreateFormSerializer(serializers.ModelSerializer):
 
 
 
-class UserUpdateFormSerializer(serializers.ModelSerializer): 
+class UserUpdateFormSerializer(serializers.ModelSerializer):
     user_routes = UserRouteCreateMultiFormSerializer(many=True, required=True)
     user_subroutes = UserSubrouteCreateMultiFormSerializer(many=True, required=True)
 
