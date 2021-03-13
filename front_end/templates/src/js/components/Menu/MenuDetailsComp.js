@@ -32,7 +32,7 @@ const MenuDetails = observer(({ menuStore }) => {
 
 
     const redirectBackToMenuList = useCallback(() => {
-        history.push('/'), [history]
+        history.push('/menus'), [history]
     });
 
 
@@ -84,10 +84,10 @@ const MenuDetails = observer(({ menuStore }) => {
                     <div className="page-header-breadcrumb">
                         <ul className=" breadcrumb breadcrumb-title">
                             <li className="breadcrumb-item">
-                                <a href="/dashboard"><i className="feather icon-home"></i></a>
+                                <Link to="/"><i className="feather icon-home"></i></Link>
                             </li>
                             <li className="breadcrumb-item">
-                                <Link to="/">Menus</Link>
+                                <Link to="/menus">Menus</Link>
                             </li>
                             <li className="breadcrumb-item">
                                 Details
@@ -109,7 +109,7 @@ const MenuDetails = observer(({ menuStore }) => {
                                     <DivLoader type="Circles" loading={is_page_loading}/>
                                     <div className="card-header">
                                         <h5>Menu Details</h5>
-                                        <Link to="/" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
+                                        <Link to="/menus" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
                                             <i className="fa fa-navicon"></i> Back to List
                                         </Link>
                                         <button className="btn btn-md btn-danger btn-outline-danger float-right pt-2 pb-2" 
@@ -123,7 +123,7 @@ const MenuDetails = observer(({ menuStore }) => {
                                         {/* Menu */}
                                         <div className="col-md-12">
                                             <h5 className="sub-title">Menu</h5>
-                                            <Link to={`/${param_id}/edit`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
+                                            <Link to={`/menus/${param_id}/edit`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
                                                 <i className="fa fa-pencil-square-o"></i> Edit Menu
                                             </Link>
                                             <div className="row mt-4">
@@ -153,7 +153,7 @@ const MenuDetails = observer(({ menuStore }) => {
                                         {/* Permissions */}
                                         <div className="col-md-12 mt-5">
                                             <h5 className="sub-title mt-2">Permissions</h5>
-                                            <Link to={`/${param_id}/edit_permissions`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
+                                            <Link to={`/menus/${param_id}/edit_permissions`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
                                                 <i className="fa fa-pencil-square-o"></i> Edit Permissions
                                             </Link>
                                             <div className="table-responsive mt-3">

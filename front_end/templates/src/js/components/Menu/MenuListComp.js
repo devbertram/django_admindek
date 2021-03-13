@@ -1,7 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory, useRouteMatch } from 'react-router-dom'
 import { observer } from 'mobx-react'
 
 import eventBus from '../Utils/EventBus'
@@ -13,6 +13,7 @@ import { TableFooterDefault } from '../Utils/Table/TableFooters'
 const MenuList = observer(({ menuStore }) => {
 
     const history = useHistory();
+    const {url} = useRouteMatch();
     const [is_delete_modal_loading, SetIsDeleteModalLoading] = useState(false);
     const [is_page_loading, SetIsPageLoading] = useState(false);
     const [select_all_checkbox, SetSelectAllCheckbox] = useState(false);
@@ -36,14 +37,14 @@ const MenuList = observer(({ menuStore }) => {
             menuStore.resetForm()
         }
         menuStore.setIsOpenedForm(0)
-        history.push('/create'), [history]
+        history.push(url + '/create'), [history]
     });
 
 
     const redirectToMenuDetails = useCallback((id) => {
         menuStore.setRouteId(id)
         menuStore.setIsOpenedForm(1)
-        history.push('/' + id), [history]
+        history.push(url + '/' + id), [history]
     });
 
 
@@ -130,7 +131,7 @@ const MenuList = observer(({ menuStore }) => {
                     <div className="page-header-breadcrumb">
                         <ul className=" breadcrumb breadcrumb-title">
                             <li className="breadcrumb-item">
-                                <a href="/dashboard"><i className="feather icon-home"></i></a>
+                                <Link to="/"><i className="feather icon-home"></i></Link>
                             </li>
                             <li className="breadcrumb-item">
                                 Menus

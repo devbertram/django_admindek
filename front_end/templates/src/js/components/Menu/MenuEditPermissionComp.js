@@ -183,13 +183,13 @@ const MenuEditPermission = observer(({ menuStore }) => {
                     <div className="page-header-breadcrumb">
                         <ul className=" breadcrumb breadcrumb-title">
                             <li className="breadcrumb-item">
-                                <a href="/dashboard"><i className="feather icon-home"></i></a>
+                                <Link to="/"><i className="feather icon-home"></i></Link>
                             </li>
                             <li className="breadcrumb-item"> 
-                                <Link to="/">Menus</Link>
+                                <Link to="/menus/">Menus</Link>
                             </li>
                             <li className="breadcrumb-item">
-                                <Link to={`/${menuStore.route_id}`}>Details</Link>
+                                <Link to={`/menus/${menuStore.route_id}`}>Details</Link>
                             </li>
                             <li className="breadcrumb-item">
                                 Edit Permissions
@@ -211,10 +211,10 @@ const MenuEditPermission = observer(({ menuStore }) => {
                                     <DivLoader type="Circles" loading={is_page_loading}/>
                                     <div className="card-header">
                                         <h5>Edit Menu Permissions</h5>
-                                        <Link to={`/${param_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
+                                        <Link to={`/menus/${param_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
                                             <i className="fa fa-arrow-left"></i> Back
                                         </Link>
-                                        <Link to="/" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2">
+                                        <Link to="/menus" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2">
                                             <i className="fa fa-navicon"></i> Back to List
                                         </Link>
                                     </div>

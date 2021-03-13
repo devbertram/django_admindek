@@ -91,20 +91,14 @@
                 </div>
             </nav>
 
-            <div class="pcoded-main-container">
-                <div class="pcoded-wrapper">
-
-                    <div id="side_nav"></div>
-
-                    {% block content %} {% endblock %}
-
-                </div>
-            </div>
+            <div id="root"></div>
+            
         </div>
     </div>
 
     <script type="text/javascript" src="{% static 'build/js/Authentication/LogoutFormMainComp.js' %}"></script>
-    <script type="text/javascript" src="{% static 'build/js/Authentication/SideNavMainComp.js' %}"></script>
+    <script type="text/javascript" src="{% static 'build/js/MainDashboard.js' %}"></script>
+    {% comment %} <script type="text/javascript" src="{% static 'build/js/Authentication/SideNavMainComp.js' %}"></script> {% endcomment %}
     <script type="text/javascript" src="{% static 'build/js/Utils/FullPageLoaderComp.js' %}"></script>
     <script type="text/javascript" src="{% static 'build/js/Utils/ToastNotificationComp.js' %}"></script>
 

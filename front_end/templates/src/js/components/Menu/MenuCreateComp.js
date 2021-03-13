@@ -1,8 +1,8 @@
 
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react'
 import { observer } from 'mobx-react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory} from 'react-router-dom'
 
 import eventBus from '../Utils/EventBus'
 import DivLoader from '../Utils/DivLoaderComp'
@@ -17,7 +17,7 @@ const MenuCreate = observer(({ menuStore }) => {
 
 
     const redirectBackToMenuList = useCallback(() => {
-        history.push('/'), [history]
+        history.push('/menus'), [history]
     });
 
 
@@ -111,10 +111,10 @@ const MenuCreate = observer(({ menuStore }) => {
                     <div className="page-header-breadcrumb">
                         <ul className=" breadcrumb breadcrumb-title">
                             <li className="breadcrumb-item">
-                                <a href="/dashboard"><i className="feather icon-home"></i></a>
+                                <Link to="/"><i className="feather icon-home"></i></Link>
                             </li>
                             <li className="breadcrumb-item">
-                                <Link to="/">Menus</Link>
+                                <Link to="/menus">Menus</Link>
                             </li>
                             <li className="breadcrumb-item">
                                 Create
@@ -136,7 +136,7 @@ const MenuCreate = observer(({ menuStore }) => {
                                     <DivLoader type="Circles" loading={is_page_loading}/>
                                     <div className="card-header">
                                         <h5>Create Menu and Permissions</h5>
-                                        <Link to="/" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2">
+                                        <Link to="/menus" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2">
                                             <i className="fa fa-navicon"></i> Back to List
                                         </Link>
                                     </div>
