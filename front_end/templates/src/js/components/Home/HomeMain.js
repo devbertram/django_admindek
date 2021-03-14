@@ -8,7 +8,6 @@ const HomeMain = () => {
     return (
 
     <div className="pcoded-content">
-    
         <div className="page-header card">
             <div className="row align-items-end">
                 <div className="col-lg-8">
@@ -31,7 +30,6 @@ const HomeMain = () => {
                 </div>
             </div>
         </div>
-    
         <div className="pcoded-inner-content">
             <div className="main-body">
                 <div className="page-wrapper">
@@ -75,7 +73,6 @@ const HomeMain = () => {
                                 </div>
                             </div>
                         </div>
-    
                     </div>
                 </div>
             </div>
@@ -85,7 +82,5 @@ const HomeMain = () => {
     )
 
 }
-
-
 
 export default HomeMain

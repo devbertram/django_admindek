@@ -7,13 +7,11 @@ from rest_framework.permissions import IsAuthenticated
 import requests
 
 
-
 def loginPage(request):
     if request.user.is_authenticated == False:
         return render(request, 'authentication/login.html')
     else:
         return redirect('/dashboard')
-
 
 
 def setUsernamelogoutPage(request):
@@ -23,13 +21,11 @@ def setUsernamelogoutPage(request):
         return redirect('/dashboard')
 
 
-
 def setPasswordlogoutPage(request):
     if request.user.is_authenticated == False:
         return render(request, 'authentication/set_password_logout.html')
     else:
         return redirect('/dashboard')
-
 
 
 @api_view(['POST'])
@@ -43,28 +39,14 @@ def logoutUser(request):
     return Response(response)
 
 
-
 @login_required
-def dashboardHomePage(request):
-    return render(request, 'dashboard/home.html')
-
+def dashboardMainPage(request):
+    return render(request, 'base_template/dashboard.html')
 
 
 @login_required
 def dashboardProfilePage(request):
     return render(request, 'dashboard/profile/profile.html')
-
-
-
-@login_required
-def dashboardUsersPage(request):
-    return render(request, 'dashboard/user/index.html')
-
-
-
-@login_required
-def dashboardMenusPage(request):
-    return render(request, 'dashboard/menu/index.html')
     
 
         

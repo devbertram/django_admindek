@@ -6,7 +6,7 @@ from .models import UserRoute, UserSubroute
 class CheckIfUserRouteExist(MiddlewareMixin):
 
     route_exceptions = [
-        "dashboard_home_page",
+        "dashboard_main_page",
         "dashboard_profile_page",
         "user-set-username",
         "user-set-password",

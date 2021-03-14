@@ -1,11 +1,13 @@
 
 import React from "react";
-import { NavLink } from "react-router-dom"
+import { NavLink, useLocation } from "react-router-dom"
 
 function SideNavMenu(props){
 
+    const location = useLocation();
+
     return (
-        <li className={ props.current_route ===  props.url ? "active" : ""}>
+        <li className={ location.pathname ===  props.url ? "active" : ""}>
             <NavLink to={ props.url } className="waves-effect waves-dark">
                 <span className="pcoded-micon">
                     <i className={ props.menu_icon }></i>

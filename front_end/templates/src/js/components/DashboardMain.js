@@ -11,7 +11,7 @@ import userStore from './User/store/UserStore'
 import MenuMain from './Menu/MenuMain'
 import menuStore from './Menu/store/MenuStore'
 
-const MainDashboard = () => {
+const DashboardMain = () => {
 
     return (
         <HashRouter>
@@ -51,6 +51,6 @@ const MainDashboard = () => {
 
 
 ReactDOM.render( 
-    <MainDashboard />, 
+    <DashboardMain/>, 
     document.getElementById('root')
 );

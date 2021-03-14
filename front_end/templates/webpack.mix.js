@@ -9,4 +9,4 @@ mix.js('src/js/components/Utils/ToastNotificationComp.js', 'static/build/js/Util
 
 mix.js('src/js/components/User/UserMain.js', 'static/build/js/User').react();
 mix.js('src/js/components/Menu/MenuMain.js', 'static/build/js/Menu').react();
-mix.js('src/js/components/MainDashboard.js', 'static/build/js/').react();
+mix.js('src/js/components/DashboardMain.js', 'static/build/js/').react();

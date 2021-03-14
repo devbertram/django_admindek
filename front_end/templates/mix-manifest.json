@@ -6,5 +6,5 @@
     "/static/build/js/Utils/ToastNotificationComp.js": "/static/build/js/Utils/ToastNotificationComp.js",
     "/static/build/js/User/UserMain.js": "/static/build/js/User/UserMain.js",
     "/static/build/js/Menu/MenuMain.js": "/static/build/js/Menu/MenuMain.js",
-    "/static/build/js/MainDashboard.js": "/static/build/js/MainDashboard.js"
+    "/static/build/js/DashboardMain.js": "/static/build/js/DashboardMain.js"
 }

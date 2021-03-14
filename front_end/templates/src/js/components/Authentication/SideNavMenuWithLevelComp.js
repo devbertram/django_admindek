@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect, useCallback } from "react";
-
 import { NavLink, useLocation, useHistory } from "react-router-dom"
 
 function SideNavMenuWithLevel(props){
@@ -10,10 +9,16 @@ function SideNavMenuWithLevel(props){
     const [is_menu_open, SetIsMenuOpen] = useState(false);
     const [current_path, SetCurrentPath] = useState("");
 
+    
     useEffect(() => {
         let is_mounted = true;
         if(is_mounted == true){
-            hasActiveRouteOnLoad()
+            // check active path onload
+            props.submenus.forEach((val, key) => {
+                if(props.current_path.includes(val.subroute.url)){
+                    SetIsMenuOpen(true);
+                }
+            })
         }
         return () => {
             is_mounted = false;
@@ -24,20 +29,6 @@ function SideNavMenuWithLevel(props){
     const redirectToPath = useCallback((path) => {
         history.push(path), [history]
     });
-    
-
-    const hasActiveRouteOnLoad = () => {
-        props.submenus.forEach((val, key) => {
-            if(props.current_route.includes(val.subroute.url)){
-                SetIsMenuOpen(true);
-            }
-        })
-    }
-
-
-    const hasActiveRoute = (path) => {
-        return location.pathname === path;
-    }
 
 
     const getSubmenus = () => {
@@ -46,7 +37,7 @@ function SideNavMenuWithLevel(props){
             props.submenus.forEach((val, key) => {
                 if(val.subroute.is_nav == true){
                     submenus.push(
-                        <li className={ hasActiveRoute(val.subroute.url) ? 'active' : '' } key={key}>
+                        <li className={ hasActiveSubmenuPath(val.subroute.url) ? 'active' : '' } key={key}>
                             <NavLink to="#" className="waves-effect waves-dark" onClick={e => handleClickMenu(e, val.subroute.url)}>
                                 <span className="pcoded-mtext">{ val.subroute.nav_name }</span>
                             </NavLink>
@@ -56,6 +47,16 @@ function SideNavMenuWithLevel(props){
             })
         }
         return submenus
+    }
+
+
+    const hasActiveSubmenuPath = (path) => {
+        return location.pathname === path;
+    }
+
+
+    const hasActiveMenuPath = () => {
+        return is_menu_open === true || current_path === location.pathname;
     }
 
 
@@ -77,16 +78,12 @@ function SideNavMenuWithLevel(props){
 
 
     return (
-        <li className={is_menu_open === true || current_path === location.pathname ? "pcoded-hasmenu active pcoded-trigger" : "pcoded-hasmenu"} 
-            dropdown-icon="style1" 
-            subitem-icon="style1" 
-            onClick={ handleOpen }
-            id={props.id}>
+        <li className={ hasActiveMenuPath() ? "pcoded-hasmenu active pcoded-trigger" : "pcoded-hasmenu"} dropdown-icon="style1" subitem-icon="style1" onClick={ handleOpen }>
             <NavLink to="#" onClick={ e => e.preventDefault() } className="waves-effect waves-dark">
                 <span className="pcoded-micon"><i className={ props.menu_icon }></i></span>
                 <span className="pcoded-mtext">{ props.menu_name }</span>
             </NavLink>
-            <ul className="pcoded-submenu" style={ is_menu_open === true || current_path === location.pathname ? {display:''} : {display:'none'} }>
+            <ul className="pcoded-submenu" style={ hasActiveMenuPath() ? {display:''} : {display:'none'} }>
                 { getSubmenus() }
             </ul>
         </li>

@@ -11,14 +11,14 @@ function SideNavMain(props){
 
     const location = useLocation();
     const [routes, setRoutes] = useState({});
-    const [current_route, setCurrentRoute] = useState("");
+    const [current_path, setCurrentPath] = useState("");
 
 
     useEffect(() => {
         let is_mounted = true;
         if(is_mounted == true){
             getRoutes()
-            getCurrentRoute()
+            setCurrentPath(location.pathname)
         }
         return () => {
             is_mounted = false;
@@ -31,12 +31,6 @@ function SideNavMain(props){
         .then((response) => {
             setRoutes(response.data)
         });
-    }
-
-
-    const getCurrentRoute = () => {
-        let url = window.location.toString();
-        setCurrentRoute(url.replace(window.location.origin + "/dashboard/#", ""))
     }
 
 
@@ -53,18 +47,16 @@ function SideNavMain(props){
                                     menu_name={val.route.nav_name} 
                                     menu_icon={val.route.icon} 
                                     url={val.route.url}
-                                    current_route={current_route}
                                 />
                             )
                         }else{
                             admin_menus.push(
                                 <SideNavMenuWithLevel 
                                     key={key}
-                                    id={key} 
                                     menu_name={val.route.nav_name} 
                                     menu_icon={val.route.icon} 
                                     submenus={val.userSubroute_userRoute}
-                                    current_route={current_route}
+                                    current_path={current_path}
                                 />
                             )
                         }
@@ -77,31 +69,38 @@ function SideNavMain(props){
 
 
     return (
-    <nav className="pcoded-navbar">
-        <div className="nav-list">
-            <div className="pcoded-inner-navbar main-menu">
+        <nav className="pcoded-navbar">
+            <div className="nav-list">
+                <div className="pcoded-inner-navbar main-menu">
 
-                <div className="pcoded-navigation-label">App</div>
-                <ul className="pcoded-item pcoded-left-item">
-                    <li className={ location.pathname === "/" ? "active" : "" } key={0}>
-                        <NavLink to="/" className="waves-effect waves-dark">
-                            <span className="pcoded-micon">
-                                <i className="ti-home"></i>
-                            </span>
-                            <span className="pcoded-mtext">Home</span>
-                        </NavLink>
-                    </li>
-            </ul>
+                    <div className="pcoded-navigation-label">App</div>
+                    <ul className="pcoded-item pcoded-left-item">
+                        <li className={ location.pathname === "/" ? "active" : "" } key={0}>
+                            <NavLink to="/" className="waves-effect waves-dark">
+                                <span className="pcoded-micon">
+                                    <i className="ti-home"></i>
+                                </span>
+                                <span className="pcoded-mtext">Home</span>
+                            </NavLink>
+                        </li>
+                    </ul>
 
-                <div className="pcoded-navigation-label">Admin</div>
-                <ul className="pcoded-item pcoded-left-item">
-                    { getMenus('ADM') }
-                </ul>
+                    <div className="pcoded-navigation-label">Admin</div>
+                    <ul className="pcoded-item pcoded-left-item">
+                        { getMenus('ADM') }
+                    </ul>
 
+                    <div className="pcoded-navigation-label">HR</div>
+                    <ul className="pcoded-item pcoded-left-item">
+                        { getMenus('HR') }
+                    </ul>
+
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
     );
+
+
 }
 
 export default SideNavMain;
