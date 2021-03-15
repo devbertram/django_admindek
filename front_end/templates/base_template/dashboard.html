@@ -41,57 +41,8 @@
     <div class="loader-bg">
         <div class="loader-bar"></div>
     </div>
-    
-    <div id="pcoded" class="pcoded">
-        <div class="pcoded-overlay-box"></div>
 
-        <div class="pcoded-container navbar-wrapper">
-
-            <nav class="navbar header-navbar pcoded-header">
-                <div class="navbar-wrapper">
-                    <div class="navbar-logo">
-                        <a href="/" style="font-size:20px; font-weight:bold;">
-                            ADMINDEK
-                        </a>
-                        <a class="mobile-menu" id="mobile-collapse" href="#">
-                            <i class="feather icon-menu icon-toggle-right"></i>
-                        </a>
-                        <a class="mobile-options waves-effect waves-light">
-                            <i class="feather icon-more-horizontal"></i>
-                        </a>
-                    </div>
-                    <div class="navbar-container container-fluid">
-                        <ul class="nav-right">
-                            <li class="user-profile header-notification">
-                                <div class="dropdown-primary dropdown">
-                                    <div class="dropdown-toggle" data-toggle="dropdown">
-                                        <img src="{% static 'images/user_avatar.jpeg' %}" class="img-radius" alt="User-Profile-Image">
-                                        <span>{{ user.first_name  }}</span>
-                                        <i class="feather icon-chevron-down"></i>
-                                    </div>
-
-                                    <ul class="show-notification profile-notification dropdown-menu" data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
-                                    
-                                        <li>
-                                            <a href="{% url 'dashboard_profile_page' %}">
-                                                <i class="feather icon-user"></i> Profile
-                                            </a>
-                                        </li>
-                                    
-                                        <div id="logout"></div>
-                                    
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-
-            <div id="root"></div>
-            
-        </div>
-    </div>
+    <div id="root"></div>
 
     <script type="text/javascript" src="{% static 'build/js/DashboardMain.js' %}"></script>
     <script type="text/javascript" src="{% static 'build/js/Authentication/LogoutFormMainComp.js' %}"></script>

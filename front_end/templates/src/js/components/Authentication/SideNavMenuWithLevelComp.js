@@ -50,8 +50,8 @@ function SideNavMenuWithLevel(props){
     }
 
 
-    const hasActiveSubmenuPath = (path) => {
-        return location.pathname === path;
+    const hasActiveSubmenuPath = (url) => {
+        return location.pathname.includes(url);
     }
 
 
@@ -60,10 +60,10 @@ function SideNavMenuWithLevel(props){
     }
 
 
-    const handleClickMenu = (e, path) =>{
+    const handleClickMenu = (e, url) =>{
         e.preventDefault()
-        redirectToPath(path)
-        SetCurrentPath(path)
+        redirectToPath(url)
+        SetCurrentPath(url)
     }
 
     
