@@ -1,6 +1,4 @@
 
-require('../../config');
-
 import React ,{ useState, useEffect } from "react"
 import { NavLink, useLocation} from "react-router-dom"
 
@@ -53,6 +51,7 @@ function SideNavMain(props){
                             admin_menus.push(
                                 <SideNavMenuWithLevel 
                                     key={key}
+                                    url_name={val.route.url_name}
                                     menu_name={val.route.nav_name} 
                                     menu_icon={val.route.icon} 
                                     submenus={val.userSubroute_userRoute}

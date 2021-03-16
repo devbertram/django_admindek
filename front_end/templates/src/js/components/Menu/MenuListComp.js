@@ -15,7 +15,6 @@ const MenuList = observer(({ menuStore }) => {
     const history = useHistory();
     const {url} = useRouteMatch();
     const [is_delete_modal_loading, SetIsDeleteModalLoading] = useState(false);
-    const [is_page_loading, SetIsPageLoading] = useState(false);
     const [select_all_checkbox, SetSelectAllCheckbox] = useState(false);
 
 
@@ -23,9 +22,7 @@ const MenuList = observer(({ menuStore }) => {
         let is_mounted = true;
         if(is_mounted = true){
             menuStore.fetch()
-            SetIsPageLoading(true)
         }
-        SetIsPageLoading(false)
         return () => {
             is_mounted = false
         } 
@@ -82,8 +79,8 @@ const MenuList = observer(({ menuStore }) => {
 
     const handleBulkDeleteSumbmit = (e) => {
         e.preventDefault()
-        let ids_for_delete = [];
         SetIsDeleteModalLoading(true)
+        let ids_for_delete = [];
         menuStore.selected_rows.map(data => {
             if(data.status === true){
                 ids_for_delete.push(data.id)
@@ -99,16 +96,16 @@ const MenuList = observer(({ menuStore }) => {
                     message: "The menus has been successfully Deleted!", type: "inverse"
                 });
                 menuStore.fetch()
+                SetIsDeleteModalLoading(false)
             }).catch((error) => {
                 if(error.response.status == 500){
                     eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                         message: "There's an error trying to send data to the server!", type: "danger" 
                     });
                 }
+                SetIsDeleteModalLoading(false)
             });
         }
-        SetIsDeleteModalLoading(false)
-        SetSelectAllCheckbox(false)
         $("#route-bulk-delete-modal").modal('hide');
     }
 
@@ -149,8 +146,6 @@ const MenuList = observer(({ menuStore }) => {
                             <div className="col-md-12">
                                 <div className="card table-card">
 
-                                    <DivLoader type="Circles" loading={is_page_loading}/>
-
                                     {/* Table Header */}
                                     <div className="card-header p-b-0"> 
                                         <TableHeaderDefault
@@ -176,7 +171,7 @@ const MenuList = observer(({ menuStore }) => {
                                     {/* TABLE BODY */}
                                     <div className="card-block table-border-style pb-0 pt-0">
                                         <div className="table-responsive">
-                                            <table className="table table-de table-hover">
+                                            <table className="table table-sm table-hover">
                                                 <thead>
                                                     <tr>
                                                         <th className="p-0">
@@ -189,14 +184,14 @@ const MenuList = observer(({ menuStore }) => {
                                                                 </label>
                                                             </div>
                                                         </th>
-                                                        <th>Name</th>
-                                                        <th>Category</th>
-                                                        <th>Is Side Nav.</th>
-                                                        <th>Is Side Nav. Dropdown</th>
-                                                        <th>Side Nav. Name</th>
-                                                        <th>Side Nav. Icon</th>
-                                                        <th>Url</th>
-                                                        <th>Url Name</th>
+                                                        <th className="align-middle">Name</th>
+                                                        <th className="align-middle">Category</th>
+                                                        <th className="align-middle">Is Side Nav.</th>
+                                                        <th className="align-middle">Is Side Nav. Dropdown</th>
+                                                        <th className="align-middle">Side Nav. Name</th>
+                                                        <th className="align-middle">Side Nav. Icon</th>
+                                                        <th className="align-middle">Url</th>
+                                                        <th className="align-middle">Url Name</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>

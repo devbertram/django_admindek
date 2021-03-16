@@ -5,7 +5,7 @@ import { makeAutoObservable, runInAction } from "mobx"
 class UserStore{
 
     // List
-    list = {};
+    list = [];
     total_records = 0;
     page_prev = 0;
     page_current = 1;

@@ -54,6 +54,7 @@ const MenuEdit = observer(({ menuStore }) => {
             });
             menuStore.setSelectedRoute(response.data.id)
             if(btl === 1){ redirectBackToMenuList() }
+            SetIsPageLoading(false);
         }).catch((error) => {
             if(error.response.status === 400){
                 let field_errors = error.response.data;
@@ -74,8 +75,8 @@ const MenuEdit = observer(({ menuStore }) => {
                     message: "There's an error trying to send data to the server!", type: "danger" 
                 });
             }
+            SetIsPageLoading(false);
         });
-        SetIsPageLoading(false);
     }
     
 
@@ -195,8 +196,8 @@ const MenuEdit = observer(({ menuStore }) => {
 
                                             <InputTextInline 
                                                 type="text"
-                                                label="Url:"
-                                                placeholder="Url"
+                                                label="Url / Main Path:"
+                                                placeholder="Url / Main Path"
                                                 errorField={ menuStore.error_fields.url }
                                                 value={ menuStore.url }
                                                 setter={ e => menuStore.setUrl(e.target.value) }

@@ -257,6 +257,12 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({}, 200)
         else:
             return Response({}, 404)
+    
+
+    @action(methods=['get'], detail=False)
+    def current_user(self, request):
+        serializer =  UserSerializer(request.user)
+        return Response(serializer.data, 200)
 
 
 

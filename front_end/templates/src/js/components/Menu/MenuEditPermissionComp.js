@@ -143,6 +143,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
 
     const handleDeleteSubrouteSubmit = (e, subroute_delete_id) => {
         e.preventDefault()
+        SetIsPageLoading(true);
         axios.delete('api/subroute/'+subroute_delete_id+"/")
              .then((response) => {
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
@@ -150,6 +151,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                 });
                 menuStore.retrieve(param_id)
                 $("#subroute-delete-modal").modal('hide');
+                SetIsPageLoading(false);
              }).catch((error) => {
                 if(error.response.status == 404){
                     eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
@@ -161,6 +163,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                         message: "There's an error trying to send data to the server!", type: "danger" 
                     });
                 }
+                SetIsPageLoading(false);
             });
     }
 

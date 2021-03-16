@@ -13,7 +13,7 @@ const MenuDetails = observer(({ menuStore }) => {
 
     const history = useHistory();
     const { param_id } = useParams();
-    const [is_page_loading, SetIsPageLoading] = useState(false);
+    const [ is_page_loading, SetIsPageLoading ] = useState(false);
 
     
     useEffect (() => {
@@ -44,12 +44,14 @@ const MenuDetails = observer(({ menuStore }) => {
 
     const handleDeleteRouteSubmit = (e) => {
         e.preventDefault()
+        SetIsPageLoading(true)
         axios.delete('api/route/'+param_id+'/')
              .then((response) => {
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                     message: "Menu has been successfully Deleted!", type: "inverse"
                 });
                 redirectBackToMenuList()
+                SetIsPageLoading(false)
              }).catch((error) => {
                 if(error.response.status == 404){
                     eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
@@ -61,6 +63,7 @@ const MenuDetails = observer(({ menuStore }) => {
                         message: "There's an error trying to send data to the server!", type: "danger" 
                     });
                 }
+                SetIsPageLoading(false)
             });
         $("#route-delete-modal").modal('hide');
     }

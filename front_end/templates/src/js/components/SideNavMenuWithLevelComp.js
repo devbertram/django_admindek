@@ -17,6 +17,7 @@ function SideNavMenuWithLevel(props){
             props.submenus.forEach((val, key) => {
                 if(props.current_path.includes(val.subroute.url)){
                     SetIsMenuOpen(true);
+                    SetCurrentPath(props.url_name)
                 }
             })
         }
@@ -56,7 +57,7 @@ function SideNavMenuWithLevel(props){
 
 
     const hasActiveMenuPath = () => {
-        return is_menu_open === true || current_path === location.pathname;
+        return is_menu_open === true || location.pathname.includes(props.url_name);
     }
 
 
@@ -68,7 +69,6 @@ function SideNavMenuWithLevel(props){
 
     
     const handleOpen = (e) =>{
-        e.preventDefault()
         if(is_menu_open == false){
             SetIsMenuOpen(true)
         }else{
@@ -79,7 +79,7 @@ function SideNavMenuWithLevel(props){
 
     return (
         <li className={ hasActiveMenuPath() ? "pcoded-hasmenu active pcoded-trigger" : "pcoded-hasmenu"} dropdown-icon="style1" subitem-icon="style1" onClick={ handleOpen }>
-            <NavLink to="#" onClick={ e => e.preventDefault() } className="waves-effect waves-dark">
+            <NavLink to="#" onClick={ e => e.preventDefault()  } className="waves-effect waves-dark">
                 <span className="pcoded-micon"><i className={ props.menu_icon }></i></span>
                 <span className="pcoded-mtext">{ props.menu_name }</span>
             </NavLink>
