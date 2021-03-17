@@ -6,6 +6,8 @@ import { HashRouter, Switch, Route } from "react-router-dom"
 
 import UserList from './UserListComp'
 import UserCreate from './UserCreateComp'
+import UserDetails from './UserDetailsComp'
+import UserEdit from './UserEditComp'
 
 const UserMain = observer(({ userStore }) => {
 
@@ -21,6 +23,16 @@ const UserMain = observer(({ userStore }) => {
                 {/* CREATE */}
                 <Route exact path="/users/create">
                     <UserCreate userStore={ userStore }/>
+                </Route>
+
+                {/* DETAILS */}
+                <Route exact path="/users/:user_id">
+                    <UserDetails userStore={ userStore }/>
+                </Route>
+
+                {/* EDIT */}
+                <Route exact path="/users/:user_id/edit">
+                    <UserEdit userStore={ userStore }/>
                 </Route>
 
             </Switch>

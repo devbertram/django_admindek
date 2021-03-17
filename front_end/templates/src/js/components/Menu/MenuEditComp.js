@@ -13,7 +13,7 @@ import { InputTextInline, RadioButton } from '../Utils/Forms/InlineInputs'
 const MenuEdit = observer(({ menuStore }) => {
 
     const history = useHistory();
-    const { param_id } = useParams();
+    const { menu_id } = useParams();
     const [is_page_loading, SetIsPageLoading] = useState(false);
     
     
@@ -22,7 +22,7 @@ const MenuEdit = observer(({ menuStore }) => {
         if(is_mounted = true){
             SetIsPageLoading(true)
             menuStore.setIsOpenedForm(1)
-            menuStore.retrieve(param_id)
+            menuStore.retrieve(menu_id)
             SetIsPageLoading(false)
         }
         return () => {
@@ -39,7 +39,7 @@ const MenuEdit = observer(({ menuStore }) => {
     const handleSave = (e, btl) => {
         e.preventDefault();
         SetIsPageLoading(true)
-        axios.put('api/route/'+param_id+'/', { 
+        axios.put('api/route/'+menu_id+'/', { 
             category : menuStore.category,
             name : menuStore.name,
             nav_name : menuStore.nav_name,
@@ -104,7 +104,7 @@ const MenuEdit = observer(({ menuStore }) => {
                                 <Link to="/menus">Menus</Link>
                             </li>
                             <li className="breadcrumb-item">
-                                <Link to={`/menus/${menuStore.route_id}`}>Details</Link>
+                                <Link to={`/menus/${ menu_id }`}>Details</Link>
                             </li>
                             <li className="breadcrumb-item">
                                 Edit
@@ -125,7 +125,7 @@ const MenuEdit = observer(({ menuStore }) => {
                                     <DivLoader type="Circles" loading={is_page_loading}/>
                                     <div className="card-header">
                                         <h5>Edit Menu </h5>
-                                        <Link to={`/menus/${param_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
+                                        <Link to={`/menus/${menu_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
                                             <i className="fa fa-arrow-left"></i> Back
                                         </Link>
                                         <Link to="/menus" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2">
@@ -216,7 +216,7 @@ const MenuEdit = observer(({ menuStore }) => {
 
 
                                         {/* BUTTON / FOOTERS */}
-                                        <div className="form-group row">
+                                        <div className="form-group row mt-4">
                                             <div className="col-sm-12">
                                                 <button type="submit" className="btn btn-primary float-right mr-2" onClick={ (e) => handleSave(e, 0) }>
                                                     Save

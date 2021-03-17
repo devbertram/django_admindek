@@ -11,7 +11,7 @@ import DivLoader from '../Utils/DivLoaderComp'
 
 const MenuEditPermission = observer(({ menuStore }) => {
 
-    const { param_id } = useParams();
+    const { menu_id } = useParams();
     const [is_page_loading, SetIsPageLoading] = useState(false);
     const [selected_subroute_id, SetSelectedSubrouteId] = useState("");
     const [subroute_delete_id, SetSubrouteDeleteId] = useState("");
@@ -22,7 +22,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
         if(is_mounted = true){
             SetIsPageLoading(true)
             menuStore.setIsOpenedForm(1)
-            menuStore.retrieve(param_id)
+            menuStore.retrieve(menu_id)
             SetIsPageLoading(false)
         }
         return () => {
@@ -66,7 +66,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
         SetIsPageLoading(true)
         const subroute = menuStore.findSubrouteByKey(key)
         axios.post('api/subroute/', { 
-            route: param_id,
+            route: menu_id,
             name: subroute.name,
             is_nav: subroute.is_nav,
             nav_name: subroute.nav_name,
@@ -77,8 +77,8 @@ const MenuEditPermission = observer(({ menuStore }) => {
                 message: "Permission Successfully Created!", type: "inverse" 
             });
             SetSelectedSubrouteId(response.data.id)
-            menuStore.setSelectedRoute(param_id)
-            menuStore.retrieve(param_id)
+            menuStore.setSelectedRoute(menu_id)
+            menuStore.retrieve(menu_id)
             SetIsPageLoading(false);
         }).catch((error) => {
             if(error.response.status === 400){
@@ -102,7 +102,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
         SetIsPageLoading(true)
         const subroute = menuStore.findSubrouteById(id)
         axios.put('api/subroute/'+id+'/', { 
-            route: param_id,
+            route: menu_id,
             name: subroute[key]['name'],
             is_nav: subroute[key]['is_nav'],
             nav_name: subroute[key]['nav_name'],
@@ -113,8 +113,8 @@ const MenuEditPermission = observer(({ menuStore }) => {
                 message: "Permission Successfully Updated!", type: "inverse" 
             });
             SetSelectedSubrouteId(response.data.id)
-            menuStore.setSelectedRoute(param_id)
-            menuStore.retrieve(param_id)
+            menuStore.setSelectedRoute(menu_id)
+            menuStore.retrieve(menu_id)
             SetIsPageLoading(false);
         }).catch((error) => {
             if(error.response.status === 400){
@@ -149,7 +149,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                     message: "Permission Successfully Deleted!", type: "inverse" 
                 });
-                menuStore.retrieve(param_id)
+                menuStore.retrieve(menu_id)
                 $("#subroute-delete-modal").modal('hide');
                 SetIsPageLoading(false);
              }).catch((error) => {
@@ -192,7 +192,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                                 <Link to="/menus/">Menus</Link>
                             </li>
                             <li className="breadcrumb-item">
-                                <Link to={`/menus/${menuStore.route_id}`}>Details</Link>
+                                <Link to={`/menus/${ menu_id }`}>Details</Link>
                             </li>
                             <li className="breadcrumb-item">
                                 Edit Permissions
@@ -214,7 +214,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                                     <DivLoader type="Circles" loading={is_page_loading}/>
                                     <div className="card-header">
                                         <h5>Edit Menu Permissions</h5>
-                                        <Link to={`/menus/${param_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
+                                        <Link to={`/menus/${menu_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
                                             <i className="fa fa-arrow-left"></i> Back
                                         </Link>
                                         <Link to="/menus" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2">

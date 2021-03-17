@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 import moment from 'moment'
 import { observer } from 'mobx-react'
@@ -9,13 +9,13 @@ import { Link, useHistory } from "react-router-dom"
 import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
 import UserListFilterModal from './UserListFilterModalComp'
-import UserUpdateModal from './UserUpdateModalComp'
 import UserDeleteModal from './UserDeleteModalComp'
 
 
 const UserList = observer(({ userStore }) => {
 
     const history = useHistory();
+    const [select_all_checkbox, SetSelectAllCheckbox] = useState(false);
 
 
     useEffect (() => {
@@ -35,19 +35,19 @@ const UserList = observer(({ userStore }) => {
 
 
     const redirectToUserDetails = useCallback((id) => {
-        menuStore.setRouteId(id)
-        menuStore.setIsOpenedForm(1)
-        history.push(url + '/' + id), [history]
+        userStore.setIsOpenedForm(1)
+        history.push('users/' + id), [history]
     });
 
 
-    const handleOpenUserDetails = (e, id) => {
-        e.preventDefault()
-        redirectToUserDetails(id)
+    const tableRowIsChecked = (id) => {
+        return userStore.selected_rows.some(data => {
+            return data.id === id && data.status === true;
+        })
     }
 
 
-    const handleCreateButtonClick = (e) => {
+    const handleCreateButton = (e) => {
         e.preventDefault()
         if(userStore.is_opened_form === 1){
             userStore.resetForm()
@@ -57,23 +57,26 @@ const UserList = observer(({ userStore }) => {
     }
 
 
-    const handleUpdateButtonClick = (e, id) => {
+    const handleOpenUserDetails = (e, id) => {
         e.preventDefault()
-        $("#user-update-modal").modal('toggle')
-        userStore.setIsOpenedForm(1)
-        userStore.setUserId(id)
-        userStore.retrieveUser()
+        redirectToUserDetails(id)
     }
 
 
-    const handleDeleteButtonClick = (e, id) => {
-        e.preventDefault()
-        $("#user-delete-modal").modal('toggle')
-        userStore.setUserId(id)
+    const handleSelectCheckbox = (e, id) => {
+        userStore.setSelectedRowObject(e.target.checked, id)
     }
 
 
-    const handleFilterButtonClick = (e) => {
+    const handleSelectAllCheckbox = (e) => {
+        SetSelectAllCheckbox(e.target.checked)
+        userStore.selected_rows.map(data => {
+            userStore.setSelectedRowObject(e.target.checked, data.id)
+        })
+    }
+
+
+    const handleFilterButton = (e) => {
         e.preventDefault()
         $("#user-filter-modal").modal('toggle')
     }
@@ -118,11 +121,11 @@ const UserList = observer(({ userStore }) => {
                                     {/* Table Header */}
                                     <div className="card-header"> 
                                         <TableHeaderDefault
-                                            addButtonClickHandler={ handleCreateButtonClick }
+                                            addButtonClickHandler={ handleCreateButton }
                                             searchInputValue={ userStore.query }
                                             searchInputHandler={ (e) => userStore.handleSearch(e) }
                                             filterButton={true}
-                                            filterButtonClickHandler={ handleFilterButtonClick }
+                                            filterButtonClickHandler={ handleFilterButton }
                                             refreshButtonClickHandler={ (e) => userStore.handleRefreshClick(e) }
                                             entriesSelectPageSize={ userStore.page_size }
                                             entriesSelectChangeHandler={ (e) => userStore.handlePageSizeClick(e) }
@@ -141,12 +144,21 @@ const UserList = observer(({ userStore }) => {
                                             <table className="table table-sm table-hover">
                                                 <thead>
                                                     <tr>
+                                                        <th className="p-0">
+                                                            <div className="checkbox-fade fade-in-primary ml-3 mt-3">
+                                                                <label>
+                                                                    <input type="checkbox" checked={select_all_checkbox} onChange={ handleSelectAllCheckbox }/>
+                                                                    <span className="cr">
+                                                                        <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
+                                                                    </span>
+                                                                </label>
+                                                            </div>
+                                                        </th>
                                                         <th>Username</th>
                                                         <th>Name</th>
                                                         <th>Status</th>
                                                         <th>Last Login</th>
                                                         <th>Date Joined</th>
-                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -154,7 +166,21 @@ const UserList = observer(({ userStore }) => {
                                                     let last_login = moment(val.last_login).format("MM/DD/YYYY hh:mm A")
                                                     let date_joined = moment(val.date_joined).format("MM/DD/YYYY hh:mm A")
                                                     return (
-                                                        <tr key={key} className={ val.id == userStore.selected_user ? "table-info" : "" }>
+                                                        <tr key={key} className={ val.id == userStore.selected_user || tableRowIsChecked(val.id) ? "table-info" : "" }>
+
+                                                            <td className="p-0">
+                                                                <div className="checkbox-fade fade-in-primary ml-3 mt-3">
+                                                                    <label>
+                                                                        <input key={key}
+                                                                            type="checkbox"
+                                                                            checked={ tableRowIsChecked(val.id) }
+                                                                            onChange={ e => handleSelectCheckbox(e, val.id) }/>
+                                                                        <span className="cr">
+                                                                            <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                            </td>
                                                             <td className="align-middle">
                                                                 <a href="#" onClick={ (e) => handleOpenUserDetails(e, val.id) }>
                                                                     <ins className="text-info">{ val.username }</ins>
@@ -169,14 +195,6 @@ const UserList = observer(({ userStore }) => {
                                                             </td>
                                                             <td className="align-middle">{ last_login }</td>
                                                             <td className="align-middle">{ date_joined }</td>
-                                                            <td className="align-middle">
-                                                                <button className="btn btn-sm btn-primary" type="button" onClick={ (e) => handleUpdateButtonClick(e, val.id) }>
-                                                                    <i className="fa fa-pencil ml-1"></i>
-                                                                </button>
-                                                                <button className="btn btn-sm btn-danger ml-1" type="button" onClick={ (e) => handleDeleteButtonClick(e, val.id) }>
-                                                                    <i className="fa fa-trash ml-1"></i>
-                                                                </button>
-                                                            </td>
                                                         </tr>
                                                     )
                                                 }) }
@@ -213,9 +231,6 @@ const UserList = observer(({ userStore }) => {
 
                                 {/* Filter Modal */}
                                 <UserListFilterModal userStore={ userStore } />
-
-                                {/* Update Modal */}
-                                <UserUpdateModal userStore={ userStore } />
 
                                 {/* Delete Modal */}
                                 <UserDeleteModal userStore={ userStore } />

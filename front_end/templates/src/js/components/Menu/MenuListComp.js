@@ -1,7 +1,7 @@
 
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { Link, useHistory, useRouteMatch } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { observer } from 'mobx-react'
 
 import eventBus from '../Utils/EventBus'
@@ -13,7 +13,6 @@ import { TableFooterDefault } from '../Utils/Table/TableFooters'
 const MenuList = observer(({ menuStore }) => {
 
     const history = useHistory();
-    const {url} = useRouteMatch();
     const [is_delete_modal_loading, SetIsDeleteModalLoading] = useState(false);
     const [select_all_checkbox, SetSelectAllCheckbox] = useState(false);
 
@@ -34,14 +33,13 @@ const MenuList = observer(({ menuStore }) => {
             menuStore.resetForm()
         }
         menuStore.setIsOpenedForm(0)
-        history.push(url + '/create'), [history]
+        history.push('menus/create'), [history]
     });
 
 
     const redirectToMenuDetails = useCallback((id) => {
-        menuStore.setRouteId(id)
         menuStore.setIsOpenedForm(1)
-        history.push(url + '/' + id), [history]
+        history.push('menus/' + id), [history]
     });
 
 

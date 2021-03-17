@@ -18,9 +18,8 @@ class UserStore{
     
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
     selected_user = 0; // selected user id after create or update
-    is_list_loading = false;
-    is_form_loading = false;
     is_opened_form = 0; // 0 = create form, 1 = update form
+    selected_rows = []; // rows that are selected via checkbox
 
     // Form
     user_id = "";
@@ -28,6 +27,9 @@ class UserStore{
     last_name = "";
     email = "";
     username = "";
+    is_active = false;
+    date_joined = "";
+    last_login = "";
     password = "";
     password_confirm = "";
     error_fields = {};
@@ -42,28 +44,39 @@ class UserStore{
     }
 
 
-    // Form
-    retrieveUser(){
+    fetch(){
+        axios.get('api/user', { 
+            params: { 
+                q: this.query, 
+                page_size: this.page_size, 
+                page: this.page_current, 
+                os: this.filter_online_status.value,
+                sus: this.filter_su_status.value
+            }
+        }).then((response) => {
+            runInAction(() => {
+                const users = response.data.results;
+                let array = [];
+                this.list = users;
+                this.total_records = response.data.count
+                this.page_limit = Math.ceil(response.data.count / this.page_size);
+                users.forEach(data => array.push({id:data.id, status:false}))
+                this.selected_rows = array;
+            })
+        });
+    }
 
+
+    retrieve(user_id){
         this.resetForm();
-
-        runInAction(() => {
-            this.is_form_loading = true;
-        })
-
-        if(this.user_id != ""){
-
-            axios.get('api/user/' + this.user_id)
+        if(user_id != ""){
+            axios.get('api/user/' + user_id)
                 .then((response) => {
-
                     let r = response.data.userRoute_user;
                     let user_r = [];
                     let user_sr = [];
-
                     r.forEach( data_r => {
-
                         let sr = data_r.userSubroute_userRoute;
-
                         // set subroute options
                         axios.get('api/route/' + data_r.route.id)
                             .then((response) => {
@@ -74,13 +87,11 @@ class UserStore{
                                     });
                                 }
                             });
-                        
                         // push user route
                         user_r.push({ 
                             value: data_r.route.id, 
                             label:data_r.route.name 
                         })
-
                         // push user subroute
                         sr.forEach(data_sr => {
                             user_sr.push({
@@ -88,26 +99,30 @@ class UserStore{
                                 label:data_sr.subroute.name
                             })
                         })
-
                     })
-
                     // set form values
                     runInAction(() => {
+                        this.username = response.data.username;
                         this.first_name = response.data.first_name;
                         this.last_name = response.data.last_name;
                         this.email = response.data.email;
-                        this.username = response.data.username;
+                        this.is_active = response.data.is_active;
+                        this.date_joined = response.data.date_joined;
+                        this.last_login = response.data.last_login;
                         this.user_routes = user_r;
                         this.user_subroutes = user_sr;
-                        this.is_form_loading = false;
                     })
-
                 });
-
         }
     }
 
+    setSelectedRowObject(status, id){
+        let obj_index = this.selected_rows.findIndex(data => data.id === id)
+        this.selected_rows[obj_index].status = status;
+    }
 
+
+    // Form
     resetForm(){
         this.first_name = "";
         this.last_name = "";
@@ -164,11 +179,9 @@ class UserStore{
 
     // User Routes
     setUserRoutes(array){
-
         let existing = this.getUserRouteValues();
         let passed = this.getUserRoutePassedValues(array);
         let diff = [];
-        
         if(existing.length < passed.length ){
             diff = passed.filter(x => !existing.includes(x));
             if(diff.length === 1){
@@ -183,7 +196,6 @@ class UserStore{
                     });
             }
         }
-        
         if(existing.length > passed.length ){
             diff = existing.filter(x => !passed.includes(x));
             if(diff.length === 1){
@@ -199,9 +211,7 @@ class UserStore{
                     });
             }
         }
-
         this.user_routes = array;
-
     }
 
 
@@ -226,28 +236,22 @@ class UserStore{
 
 
     removeObjectFromUserSubroutes(value){
-
         let user_subroutes = [];
-
         this.user_subroutes.forEach(data => {
             user_subroutes.push({value:data.value, label:data.label})
         })
-
         for (var i=0; i < user_subroutes.length; i++){
             if (user_subroutes[i].value === value) {
                 user_subroutes.splice(i, 1);
                 break;
             }
         }
-        
         this.user_subroutes = user_subroutes;
-
     }
 
 
     // Route Options
     setRouteOptions(){
-
         axios.get('api/route/get_all')
              .then((response) => {
                 let routes = response.data; 
@@ -271,14 +275,12 @@ class UserStore{
 
 
     removeObjectFromSubrouteOptions(value){
-
         for (var i=0; i < this.subroute_options.length; i++){
             if (this.subroute_options[i].value === value) {
                 this.subroute_options.splice(i, 1);
                 break;
             }
         }
-
     }
 
 
@@ -300,31 +302,6 @@ class UserStore{
     
     setIsOpenedForm(int){
         this.is_opened_form = int;
-    }
-
-
-    fetch(){
-
-        this.is_list_loading = true;
-
-        axios.get('api/user', { 
-            params: { 
-                q: this.query, 
-                page_size: this.page_size, 
-                page: this.page_current, 
-                os: this.filter_online_status.value,
-                sus: this.filter_su_status.value
-            }
-        }).then((response) => {
-            runInAction(() => {
-                this.list = response.data.results;
-                this.total_records = response.data.count
-                this.page_limit = Math.ceil(response.data.count / this.page_size);
-            })
-        });
-
-        this.is_list_loading = false;
-
     }
 
 

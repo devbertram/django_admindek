@@ -225,7 +225,7 @@ const MenuCreate = observer(({ menuStore }) => {
 
 
                                         {/* PERMISSIONS */}
-                                        <div className="col-md-12 mt-5 mb-5">
+                                        <div className="col-md-12 mt-5">
                                             <h5 className="sub-title">Permissions</h5>
                                             <div className="table-responsive">
                                                 <button className="btn btn-md btn-success btn-outline-success float-right mb-2  pt-2 pb-2" 
@@ -293,7 +293,7 @@ const MenuCreate = observer(({ menuStore }) => {
 
 
                                         {/* BUTTON / FOOTERS */}
-                                        <div className="form-group row">
+                                        <div className="form-group row mt-4">
                                             <div className="col-sm-12">
                                                 <button type="submit" className="btn btn-primary float-right mr-2" onClick={ (e) => handleCreate(e, 0)}>
                                                     Save

@@ -20,7 +20,6 @@ class MenuStore{
     selected_rows = []; // rows that are selected via checkbox
 
     // Form
-    route_id = "";
     category = "";
     name = "";
     is_menu = null;
@@ -65,7 +64,6 @@ class MenuStore{
             runInAction(() => {
                 const res_subroutes = response.data.subroute_route;
                 let subroutes = [];
-                this.route_id = response.data.id
                 this.category = response.data.category
                 this.name = response.data.name
                 this.is_menu = response.data.is_menu
@@ -108,7 +106,6 @@ class MenuStore{
 
     // Form
     resetForm(){
-        this.route_id = "";
         this.category = "";
         this.name = "";
         this.nav_name = "";
@@ -119,10 +116,6 @@ class MenuStore{
         this.url_name = "";
         this.subroutes = [];
         this.error_fields = {};
-    }
-
-    setRouteId(route_id){
-        this.route_id = route_id;
     }
 
     setCategory(cat){

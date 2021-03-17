@@ -1,7 +1,8 @@
 
-import React, { useState, useEffect, useCallback } from 'react'
-import { observer } from 'mobx-react'
-import { Link, useHistory } from 'react-router-dom'
+
+import React, { useState, useCallback, useEffect } from 'react';
+import { observer } from 'mobx-react';
+import { Link, useHistory, useParams } from 'react-router-dom';
 
 import eventBus from '../Utils/EventBus'
 import DivLoader from '../Utils/DivLoaderComp'
@@ -9,16 +10,19 @@ import { InputTextInline, SelectMultiInline } from '../Utils/Forms/InlineInputs'
 
 
 
-const UserCreate = observer(({ userStore }) => {
-    
+const UserEdit = observer(({ userStore }) => {
+
     const history = useHistory();
+    const { user_id } = useParams();
     const [loader, SetLoader] = useState(false);
-
-
+    
+    
     useEffect (() => {
         let is_mounted = true;
         if(is_mounted = true){
+            userStore.setIsOpenedForm(1)
             userStore.setRouteOptions()
+            userStore.retrieve(user_id)
         }
         return () => {
             is_mounted = false;
@@ -34,76 +38,58 @@ const UserCreate = observer(({ userStore }) => {
     const handleUserRouteMultiSelectChange = (values) => {
         userStore.setUserRoutes(values)
     }
-    
 
+    
     const handleUserSubrouteMultiSelectChange = (values) => {
         userStore.setUserSubroutes(values)
     }
 
 
-    const handleResetForm = (e) =>{
-        e.preventDefault()
-        userStore.resetForm()
-    }
-
-
-    const handleCreate = (e, is_save_another) => {
+    const handleUpdate = (e, btl) => {
         e.preventDefault()
         SetLoader(true)
-        if(userStore.password != userStore.password_confirm){
-            userStore.setErrorFields({ password : "Password doesn't match!" })
-            SetLoader(false)
-        }else{
-            axios.post('api/user/', { 
-                first_name : userStore.first_name,
-                last_name : userStore.last_name,
-                email : userStore.email,
-                username : userStore.username, 
-                password : userStore.password, 
-                user_routes : userStore.user_routes,
-                user_subroutes : userStore.user_subroutes,
-            }).then((response) => {
-                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                    message: "User Successfully Created!", type: "inverse" 
+        axios.put('api/user/' + user_id +'/', {
+            first_name : userStore.first_name,
+            last_name : userStore.last_name,
+            email : userStore.email,
+            username : userStore.username, 
+            user_routes : userStore.user_routes,
+            user_subroutes : userStore.user_subroutes,
+        }).then((response) => {
+            eventBus.dispatch("SHOW_TOAST_NOTIFICATION", { message: "User Successfully Updated!", type: "inverse"});
+            userStore.fetch();
+            userStore.setSelectedUser(response.data.id);
+            if(btl === 1){ redirectBackToUserList() }
+            SetLoader(false);
+        }).catch((error) => {
+            if(error.response.status == 400){
+                let field_errors = error.response.data;
+                userStore.setErrorFields({
+                    firstname: field_errors.first_name?.toString(),
+                    lastname: field_errors.last_name?.toString(),
+                    email: field_errors.email?.toString(),
+                    username: field_errors.username?.toString(),
+                    user_routes: field_errors.user_routes?.toString(),
+                    user_subroutes: field_errors.user_subroutes?.toString(),
                 });
-                userStore.fetch();
-                userStore.setSelectedUser(response.data.id);
-                userStore.resetForm()
-                if (is_save_another == 0){
-                    redirectBackToUserList()
-                }
-                SetLoader(false);
-            }).catch((error) => {
-                if(error.response.status == 400){
-                    let field_errors = error.response.data;
-                    userStore.setErrorFields({
-                        firstname: field_errors.first_name?.toString(),
-                        lastname: field_errors.last_name?.toString(),
-                        email: field_errors.email?.toString(),
-                        username: field_errors.username?.toString(),
-                        password: field_errors.password?.toString(),
-                        user_routes: field_errors.user_routes?.toString(),
-                        user_subroutes: field_errors.user_subroutes?.toString(),
-                    });
-                }
-                if(error.response.status == 404){
-                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                        message: "Data Not Found!", type: "danger" 
-                    });
-                }
-                if(error.response.status == 500){
-                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                        message: "There's an error trying to send data to the server!", type: "danger" 
-                    });
-                }
-                SetLoader(false);
-            });
-        }
+            }
+            if(error.response.status == 404){
+                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                    message: "Data Not Found!", type: "danger" 
+                });
+            }
+            if(error.response.status == 500){
+                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
+                    message: "There's an error trying to send data to the server!", type: "danger" 
+                });
+            }
+            SetLoader(false);
+        });
     }
     
 
     return (
-        
+
     <div className="pcoded-content">
         <div className="page-header card">
             <div className="row align-items-end">
@@ -126,7 +112,10 @@ const UserCreate = observer(({ userStore }) => {
                                 <Link to="/users">Users</Link>
                             </li>
                             <li className="breadcrumb-item">
-                                Create
+                                <Link to={`/users/${ user_id }`}>Details</Link>
+                            </li>
+                            <li className="breadcrumb-item">
+                                Edit
                             </li>
                         </ul>
                     </div>
@@ -137,22 +126,23 @@ const UserCreate = observer(({ userStore }) => {
             <div className="main-body">
                 <div className="page-wrapper">
                     <div className="page-body">
-
                         <div className="row">
                             <div className="col-sm-12">
                                 <div className="card">
 
                                     <DivLoader type="Circles" loading={loader}/>
                                     <div className="card-header">
-                                        <h5>Create User</h5>
+                                        <h5>Edit User </h5>
+                                        <Link to={`/users/${user_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
+                                            <i className="fa fa-arrow-left"></i> Back
+                                        </Link>
                                         <Link to="/users" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2">
                                             <i className="fa fa-navicon"></i> Back to List
                                         </Link>
                                     </div>
 
                                     <div className="card-block">
-
-                                        <div className="col-sm-12">
+                                        <div className="col-md-12">
                                             <h4 className="sub-title">User Details</h4>
 
                                             <InputTextInline 
@@ -191,26 +181,8 @@ const UserCreate = observer(({ userStore }) => {
                                                 setter={ e => userStore.setUsername(e.target.value) }
                                             />
 
-                                            <InputTextInline 
-                                                secureTextEntry
-                                                type="password"
-                                                label="Password:"
-                                                placeholder="Password"
-                                                errorField={ userStore.error_fields.password }
-                                                value={ userStore.password }
-                                                setter={ e => userStore.setPassword(e.target.value) }
-                                            />
-
-                                            <InputTextInline 
-                                                type="password"
-                                                label="Confirm Password:"
-                                                placeholder="Confirm Password"
-                                                errorField={ userStore.error_fields.password_confirm }
-                                                value={ userStore.password_confirm }
-                                                setter={ e => userStore.setPasswordConfirm(e.target.value) }
-                                            />
-
                                         </div>
+
 
                                         <div className="col-sm-12 mt-5">
                                             <h4 className="sub-title">User Modules and Module Permissions</h4>
@@ -228,7 +200,7 @@ const UserCreate = observer(({ userStore }) => {
                                             />
 
                                             <SelectMultiInline 
-                                                label="Module Permissions:"
+                                                label="Permissions:"
                                                 name="user_subroutes"
                                                 value={userStore.user_subroutes}
                                                 errorField={ userStore.error_fields.user_subroutes }
@@ -240,22 +212,21 @@ const UserCreate = observer(({ userStore }) => {
 
                                         </div>
 
+
+                                        {/* BUTTON / FOOTERS */}
                                         <div className="form-group row mt-2">
                                             <div className="col-sm-12">
-                                                <button type="button" className="btn btn-primary float-right mr-2" onClick={ (e) => handleCreate(e, 0) }>
+                                                <button type="submit" className="btn btn-primary float-right mr-2" onClick={ (e) => handleUpdate(e, 0) }>
                                                     Save
                                                 </button>
-                                                <button type="button" className="btn btn-primary float-right mr-2" onClick={ (e) => handleCreate(e, 1) }>
-                                                    Save and add another
-                                                </button>
-                                                <button type="button" className="btn btn-primary float-right mr-2" onClick={ (e) => handleResetForm(e) }>
-                                                    Reset
+                                                <button type="submit" className="btn btn-primary float-right mr-2" onClick={ (e) => handleUpdate(e, 1) }>
+                                                    Save and back to list
                                                 </button>
                                             </div>
                                         </div>
 
-                                    </div>
 
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -270,4 +241,4 @@ const UserCreate = observer(({ userStore }) => {
 });
 
 
-export default UserCreate
+export default UserEdit

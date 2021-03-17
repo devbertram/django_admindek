@@ -12,7 +12,7 @@ import DivLoader from '../Utils/DivLoaderComp'
 const MenuDetails = observer(({ menuStore }) => {
 
     const history = useHistory();
-    const { param_id } = useParams();
+    const { menu_id } = useParams();
     const [ is_page_loading, SetIsPageLoading ] = useState(false);
 
     
@@ -20,9 +20,9 @@ const MenuDetails = observer(({ menuStore }) => {
         let is_mounted = true;
         if(is_mounted = true){
             SetIsPageLoading(true)
-            menuStore.retrieve(param_id)
+            menuStore.retrieve(menu_id)
             menuStore.setIsOpenedForm(1)
-            menuStore.setSelectedRoute(param_id)
+            menuStore.setSelectedRoute(menu_id)
             SetIsPageLoading(false)
         }
         return () => {
@@ -45,7 +45,7 @@ const MenuDetails = observer(({ menuStore }) => {
     const handleDeleteRouteSubmit = (e) => {
         e.preventDefault()
         SetIsPageLoading(true)
-        axios.delete('api/route/'+param_id+'/')
+        axios.delete('api/route/'+menu_id+'/')
              .then((response) => {
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                     message: "Menu has been successfully Deleted!", type: "inverse"
@@ -126,7 +126,7 @@ const MenuDetails = observer(({ menuStore }) => {
                                         {/* Menu */}
                                         <div className="col-md-12">
                                             <h5 className="sub-title">Menu</h5>
-                                            <Link to={`/menus/${param_id}/edit`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
+                                            <Link to={`/menus/${menu_id}/edit`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
                                                 <i className="fa fa-pencil-square-o"></i> Edit Menu
                                             </Link>
                                             <div className="row mt-4">
@@ -156,7 +156,7 @@ const MenuDetails = observer(({ menuStore }) => {
                                         {/* Permissions */}
                                         <div className="col-md-12 mt-5">
                                             <h5 className="sub-title mt-2">Permissions</h5>
-                                            <Link to={`/menus/${param_id}/edit_permissions`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
+                                            <Link to={`/menus/${menu_id}/edit_permissions`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
                                                 <i className="fa fa-pencil-square-o"></i> Edit Permissions
                                             </Link>
                                             <div className="table-responsive mt-3">

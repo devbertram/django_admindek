@@ -28,17 +28,17 @@ const MenuMain = observer(({ menuStore }) => {
                 </Route>
 
                 {/* DETAILS */}
-                <Route exact path="/menus/:param_id">
+                <Route exact path="/menus/:menu_id">
                     <MenuDetails menuStore={ menuStore }/>
                 </Route>
 
                 {/* EDIT */}
-                <Route exact path="/menus/:param_id/edit">
+                <Route exact path="/menus/:menu_id/edit">
                     <MenuEdit menuStore={ menuStore }/>
                 </Route>
 
                 {/* EDIT Permissions*/}
-                <Route exact path="/menus/:param_id/edit_permissions">
+                <Route exact path="/menus/:menu_id/edit_permissions">
                     <MenuEditPermission menuStore={ menuStore }/>
                 </Route>
 
