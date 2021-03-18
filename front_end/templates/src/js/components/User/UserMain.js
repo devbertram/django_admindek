@@ -8,6 +8,7 @@ import UserList from './UserListComp'
 import UserCreate from './UserCreateComp'
 import UserDetails from './UserDetailsComp'
 import UserEdit from './UserEditComp'
+import UserResetPassword from './UserResetPasswordComp'
 
 const UserMain = observer(({ userStore }) => {
 
@@ -33,6 +34,11 @@ const UserMain = observer(({ userStore }) => {
                 {/* EDIT */}
                 <Route exact path="/users/:user_id/edit">
                     <UserEdit userStore={ userStore }/>
+                </Route>
+
+                {/* RESET PASSWORD */}
+                <Route exact path="/users/:user_id/reset_password">
+                    <UserResetPassword userStore={ userStore }/>
                 </Route>
 
             </Switch>

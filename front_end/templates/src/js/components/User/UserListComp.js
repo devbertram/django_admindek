@@ -9,13 +9,12 @@ import { Link, useHistory } from "react-router-dom"
 import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
 import UserListFilterModal from './UserListFilterModalComp'
-import UserDeleteModal from './UserDeleteModalComp'
+import UserListBulkDeleteModal from './UserListBulkDeleteModalComp'
 
 
 const UserList = observer(({ userStore }) => {
 
     const history = useHistory();
-    const [select_all_checkbox, SetSelectAllCheckbox] = useState(false);
 
 
     useEffect (() => {
@@ -40,13 +39,6 @@ const UserList = observer(({ userStore }) => {
     });
 
 
-    const tableRowIsChecked = (id) => {
-        return userStore.selected_rows.some(data => {
-            return data.id === id && data.status === true;
-        })
-    }
-
-
     const handleCreateButton = (e) => {
         e.preventDefault()
         if(userStore.is_opened_form === 1){
@@ -63,22 +55,22 @@ const UserList = observer(({ userStore }) => {
     }
 
 
-    const handleSelectCheckbox = (e, id) => {
-        userStore.setSelectedRowObject(e.target.checked, id)
-    }
-
-
-    const handleSelectAllCheckbox = (e) => {
-        SetSelectAllCheckbox(e.target.checked)
-        userStore.selected_rows.map(data => {
-            userStore.setSelectedRowObject(e.target.checked, data.id)
-        })
-    }
-
-
     const handleFilterButton = (e) => {
         e.preventDefault()
         $("#user-filter-modal").modal('toggle')
+    }
+
+    
+    const handleOpenBulkDeleteModal = (e) => {
+        e.preventDefault()
+        $("#user-bulk-delete-modal").modal('toggle')
+    }
+
+
+    const tableRowIsChecked = (id) => {
+        return userStore.selected_rows.some(data => {
+            return data.id === id && data.status === true;
+        })
     }
 
 
@@ -127,6 +119,9 @@ const UserList = observer(({ userStore }) => {
                                             filterButton={true}
                                             filterButtonClickHandler={ handleFilterButton }
                                             refreshButtonClickHandler={ (e) => userStore.handleRefreshClick(e) }
+                                            deleteButton={true}
+                                            deleteButtonDisable= { userStore.selected_rows.some(data => data.status === true) }
+                                            deleteButtonClickHandler={ (e) => handleOpenBulkDeleteModal(e) }
                                             entriesSelectPageSize={ userStore.page_size }
                                             entriesSelectChangeHandler={ (e) => userStore.handlePageSizeClick(e) }
                                             paginationPagePrev={ userStore.page_prev }
@@ -147,18 +142,20 @@ const UserList = observer(({ userStore }) => {
                                                         <th className="p-0">
                                                             <div className="checkbox-fade fade-in-primary ml-3 mt-3">
                                                                 <label>
-                                                                    <input type="checkbox" checked={select_all_checkbox} onChange={ handleSelectAllCheckbox }/>
+                                                                    <input type="checkbox" 
+                                                                           checked={ userStore.is_selected_all_rows } 
+                                                                           onChange={ e => userStore.setIsSelectedAllRows(e.target.checked) }/>
                                                                     <span className="cr">
                                                                         <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
                                                                     </span>
                                                                 </label>
                                                             </div>
                                                         </th>
-                                                        <th>Username</th>
-                                                        <th>Name</th>
-                                                        <th>Status</th>
-                                                        <th>Last Login</th>
-                                                        <th>Date Joined</th>
+                                                        <th className="align-middle">Username</th>
+                                                        <th className="align-middle">Name</th>
+                                                        <th className="align-middle">Status</th>
+                                                        <th className="align-middle">Last Login</th>
+                                                        <th className="align-middle">Date Joined</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -174,7 +171,7 @@ const UserList = observer(({ userStore }) => {
                                                                         <input key={key}
                                                                             type="checkbox"
                                                                             checked={ tableRowIsChecked(val.id) }
-                                                                            onChange={ e => handleSelectCheckbox(e, val.id) }/>
+                                                                            onChange={ e => userStore.setSelectedRowObject(e.target.checked, val.id) }/>
                                                                         <span className="cr">
                                                                             <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
                                                                         </span>
@@ -228,24 +225,23 @@ const UserList = observer(({ userStore }) => {
                                     </div>
 
                                 </div>
-
-                                {/* Filter Modal */}
-                                <UserListFilterModal userStore={ userStore } />
-
-                                {/* Delete Modal */}
-                                <UserDeleteModal userStore={ userStore } />
-
                             </div>
                         </div>
-    
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+        
+        {/* Filter Modal */}
+        <UserListFilterModal userStore={ userStore } />
 
+        {/* Bulk Delete Modal */}
+        <UserListBulkDeleteModal userStore={ userStore } />
+
+    </div>
     );
     
+
 });
 
 

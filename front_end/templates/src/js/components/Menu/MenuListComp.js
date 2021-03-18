@@ -4,17 +4,14 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { observer } from 'mobx-react'
 
-import eventBus from '../Utils/EventBus'
-import DivLoader from '../Utils/DivLoaderComp'
 import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
+import MenuListBulkDeleteModal from './MenuListBulkDeleteModalComp'
 
 
 const MenuList = observer(({ menuStore }) => {
 
     const history = useHistory();
-    const [is_delete_modal_loading, SetIsDeleteModalLoading] = useState(false);
-    const [select_all_checkbox, SetSelectAllCheckbox] = useState(false);
 
 
     useEffect (() => {
@@ -43,29 +40,9 @@ const MenuList = observer(({ menuStore }) => {
     });
 
 
-    const tableRowIsChecked = (id) => {
-        return menuStore.selected_rows.some(data => {
-            return data.id === id && data.status === true;
-        })
-    }
-
-
     const handleOpenMenuDetails = (e, id) => {
         e.preventDefault()
         redirectToMenuDetails(id)
-    }
-
-
-    const handleSelectCheckbox = (e, id) => {
-        menuStore.setSelectedRowObject(e.target.checked, id)
-    }
-
-
-    const handleSelectAllCheckbox = (e) => {
-        SetSelectAllCheckbox(e.target.checked)
-        menuStore.selected_rows.map(data => {
-            menuStore.setSelectedRowObject(e.target.checked, data.id)
-        })
     }
 
     
@@ -75,36 +52,10 @@ const MenuList = observer(({ menuStore }) => {
     }
 
 
-    const handleBulkDeleteSumbmit = (e) => {
-        e.preventDefault()
-        SetIsDeleteModalLoading(true)
-        let ids_for_delete = [];
-        menuStore.selected_rows.map(data => {
-            if(data.status === true){
-                ids_for_delete.push(data.id)
-            }
+    const tableRowIsChecked = (id) => {
+        return menuStore.selected_rows.some(data => {
+            return data.id === id && data.status === true;
         })
-        if(ids_for_delete.length > 0){
-            axios.delete('api/route/bulk_destroy/', {
-                data: { 
-                    ids:ids_for_delete 
-                }
-            }).then((response) => {
-                eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                    message: "The menus has been successfully Deleted!", type: "inverse"
-                });
-                menuStore.fetch()
-                SetIsDeleteModalLoading(false)
-            }).catch((error) => {
-                if(error.response.status == 500){
-                    eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
-                        message: "There's an error trying to send data to the server!", type: "danger" 
-                    });
-                }
-                SetIsDeleteModalLoading(false)
-            });
-        }
-        $("#route-bulk-delete-modal").modal('hide');
     }
 
 
@@ -175,7 +126,9 @@ const MenuList = observer(({ menuStore }) => {
                                                         <th className="p-0">
                                                             <div className="checkbox-fade fade-in-primary ml-3 mt-3">
                                                                 <label>
-                                                                    <input type="checkbox" checked={select_all_checkbox} onChange={ handleSelectAllCheckbox }/>
+                                                                    <input type="checkbox" 
+                                                                           checked={ menuStore.is_selected_all_rows } 
+                                                                           onChange={ e => menuStore.setIsSelectedAllRows(e.target.checked) }/>
                                                                     <span className="cr">
                                                                         <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
                                                                     </span>
@@ -204,7 +157,7 @@ const MenuList = observer(({ menuStore }) => {
                                                                         <input key={key}
                                                                                type="checkbox"
                                                                                checked={ tableRowIsChecked(val.id) }
-                                                                               onChange={ e => handleSelectCheckbox(e, val.id) }/>
+                                                                               onChange={ e => menuStore.setSelectedRowObject(e.target.checked, val.id) }/>
                                                                         <span className="cr">
                                                                             <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
                                                                         </span>
@@ -268,26 +221,7 @@ const MenuList = observer(({ menuStore }) => {
         </div>
                                                                     
         {/* BULK DELETE MODAL */}
-        <div className="modal" id="route-bulk-delete-modal" role="dialog">
-            <div className="modal-dialog modal-lg" role="document">
-                <div className="modal-content">
-                    <DivLoader type="Circles" loading={is_delete_modal_loading}/>
-                    <div className="modal-header">
-                        <h4 className="modal-title">Delete Menus</h4>
-                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div className="modal-body">
-                        <h4>Are you sure you want to permanently delete the selected records?</h4>
-                    </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-danger waves-effect waves-light" onClick={ handleBulkDeleteSumbmit }>Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <MenuListBulkDeleteModal menuStore={menuStore} />
 
     </div>
 

@@ -3,6 +3,8 @@ from django.core.exceptions import PermissionDenied
 from django.urls import resolve
 from .models import UserRoute, UserSubroute
 
+from django_admindek.urls import urlpatterns
+
 class CheckIfUserRouteExist(MiddlewareMixin):
 
     route_exceptions = [
@@ -18,6 +20,14 @@ class CheckIfUserRouteExist(MiddlewareMixin):
 
     def process_request(self, request):
         current_url_name = resolve(request.path_info).url_name
+
+        for url in urlpatterns:
+            if hasattr(url, 'url_patterns'):
+                for up in url.url_patterns:
+                    if up.__class__.__name__ == "URLPattern":
+                            print(up)
+
+            
         if request.user.is_authenticated and request.user.is_superuser == False:
             if current_url_name not in self.route_exceptions:
                 if self.isUserRouteExist(request.user.id, current_url_name) or self.isUserSubrouteExist(request.user.id, current_url_name):

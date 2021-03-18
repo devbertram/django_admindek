@@ -89,11 +89,6 @@ function SideNavMain(props){
                         { getMenus('ADM') }
                     </ul>
 
-                    <div className="pcoded-navigation-label">HR</div>
-                    <ul className="pcoded-item pcoded-left-item">
-                        { getMenus('HR') }
-                    </ul>
-
                 </div>
             </div>
         </nav>

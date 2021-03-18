@@ -22,7 +22,6 @@ const UserDetails = observer(({ userStore }) => {
         if(is_mounted = true){
             userStore.retrieve(user_id)
             userStore.setIsOpenedForm(1)
-            userStore.setSelectedUser(user_id)
         }
         return () => { is_mounted = false; } 
     },[])
@@ -103,7 +102,6 @@ const UserDetails = observer(({ userStore }) => {
                     <div className="page-body">
                         <div className="row">
 
-
                             <div className="col-sm-12">
                                 <div className="card">
                                     <DivLoader type="Circles" loading={is_page_loading}/>
@@ -113,54 +111,56 @@ const UserDetails = observer(({ userStore }) => {
                                               className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
                                             <i className="fa fa-navicon"></i> Back to List
                                         </Link>
-                                        <button className="btn btn-md btn-danger btn-outline-danger float-right pt-2 pb-2 ml-2" 
+                                        <Link to={`/users/${user_id}/edit`} 
+                                              className="btn btn-md btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
+                                            <i className="fa fa-pencil-square-o"></i> Edit
+                                        </Link>
+                                        <Link to={`/users/${user_id}/reset_password`} 
+                                              className="btn btn-md btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
+                                            <i className="fa fa-key"></i> Reset Password
+                                        </Link>
+                                        <button className="btn btn-md btn-danger btn-outline-danger float-right pt-2 pb-2" 
                                                 onClick={ handleDeleteRouteModal }>
                                             <i className="fa fa-trash"></i> Delete
                                         </button>
-                                        <Link to={`/users/${user_id}/edit`} 
-                                              className="btn btn-md btn-primary btn-outline-primary float-right pt-2 pb-2">
-                                            <i className="fa fa-pencil-square-o"></i> Edit
-                                        </Link>
                                     </div>
                                     <div className="card-block">
                                         {/* Menu */}
-                                        <div className="col-md-12">
-                                            <div className="row">
-                                                <div className="col-md-2">
-                                                    <p>Username:</p>
-                                                    <p>Firstname:</p>
-                                                    <p>Lastname:</p>
-                                                    <p>Email Address:</p>
-                                                    <p>Active Status:</p>
-                                                    <p>Date Joined:</p>
-                                                    <p>Last Login:</p>
-                                                    <p>Modules:</p>
-                                                    <p>Module Permissions:</p>
-                                                </div> 
-                                                <div className="col-md-10">
-                                                    <p>{ userStore.username }{'\u00A0'}</p>
-                                                    <p>{ userStore.first_name }{'\u00A0'}</p>
-                                                    <p>{ userStore.last_name }{'\u00A0'}</p>
-                                                    <p>{ userStore.email }{'\u00A0'}</p>
-                                                    <p>
-                                                        { userStore.is_active === true ? 
-                                                            <label className="label label-success">Active</label> :
-                                                            <label className="label label-danger">Inactive</label>
-                                                        }{'\u00A0'}
-                                                    </p>
-                                                    <p>{ moment(userStore.date_joined).format("MM/DD/YYYY hh:mm A") }{'\u00A0'}</p>
-                                                    <p>{ moment(userStore.last_login).format("MM/DD/YYYY hh:mm A") }{'\u00A0'}</p>
-                                                    <p>
-                                                        { userStore.user_routes.map(
-                                                            data => <label key={data.value} className="label label-primary">{data.label}</label>
-                                                        )}{'\u00A0'}
-                                                    </p>
-                                                    <p>
-                                                        { userStore.user_subroutes.map(
-                                                            data => <label key={data.value} className="label label-warning">{data.label}</label>
-                                                        )}{'\u00A0'}
-                                                    </p>
-                                                </div>
+                                        <div className="row">
+                                            <div className="col-md-2">
+                                                <p>Username:</p>
+                                                <p>Firstname:</p>
+                                                <p>Lastname:</p>
+                                                <p>Email Address:</p>
+                                                <p>Active Status:</p>
+                                                <p>Date Joined:</p>
+                                                <p>Last Login:</p>
+                                                <p>Modules:</p>
+                                                <p>Module Permissions:</p>
+                                            </div> 
+                                            <div className="col-md-10">
+                                                <p>{ userStore.username }{'\u00A0'}</p>
+                                                <p>{ userStore.first_name }{'\u00A0'}</p>
+                                                <p>{ userStore.last_name }{'\u00A0'}</p>
+                                                <p>{ userStore.email }{'\u00A0'}</p>
+                                                <p>
+                                                    { userStore.is_active === true ? 
+                                                        <label className="label label-success">Active</label> :
+                                                        <label className="label label-danger">Inactive</label>
+                                                    }{'\u00A0'}
+                                                </p>
+                                                <p>{ moment(userStore.date_joined).format("MM/DD/YYYY hh:mm A") }{'\u00A0'}</p>
+                                                <p>{ moment(userStore.last_login).format("MM/DD/YYYY hh:mm A") }{'\u00A0'}</p>
+                                                <p>
+                                                    { userStore.user_routes.map(
+                                                        data => <label key={data.value} className="label label-primary">{data.label}</label>
+                                                    )}{'\u00A0'}
+                                                </p>
+                                                <p>
+                                                    { userStore.user_subroutes.map(
+                                                        data => <label key={data.value} className="label label-warning">{data.label}</label>
+                                                    )}{'\u00A0'}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>

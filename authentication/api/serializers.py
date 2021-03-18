@@ -208,3 +208,15 @@ class UserUpdateFormSerializer(serializers.ModelSerializer):
                             user_subroute.save()
 
         return user;
+
+
+
+class UserResetPasswordFormSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=True, min_value=1)
+    new_password = serializers.CharField(required=True)
+    new_password_confirm = serializers.CharField(required=True)
+
+ 
+    
+class UserBulkDeleteSerializer(serializers.Serializer):
+    ids = serializers.ListField(child=serializers.IntegerField(min_value=1))

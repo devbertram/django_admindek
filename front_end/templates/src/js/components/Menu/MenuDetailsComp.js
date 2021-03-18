@@ -22,7 +22,6 @@ const MenuDetails = observer(({ menuStore }) => {
             SetIsPageLoading(true)
             menuStore.retrieve(menu_id)
             menuStore.setIsOpenedForm(1)
-            menuStore.setSelectedRoute(menu_id)
             SetIsPageLoading(false)
         }
         return () => {
@@ -122,76 +121,78 @@ const MenuDetails = observer(({ menuStore }) => {
                                     </div>
 
                                     <div className="card-block">
+                                        <div className="row">
 
-                                        {/* Menu */}
-                                        <div className="col-md-12">
-                                            <h5 className="sub-title">Menu</h5>
-                                            <Link to={`/menus/${menu_id}/edit`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
-                                                <i className="fa fa-pencil-square-o"></i> Edit Menu
-                                            </Link>
-                                            <div className="row mt-4">
-                                                <div className="col-md-3">
-                                                    <p>Category:</p>
-                                                    <p>Name:</p>
-                                                    <p>Is Side Navigation:</p>
-                                                    <p>Is Side Navigation Dropdown:</p>
-                                                    <p>Side Navigation Name:</p>
-                                                    <p>Side Navigation Icon:</p>
-                                                    <p>Url:</p>
-                                                    <p>Url Name:</p>
-                                                </div> 
-                                                <div className="col-md-9">
-                                                    <p>{ menuStore.category }</p>
-                                                    <p>{ menuStore.name }</p>
-                                                    <p>{ menuStore.is_menu === true ? "YES" : "NO" }</p>
-                                                    <p>{ menuStore.is_dropdown === true ? "YES" : "NO" } </p>
-                                                    <p>{ menuStore.nav_name }</p>
-                                                    <p><i className={ menuStore.icon }></i></p>
-                                                    <p>{ menuStore.url }</p>
-                                                    <p>{ menuStore.name }</p>
-                                                </div> 
+                                            {/* Menu */}
+                                            <div className="col-md-5">
+                                                <h5 className="sub-title">Menu</h5>
+                                                <Link to={`/menus/${menu_id}/edit`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
+                                                    <i className="fa fa-pencil-square-o"></i> Edit Menu
+                                                </Link>
+                                                <div className="row mt-4">
+                                                    <div className="col-md-6">
+                                                        <p>Category:</p>
+                                                        <p>Name:</p>
+                                                        <p>Is Side Navigation:</p>
+                                                        <p>Is Side Navigation Dropdown:</p>
+                                                        <p>Side Navigation Name:</p>
+                                                        <p>Side Navigation Icon:</p>
+                                                        <p>Url:</p>
+                                                        <p>Url Name:</p>
+                                                    </div> 
+                                                    <div className="col-md-6">
+                                                        <p>{ menuStore.category }</p>
+                                                        <p>{ menuStore.name }</p>
+                                                        <p>{ menuStore.is_menu === true ? "YES" : "NO" }</p>
+                                                        <p>{ menuStore.is_dropdown === true ? "YES" : "NO" } </p>
+                                                        <p>{ menuStore.nav_name }</p>
+                                                        <p><i className={ menuStore.icon }></i></p>
+                                                        <p>{ menuStore.url }</p>
+                                                        <p>{ menuStore.name }</p>
+                                                    </div> 
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        {/* Permissions */}
-                                        <div className="col-md-12 mt-5">
-                                            <h5 className="sub-title mt-2">Permissions</h5>
-                                            <Link to={`/menus/${menu_id}/edit_permissions`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
-                                                <i className="fa fa-pencil-square-o"></i> Edit Permissions
-                                            </Link>
-                                            <div className="table-responsive mt-3">
-                                                <table className="table table-sm">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Permission Name</th>
-                                                            <th>Type</th>
-                                                            <th>Subitem Name</th>
-                                                            <th>Url</th>
-                                                            <th>Url Name</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        { menuStore.subroutes.map((val, key) =>{
-                                                            return (
-                                                                <tr key={key}>
-                                                                    <td>{ val.name }</td>
-                                                                    <td className="align-middle">
-                                                                        { val.is_nav === true ? 
-                                                                            <label className="label label-success">Subitem</label> 
-                                                                            : <label className="label label-danger">API</label> 
-                                                                        }
-                                                                    </td>
-                                                                    <td>{ val.nav_name }</td>
-                                                                    <td>{ val.url }</td>
-                                                                    <td>{ val.url_name }</td>
-                                                                </tr>
-                                                            )
-                                                        }) }
-                                                    </tbody>
-                                                </table>
+                                            {/* Permissions */}
+                                            <div className="col-md-7">
+                                                <h5 className="sub-title">Permissions</h5>
+                                                <Link to={`/menus/${menu_id}/edit_permissions`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
+                                                    <i className="fa fa-pencil-square-o"></i> Edit Permissions
+                                                </Link>
+                                                <div className="table-responsive mt-3">
+                                                    <table className="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Permission</th>
+                                                                <th>Type</th>
+                                                                <th>Subitem Name</th>
+                                                                <th>Url</th>
+                                                                <th>Url Name</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            { menuStore.subroutes.map((val, key) =>{
+                                                                return (
+                                                                    <tr key={key}>
+                                                                        <td>{ val.name }</td>
+                                                                        <td className="align-middle">
+                                                                            { val.is_nav === true ? 
+                                                                                <label className="label label-success">Subitem</label> 
+                                                                                : <label className="label label-danger">API</label> 
+                                                                            }
+                                                                        </td>
+                                                                        <td>{ val.nav_name }</td>
+                                                                        <td>{ val.url }</td>
+                                                                        <td>{ val.url_name }</td>
+                                                                    </tr>
+                                                                )
+                                                            }) }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
-                                        </div>
 
+                                        </div>
                                     </div>
                                     
                                 </div>

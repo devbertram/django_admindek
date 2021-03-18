@@ -17,6 +17,7 @@ class MenuStore{
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
     selected_route = 0; // selected menu id after create or update
     is_opened_form = 0; // 0 = create form, 1 = update form
+    is_selected_all_rows = false; // is all checkbox selected
     selected_rows = []; // rows that are selected via checkbox
 
     // Form
@@ -38,6 +39,7 @@ class MenuStore{
 
 
     fetch(){
+        this.is_selected_all_rows = false;
         this.selected_rows = [];
         axios.get('api/route', { 
             params: { 
@@ -90,12 +92,21 @@ class MenuStore{
         });
     }
 
+    
+    // List Setters
     setSelectedRoute(selected_route){
         this.selected_route = selected_route;
     }
 
     setIsOpenedForm(is_opened_form){
         this.is_opened_form = is_opened_form;
+    }
+
+    setIsSelectedAllRows(bool){
+        this.is_selected_all_rows = bool;
+        this.selected_rows.map(data => {
+            this.setSelectedRowObject(bool, data.id)
+        })
     }
 
     setSelectedRowObject(status, id){

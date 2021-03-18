@@ -19,6 +19,7 @@ class UserStore{
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
     selected_user = 0; // selected user id after create or update
     is_opened_form = 0; // 0 = create form, 1 = update form
+    is_selected_all_rows = false; // is all checkbox selected
     selected_rows = []; // rows that are selected via checkbox
 
     // Form
@@ -32,6 +33,8 @@ class UserStore{
     last_login = "";
     password = "";
     password_confirm = "";
+    new_password = "";
+    new_password_confirm = "";
     error_fields = {};
     user_routes = [];
     user_subroutes = [];
@@ -45,6 +48,8 @@ class UserStore{
 
 
     fetch(){
+        this.is_selected_all_rows = false;
+        this.selected_rows = [];
         axios.get('api/user', { 
             params: { 
                 q: this.query, 
@@ -116,6 +121,34 @@ class UserStore{
         }
     }
 
+
+    // List Setters
+    setFilterOnlineStatus(online_status){
+        this.filter_online_status = online_status;
+    }
+
+
+    setFilterSUStatus(su_status){
+        this.filter_su_status = su_status;
+    }
+
+    
+    setSelectedUser(id){
+        this.selected_user = id;
+    }
+
+    
+    setIsOpenedForm(int){
+        this.is_opened_form = int;
+    }
+
+    setIsSelectedAllRows(bool){
+        this.is_selected_all_rows = bool;
+        this.selected_rows.map(data => {
+            this.setSelectedRowObject(bool, data.id)
+        })
+    }
+
     setSelectedRowObject(status, id){
         let obj_index = this.selected_rows.findIndex(data => data.id === id)
         this.selected_rows[obj_index].status = status;
@@ -130,6 +163,8 @@ class UserStore{
         this.username = "";
         this.password = "";
         this.password_confirm = "";
+        this.new_password = "";
+        this.new_password_confirm = "";
         this.error_fields = {};
         this.user_routes = [];
         this.user_subroutes = [];
@@ -169,6 +204,16 @@ class UserStore{
 
     setPasswordConfirm(password_confirm){
         this.password_confirm = password_confirm;
+    }
+
+
+    setNewPassword(new_password){
+        this.new_password = new_password;
+    }
+
+
+    setNewPasswordConfirm(new_password_confirm){
+        this.new_password_confirm = new_password_confirm;
     }
 
 
@@ -281,27 +326,6 @@ class UserStore{
                 break;
             }
         }
-    }
-
-
-    // List Setters
-    setFilterOnlineStatus(online_status){
-        this.filter_online_status = online_status;
-    }
-
-
-    setFilterSUStatus(su_status){
-        this.filter_su_status = su_status;
-    }
-
-    
-    setSelectedUser(id){
-        this.selected_user = id;
-    }
-
-    
-    setIsOpenedForm(int){
-        this.is_opened_form = int;
     }
 
 

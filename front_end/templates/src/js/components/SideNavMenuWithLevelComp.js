@@ -7,8 +7,6 @@ function SideNavMenuWithLevel(props){
     const location = useLocation();
     const history = useHistory();
     const [is_menu_open, SetIsMenuOpen] = useState(false);
-    const [current_path, SetCurrentPath] = useState("");
-
     
     useEffect(() => {
         let is_mounted = true;
@@ -17,7 +15,6 @@ function SideNavMenuWithLevel(props){
             props.submenus.forEach((val, key) => {
                 if(props.current_path.includes(val.subroute.url)){
                     SetIsMenuOpen(true);
-                    SetCurrentPath(props.url_name)
                 }
             })
         }
@@ -64,11 +61,11 @@ function SideNavMenuWithLevel(props){
     const handleClickMenu = (e, url) =>{
         e.preventDefault()
         redirectToPath(url)
-        SetCurrentPath(url)
     }
 
     
     const handleOpen = (e) =>{
+        e.preventDefault()
         if(is_menu_open == false){
             SetIsMenuOpen(true)
         }else{

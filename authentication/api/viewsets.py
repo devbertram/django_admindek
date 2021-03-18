@@ -19,6 +19,8 @@ from .serializers import (
     UserSerializer,
     UserCreateFormSerializer,
     UserUpdateFormSerializer,
+    UserResetPasswordFormSerializer,
+    UserBulkDeleteSerializer,
 )
 
 from .pagination import (
@@ -257,6 +259,31 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({}, 200)
         else:
             return Response({}, 404)
+
+
+    @action(methods=['delete'], detail=False)
+    def bulk_destroy(self, request):
+        serializer = UserBulkDeleteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        ids = serializer.data['ids']
+        for data in ids:
+            user = self.queryset.get(id=data)
+            if user:
+                user.delete()
+        return Response({}, 200)
+
+
+    @action(methods=['post'], detail=False)
+    def reset_password(self, request):
+        serializer = UserResetPasswordFormSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if serializer.data['new_password'] != serializer.data['new_password_confirm']:
+            return Response({"new_password" : "Password doesn't match."}, 400)
+        else:
+            user = self.queryset.get(id=serializer.data['id'])
+            user.set_password(serializer.data['new_password'])
+            user.save()
+        return Response({"id":user.id}, 200)
     
 
     @action(methods=['get'], detail=False)

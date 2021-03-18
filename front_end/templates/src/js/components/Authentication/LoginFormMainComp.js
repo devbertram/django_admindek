@@ -107,4 +107,4 @@ function LoginFormMain(props){
 }
 
 
-ReactDOM.render( <LoginFormMain/> , document.getElementById('login'));
+ReactDOM.render( <LoginFormMain/>, document.getElementById('login'));
