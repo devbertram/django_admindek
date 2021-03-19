@@ -12,7 +12,7 @@ import UserListFilterModal from './UserListFilterModalComp'
 import UserListBulkDeleteModal from './UserListBulkDeleteModalComp'
 
 
-const UserList = observer(({ userStore }) => {
+const UserList = observer(({ userStore, dashboardMainStore }) => {
 
     const history = useHistory();
 
@@ -119,9 +119,10 @@ const UserList = observer(({ userStore }) => {
                                             filterButton={true}
                                             filterButtonClickHandler={ handleFilterButton }
                                             refreshButtonClickHandler={ (e) => userStore.handleRefreshClick(e) }
-                                            deleteButton={true}
+                                            deleteButton={dashboardMainStore.checkIfSubrouteExist('user-delete')}
                                             deleteButtonDisable= { userStore.selected_rows.some(data => data.status === true) }
                                             deleteButtonClickHandler={ (e) => handleOpenBulkDeleteModal(e) }
+                                            createButton={dashboardMainStore.checkIfSubrouteExist('user-create-page')}
                                             entriesSelectPageSize={ userStore.page_size }
                                             entriesSelectChangeHandler={ (e) => userStore.handlePageSizeClick(e) }
                                             paginationPagePrev={ userStore.page_prev }
@@ -139,18 +140,20 @@ const UserList = observer(({ userStore }) => {
                                             <table className="table table-sm table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <th className="p-0">
-                                                            <div className="checkbox-fade fade-in-primary ml-3 mt-3">
-                                                                <label>
-                                                                    <input type="checkbox" 
-                                                                           checked={ userStore.is_selected_all_rows } 
-                                                                           onChange={ e => userStore.setIsSelectedAllRows(e.target.checked) }/>
-                                                                    <span className="cr">
-                                                                        <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
-                                                                    </span>
-                                                                </label>
-                                                            </div>
-                                                        </th>
+                                                        { dashboardMainStore.checkIfSubrouteExist('user-delete') ? 
+                                                            <th className="p-0">
+                                                                <div className="checkbox-fade fade-in-primary ml-3 mt-3">
+                                                                    <label>
+                                                                        <input type="checkbox" 
+                                                                            checked={ userStore.is_selected_all_rows } 
+                                                                            onChange={ e => userStore.setIsSelectedAllRows(e.target.checked) }/>
+                                                                        <span className="cr">
+                                                                            <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                            </th> : <></>
+                                                        }
                                                         <th className="align-middle">Username</th>
                                                         <th className="align-middle">Name</th>
                                                         <th className="align-middle">Status</th>
@@ -164,20 +167,21 @@ const UserList = observer(({ userStore }) => {
                                                     let date_joined = moment(val.date_joined).format("MM/DD/YYYY hh:mm A")
                                                     return (
                                                         <tr key={key} className={ val.id == userStore.selected_user || tableRowIsChecked(val.id) ? "table-info" : "" }>
-
-                                                            <td className="p-0">
-                                                                <div className="checkbox-fade fade-in-primary ml-3 mt-3">
-                                                                    <label>
-                                                                        <input key={key}
-                                                                            type="checkbox"
-                                                                            checked={ tableRowIsChecked(val.id) }
-                                                                            onChange={ e => userStore.setSelectedRowObject(e.target.checked, val.id) }/>
-                                                                        <span className="cr">
-                                                                            <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
-                                                                        </span>
-                                                                    </label>
-                                                                </div>
-                                                            </td>
+                                                            { dashboardMainStore.checkIfSubrouteExist('user-delete') ? 
+                                                                <td className="p-0">
+                                                                    <div className="checkbox-fade fade-in-primary ml-3 mt-3">
+                                                                        <label>
+                                                                            <input key={key}
+                                                                                type="checkbox"
+                                                                                checked={ tableRowIsChecked(val.id) }
+                                                                                onChange={ e => userStore.setSelectedRowObject(e.target.checked, val.id) }/>
+                                                                            <span className="cr">
+                                                                                <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
+                                                                            </span>
+                                                                        </label>
+                                                                    </div>
+                                                                </td> : <></>
+                                                            }
                                                             <td className="align-middle">
                                                                 <a href="#" onClick={ (e) => handleOpenUserDetails(e, val.id) }>
                                                                     <ins className="text-info">{ val.username }</ins>
@@ -236,7 +240,8 @@ const UserList = observer(({ userStore }) => {
         <UserListFilterModal userStore={ userStore } />
 
         {/* Bulk Delete Modal */}
-        <UserListBulkDeleteModal userStore={ userStore } />
+        { dashboardMainStore.checkIfSubrouteExist('user-delete') ?                                                   
+            <UserListBulkDeleteModal userStore={ userStore } /> : <></>}
 
     </div>
     );

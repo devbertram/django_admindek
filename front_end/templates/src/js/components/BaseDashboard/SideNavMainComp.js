@@ -1,41 +1,19 @@
 
-import React ,{ useState, useEffect } from "react"
+import React from "react"
 import { NavLink, useLocation} from "react-router-dom"
+import { observer } from 'mobx-react'
 
 import SideNavMenu from "./SideNavMenuComp"
 import SideNavMenuWithLevel from "./SideNavMenuWithLevelComp"
 
-function SideNavMain(props){
+const SideNavMain = observer(({ dashboardMainStore }) => {
 
     const location = useLocation();
-    const [routes, setRoutes] = useState({});
-    const [current_path, setCurrentPath] = useState("");
-
-
-    useEffect(() => {
-        let is_mounted = true;
-        if(is_mounted == true){
-            getRoutes()
-            setCurrentPath(location.pathname)
-        }
-        return () => {
-            is_mounted = false;
-        } 
-    }, []);
-
-
-    const getRoutes = () => {
-        axios.get('api/user_route/get_by_user/')
-        .then((response) => {
-            setRoutes(response.data)
-        });
-    }
-
 
     const getMenus = (category) => {
         const admin_menus = [];
-        if(routes.length > 0){
-            routes.forEach((val, key) => {
+        if(dashboardMainStore.current_user_routes.length > 0){
+            dashboardMainStore.current_user_routes.forEach((val, key) => {
                 if(val.route.category == category) {
                     if(val.route.is_menu == true){
                         if(val.route.is_dropdown == false){
@@ -55,7 +33,7 @@ function SideNavMain(props){
                                     menu_name={val.route.nav_name} 
                                     menu_icon={val.route.icon} 
                                     submenus={val.userSubroute_userRoute}
-                                    current_path={current_path}
+                                    current_path={location.pathname}
                                 />
                             )
                         }
@@ -93,8 +71,6 @@ function SideNavMain(props){
             </div>
         </nav>
     );
-
-
-}
+})
 
 export default SideNavMain;

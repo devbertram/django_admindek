@@ -119,11 +119,7 @@ function TableHeaderDefault(props){
             
             <div className="col-md-9 d-flex flex-row">
 
-                <div>
-                    <AddButton displayText="Add" clickHandler={ props.addButtonClickHandler }/>
-                </div>
-
-                <div className="pl-4" style={{ width : '40%' }}>
+                <div style={{ width : '40%' }}>
                     <SearchInput searchValue={ props.searchInputValue } searchHandler={ props.searchInputHandler } />
                 </div>
 
@@ -143,6 +139,14 @@ function TableHeaderDefault(props){
                     (
                         <div className="pl-4">
                             <DeleteButton isDisabled={ !props.deleteButtonDisable } onClick={ props.deleteButtonClickHandler } />
+                        </div>
+                    ) : ""
+                }
+
+                { props.createButton === true ?
+                    (
+                        <div className="pl-4">
+                            <AddButton displayText="Add" clickHandler={ props.addButtonClickHandler }/>
                         </div>
                     ) : ""
                 }

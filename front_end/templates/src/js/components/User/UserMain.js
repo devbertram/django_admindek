@@ -9,8 +9,13 @@ import UserCreate from './UserCreateComp'
 import UserDetails from './UserDetailsComp'
 import UserEdit from './UserEditComp'
 import UserResetPassword from './UserResetPasswordComp'
+import NotFoundPage from '../ErrorPages/NotFoundPageComp'
 
-const UserMain = observer(({ userStore }) => {
+const UserMain = observer(({ userStore, dashboardMainStore }) => {
+
+    const checkIfSubmoduleExist = (route_name) => {
+        return dashboardMainStore.current_user_subroutes.some(data => data.subroute.name === route_name)
+    }
 
     return (
         <HashRouter>
@@ -18,27 +23,37 @@ const UserMain = observer(({ userStore }) => {
 
                 {/* LIST */}
                 <Route exact path="/users">
-                    <UserList userStore={ userStore }/>
+                    { checkIfSubmoduleExist('user-manage-page') ? 
+                        <UserList userStore={ userStore } dashboardMainStore={dashboardMainStore}/> : <NotFoundPage/> }
                 </Route>
 
                 {/* CREATE */}
                 <Route exact path="/users/create">
-                    <UserCreate userStore={ userStore }/>
+                    { checkIfSubmoduleExist('user-create-page') ? 
+                        <UserCreate userStore={ userStore }/> : <NotFoundPage/> }
                 </Route>
 
                 {/* DETAILS */}
                 <Route exact path="/users/:user_id">
-                    <UserDetails userStore={ userStore }/>
+                    { checkIfSubmoduleExist('user-details-page') ? 
+                        <UserDetails userStore={ userStore } dashboardMainStore={dashboardMainStore}/> : <NotFoundPage/> }
                 </Route>
 
                 {/* EDIT */}
                 <Route exact path="/users/:user_id/edit">
-                    <UserEdit userStore={ userStore }/>
+                    { checkIfSubmoduleExist('user-edit-page') ? 
+                        <UserEdit userStore={ userStore }/> : <NotFoundPage/> }
                 </Route>
 
                 {/* RESET PASSWORD */}
                 <Route exact path="/users/:user_id/reset_password">
-                    <UserResetPassword userStore={ userStore }/>
+                    { checkIfSubmoduleExist('user-reset-password-page') ? 
+                        <UserResetPassword userStore={ userStore }/> : <NotFoundPage/> }
+                </Route>
+    
+                {/* Page not found */}
+                <Route path="/users/*">
+                    <NotFoundPage/>
                 </Route>
 
             </Switch>

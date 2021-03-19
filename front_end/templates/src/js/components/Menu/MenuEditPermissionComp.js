@@ -259,8 +259,8 @@ const MenuEditPermission = observer(({ menuStore }) => {
                                                                             className="form-control form-control-primary" 
                                                                             onChange={(e) => menuStore.modifySubroutes(key, e)}>
                                                                         <option value="">Select</option>
-                                                                        <option value={false}>Api</option>
-                                                                        <option value={true}>Subitem</option>
+                                                                        <option value={false}>Page / API</option>
+                                                                        <option value={true}>Nav Subitem</option>
                                                                     </select>
                                                                 </td>
                                                                 <td className="align-middle">

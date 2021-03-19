@@ -10,7 +10,7 @@ import DivLoader from '../Utils/DivLoaderComp'
 
 
 
-const UserDetails = observer(({ userStore }) => {
+const UserDetails = observer(({ userStore, dashboardMainStore }) => {
 
     const history = useHistory();
     const { user_id } = useParams();
@@ -111,18 +111,21 @@ const UserDetails = observer(({ userStore }) => {
                                               className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
                                             <i className="fa fa-navicon"></i> Back to List
                                         </Link>
-                                        <Link to={`/users/${user_id}/edit`} 
-                                              className="btn btn-md btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
-                                            <i className="fa fa-pencil-square-o"></i> Edit
-                                        </Link>
-                                        <Link to={`/users/${user_id}/reset_password`} 
-                                              className="btn btn-md btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
-                                            <i className="fa fa-key"></i> Reset Password
-                                        </Link>
-                                        <button className="btn btn-md btn-danger btn-outline-danger float-right pt-2 pb-2" 
-                                                onClick={ handleDeleteRouteModal }>
-                                            <i className="fa fa-trash"></i> Delete
-                                        </button>
+                                        { dashboardMainStore.checkIfSubrouteExist('user-edit-page') ?
+                                            <Link to={`/users/${user_id}/edit`} 
+                                                className="btn btn-md btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
+                                                <i className="fa fa-pencil-square-o"></i> Edit
+                                            </Link> : <></> }
+                                        { dashboardMainStore.checkIfSubrouteExist('user-reset-password-page') ? 
+                                            <Link to={`/users/${user_id}/reset_password`} 
+                                                className="btn btn-md btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
+                                                <i className="fa fa-key"></i> Reset Password
+                                            </Link> : <></> }
+                                        { dashboardMainStore.checkIfSubrouteExist('user-delete') ? 
+                                            <button className="btn btn-md btn-danger btn-outline-danger float-right pt-2 pb-2" 
+                                                    onClick={ handleDeleteRouteModal }>
+                                                <i className="fa fa-trash"></i> Delete
+                                            </button> : <></> }
                                     </div>
                                     <div className="card-block">
                                         {/* Menu */}

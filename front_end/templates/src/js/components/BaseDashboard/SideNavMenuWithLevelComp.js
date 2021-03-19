@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect, useCallback } from "react";
-import { NavLink, useLocation, useHistory } from "react-router-dom"
+import React, { useState, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom"
 
 function SideNavMenuWithLevel(props){
 
     const location = useLocation();
-    const history = useHistory();
     const [is_menu_open, SetIsMenuOpen] = useState(false);
+    
     
     useEffect(() => {
         let is_mounted = true;
@@ -18,15 +18,8 @@ function SideNavMenuWithLevel(props){
                 }
             })
         }
-        return () => {
-            is_mounted = false;
-        } 
+        return () => { is_mounted = false } 
     }, []);
-
-
-    const redirectToPath = useCallback((path) => {
-        history.push(path), [history]
-    });
 
 
     const getSubmenus = () => {
@@ -36,7 +29,7 @@ function SideNavMenuWithLevel(props){
                 if(val.subroute.is_nav == true){
                     submenus.push(
                         <li className={ hasActiveSubmenuPath(val.subroute.url) ? 'active' : '' } key={key}>
-                            <NavLink to="#" className="waves-effect waves-dark" onClick={e => handleClickMenu(e, val.subroute.url)}>
+                            <NavLink to={val.subroute.url} className="waves-effect waves-dark">
                                 <span className="pcoded-mtext">{ val.subroute.nav_name }</span>
                             </NavLink>
                         </li>
@@ -55,12 +48,6 @@ function SideNavMenuWithLevel(props){
 
     const hasActiveMenuPath = () => {
         return is_menu_open === true || location.pathname.includes(props.url_name);
-    }
-
-
-    const handleClickMenu = (e, url) =>{
-        e.preventDefault()
-        redirectToPath(url)
     }
 
     

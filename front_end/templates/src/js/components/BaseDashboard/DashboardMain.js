@@ -1,28 +1,60 @@
-require('../config')
+require('../../config')
 
-import React, {useState, useEffect}from "react"
+import React, { useEffect } from "react"
 import ReactDOM from "react-dom"
 import { HashRouter, Switch, Route, Link} from "react-router-dom"
+import { observer } from 'mobx-react'
+import eventBus from "../Utils/EventBus"
 
-import eventBus from "./Utils/EventBus";
+// Modules
 import SideNavMain from './SideNavMainComp'
+import ProfileMain from '../Profile/ProfileMain'
+import HomeMain from '../Home/HomeMain'
+import UserMain from '../User/UserMain'
+import MenuMain from '../Menu/MenuMain'
+import NotFoundPage from '../ErrorPages/NotFoundPageComp'
 
-import ProfileMain from './Profile/ProfileMain'
-import HomeMain from './Home/HomeMain'
-import UserMain from './User/UserMain'
-import userStore from './User/store/UserStore'
-import MenuMain from './Menu/MenuMain'
-import menuStore from './Menu/store/MenuStore'
+// Stores
+import dashboardMainStore from './store/DashboardMainStore'
+import userStore from '../User/store/UserStore'
+import menuStore from '../Menu/store/MenuStore'
 
-const DashboardMain = () => {
-
-    const [current_user, SetCurrentUser] = useState({});
+const DashboardMain = observer(({ dashboardMainStore }) => {
 
 
     useEffect(() => {
         let is_mounted = true;
         if(is_mounted == true){
-            axios.get('api/user/current_user').then(response => SetCurrentUser(response.data));
+            axios.get('api/user/current_user').then(response => {
+                let user_routes = [];
+                let user_subroutes = [];
+                // Set User
+                dashboardMainStore.setCurrentUser({
+                    id: response.data.id,
+                    username: response.data.username,
+                    first_name: response.data.first_name,
+                    last_name: response.data.last_name,
+                    fullname: response.data.fullname,
+                    email: response.data.email,
+                    is_active: response.data.is_active,
+                    date_joined: response.data.date_joined,
+                    last_login: response.data.last_login,
+                })
+                // Set User Routes
+                if(response.data.userRoute_user){
+                    response.data.userRoute_user.map(data_route => {
+                        user_routes.push(data_route)
+                        // Set User Suboutes
+                        if(data_route.userSubroute_userRoute){
+                            data_route.userSubroute_userRoute.map(data_subroute => {
+                                user_subroutes.push(data_subroute)
+                            })
+                        }
+                    })
+                }
+                dashboardMainStore.setCurrentUserRoutes(user_routes)
+                dashboardMainStore.setCurrentUserSubroutes(user_subroutes)
+            });
         }
         return () => {
             is_mounted = false;
@@ -44,8 +76,20 @@ const DashboardMain = () => {
     }
 
 
-    return (
+    const getProfileName = () => {
+        let profile_name = "";
+        if(dashboardMainStore.current_user){
+            if(dashboardMainStore.current_user.first_name){
+                profile_name = dashboardMainStore.current_user.first_name;
+            }else{
+                profile_name = dashboardMainStore.current_user.username;
+            }
+        }
+        return profile_name;
+    }
 
+
+    return (
     <HashRouter>
         <div id="pcoded" className="pcoded">
             <div className="pcoded-overlay-box"></div>
@@ -69,7 +113,7 @@ const DashboardMain = () => {
                                     <div className="dropdown-primary dropdown">
                                         <div className="dropdown-toggle" data-toggle="dropdown">
                                             <img src={`${window.location.origin}/static/images/user_avatar.jpeg`} className="img-radius" alt="User-Profile-Image"/>
-                                            <span>{ current_user.first_name ? current_user.first_name : current_user.username }</span>
+                                            <span>{ getProfileName() }</span>
                                             <i className="feather icon-chevron-down"></i>
                                         </div>
                                         <ul className="show-notification profile-notification dropdown-menu" data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
@@ -93,7 +137,7 @@ const DashboardMain = () => {
                 <div className="pcoded-main-container">
                     <div className="pcoded-wrapper">
     
-                        <SideNavMain/>
+                        <SideNavMain dashboardMainStore={dashboardMainStore}/>
     
                         <Switch>
     
@@ -104,17 +148,26 @@ const DashboardMain = () => {
     
                             {/* Profile */}
                             <Route path="/profile">
-                                <ProfileMain currentUser={current_user}/>
+                                <ProfileMain dashboardMainStore={dashboardMainStore}/>
                             </Route>
     
                             {/* Users */}
-                            <Route path="/users">
-                                <UserMain userStore={userStore}/>
-                            </Route>
+                            { dashboardMainStore.checkIfRouteExist('user-module') ? 
+                                <Route path="/users">
+                                    <UserMain userStore={userStore} dashboardMainStore={dashboardMainStore}/>
+                                </Route> : ""
+                            }
     
                             {/* Menu */}
-                            <Route path="/menus">
-                                <MenuMain menuStore={menuStore}/>
+                            { dashboardMainStore.checkIfRouteExist('menu-module') ? 
+                                <Route path="/menus">
+                                    <MenuMain menuStore={menuStore} dashboardMainStore={dashboardMainStore}/>
+                                </Route> : ""
+                            }
+    
+                            {/* Page not found */}
+                            <Route path="*">
+                                <NotFoundPage/>
                             </Route>
     
                         </Switch>
@@ -124,13 +177,12 @@ const DashboardMain = () => {
             </div>
         </div>
     </HashRouter>
-
     )
 
-}
+})
 
 
 ReactDOM.render( 
-    <DashboardMain/>, 
+    <DashboardMain dashboardMainStore={dashboardMainStore}/>, 
     document.getElementById('root')
 );

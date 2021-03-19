@@ -9,7 +9,7 @@ import DivLoader from '../Utils/DivLoaderComp'
 
 
 
-const MenuDetails = observer(({ menuStore }) => {
+const MenuDetails = observer(({ menuStore, dashboardMainStore }) => {
 
     const history = useHistory();
     const { menu_id } = useParams();
@@ -114,10 +114,12 @@ const MenuDetails = observer(({ menuStore }) => {
                                         <Link to="/menus" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">
                                             <i className="fa fa-navicon"></i> Back to List
                                         </Link>
-                                        <button className="btn btn-md btn-danger btn-outline-danger float-right pt-2 pb-2" 
-                                                onClick={ handleDeleteRouteModal }>
-                                            <i className="fa fa-trash"></i> Delete
-                                        </button>
+                                        { dashboardMainStore.checkIfSubrouteExist('menu-edit-permissions-page') ?
+                                            <button className="btn btn-md btn-danger btn-outline-danger float-right pt-2 pb-2" 
+                                                    onClick={ handleDeleteRouteModal }>
+                                                <i className="fa fa-trash"></i> Delete
+                                            </button> : <></>
+                                        }
                                     </div>
 
                                     <div className="card-block">
@@ -126,9 +128,11 @@ const MenuDetails = observer(({ menuStore }) => {
                                             {/* Menu */}
                                             <div className="col-md-5">
                                                 <h5 className="sub-title">Menu</h5>
-                                                <Link to={`/menus/${menu_id}/edit`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
-                                                    <i className="fa fa-pencil-square-o"></i> Edit Menu
-                                                </Link>
+                                                { dashboardMainStore.checkIfSubrouteExist('menu-edit-page') ?
+                                                    <Link to={`/menus/${menu_id}/edit`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
+                                                        <i className="fa fa-pencil-square-o"></i> Edit Menu
+                                                    </Link> : <></>
+                                                }
                                                 <div className="row mt-4">
                                                     <div className="col-md-6">
                                                         <p>Category:</p>
@@ -148,7 +152,7 @@ const MenuDetails = observer(({ menuStore }) => {
                                                         <p>{ menuStore.nav_name }</p>
                                                         <p><i className={ menuStore.icon }></i></p>
                                                         <p>{ menuStore.url }</p>
-                                                        <p>{ menuStore.name }</p>
+                                                        <p>{ menuStore.url_name }</p>
                                                     </div> 
                                                 </div>
                                             </div>
@@ -156,9 +160,11 @@ const MenuDetails = observer(({ menuStore }) => {
                                             {/* Permissions */}
                                             <div className="col-md-7">
                                                 <h5 className="sub-title">Permissions</h5>
-                                                <Link to={`/menus/${menu_id}/edit_permissions`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
-                                                    <i className="fa fa-pencil-square-o"></i> Edit Permissions
-                                                </Link>
+                                                { dashboardMainStore.checkIfSubrouteExist('menu-edit-permissions-page') ?
+                                                    <Link to={`/menus/${menu_id}/edit_permissions`} className="btn btn-md btn-primary btn-outline-primary pt-2 pb-2">
+                                                        <i className="fa fa-pencil-square-o"></i> Edit Permissions
+                                                    </Link> : <></>
+                                                }
                                                 <div className="table-responsive mt-3">
                                                     <table className="table table-sm">
                                                         <thead>
@@ -177,8 +183,8 @@ const MenuDetails = observer(({ menuStore }) => {
                                                                         <td>{ val.name }</td>
                                                                         <td className="align-middle">
                                                                             { val.is_nav === true ? 
-                                                                                <label className="label label-success">Subitem</label> 
-                                                                                : <label className="label label-danger">API</label> 
+                                                                                <label className="label label-success"> Nav Subitem</label> 
+                                                                                : <label className="label label-warning">Page / API</label> 
                                                                             }
                                                                         </td>
                                                                         <td>{ val.nav_name }</td>

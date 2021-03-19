@@ -9,7 +9,7 @@ import { TableFooterDefault } from '../Utils/Table/TableFooters'
 import MenuListBulkDeleteModal from './MenuListBulkDeleteModalComp'
 
 
-const MenuList = observer(({ menuStore }) => {
+const MenuList = observer(({ menuStore, dashboardMainStore }) => {
 
     const history = useHistory();
 
@@ -103,7 +103,8 @@ const MenuList = observer(({ menuStore }) => {
                                             searchInputHandler={ (e) => menuStore.handleSearch(e) }
                                             filterButton={ false }
                                             refreshButtonClickHandler={ (e) => menuStore.handleRefreshClick(e) }
-                                            deleteButton={true}
+                                            createButton={ dashboardMainStore.checkIfSubrouteExist('menu-create-page') }
+                                            deleteButton={ dashboardMainStore.checkIfSubrouteExist('menu-delete') }
                                             deleteButtonDisable= { menuStore.selected_rows.some(data => data.status === true) }
                                             deleteButtonClickHandler={ (e) => handleOpenBulkDeleteModal(e) }
                                             entriesSelectPageSize={ menuStore.page_size }
@@ -123,19 +124,23 @@ const MenuList = observer(({ menuStore }) => {
                                             <table className="table table-sm table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <th className="p-0">
-                                                            <div className="checkbox-fade fade-in-primary ml-3 mt-3">
-                                                                <label>
-                                                                    <input type="checkbox" 
-                                                                           checked={ menuStore.is_selected_all_rows } 
-                                                                           onChange={ e => menuStore.setIsSelectedAllRows(e.target.checked) }/>
-                                                                    <span className="cr">
-                                                                        <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
-                                                                    </span>
-                                                                </label>
-                                                            </div>
+                                                        { dashboardMainStore.checkIfSubrouteExist('menu-delete') ? 
+                                                            <th className="p-0">
+                                                                <div className="checkbox-fade fade-in-primary ml-3 mt-3">
+                                                                    <label>
+                                                                        <input type="checkbox" 
+                                                                            checked={ menuStore.is_selected_all_rows } 
+                                                                            onChange={ e => menuStore.setIsSelectedAllRows(e.target.checked) }/>
+                                                                        <span className="cr">
+                                                                            <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
+                                                                        </span>
+                                                                    </label>
+                                                                </div>
+                                                            </th> : <></>
+                                                        }
+                                                        <th className="align-middle">
+                                                            <a href="#" onClick={e => e.preventDefault()}><ins className="text-info">Name</ins></a>
                                                         </th>
-                                                        <th className="align-middle">Name</th>
                                                         <th className="align-middle">Category</th>
                                                         <th className="align-middle">Is Side Nav.</th>
                                                         <th className="align-middle">Is Side Nav. Dropdown</th>
@@ -148,22 +153,22 @@ const MenuList = observer(({ menuStore }) => {
                                                 <tbody>
                                                 { menuStore.list.map((val, key) => {
                                                     return (
-                                                        <tr key={key} 
-                                                            className={ val.id == menuStore.selected_route || tableRowIsChecked(val.id) ? "table-info" : "" }>
-
-                                                            <td className="p-0">
-                                                                <div className="checkbox-fade fade-in-primary ml-3 mt-3">
-                                                                    <label>
-                                                                        <input key={key}
-                                                                               type="checkbox"
-                                                                               checked={ tableRowIsChecked(val.id) }
-                                                                               onChange={ e => menuStore.setSelectedRowObject(e.target.checked, val.id) }/>
-                                                                        <span className="cr">
-                                                                            <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
-                                                                        </span>
-                                                                    </label>
-                                                                </div>
-                                                            </td>
+                                                        <tr key={key} className={ val.id == menuStore.selected_route || tableRowIsChecked(val.id) ? "table-info" : "" }>
+                                                            { dashboardMainStore.checkIfSubrouteExist('menu-delete') ? 
+                                                                <td className="p-0">
+                                                                    <div className="checkbox-fade fade-in-primary ml-3 mt-3">
+                                                                        <label>
+                                                                            <input key={key}
+                                                                                type="checkbox"
+                                                                                checked={ tableRowIsChecked(val.id) }
+                                                                                onChange={ e => menuStore.setSelectedRowObject(e.target.checked, val.id) }/>
+                                                                            <span className="cr">
+                                                                                <i className="cr-icon icofont icofont-ui-check txt-primary"></i>
+                                                                            </span>
+                                                                        </label>
+                                                                    </div>
+                                                                </td> : <></>
+                                                            }
                                                             <th scope="row" className="align-middle">
                                                                 <a href="#" onClick={ (e) => handleOpenMenuDetails(e, val.id) }>
                                                                     <ins className="text-info">{ val.name }</ins>
@@ -221,7 +226,9 @@ const MenuList = observer(({ menuStore }) => {
         </div>
                                                                     
         {/* BULK DELETE MODAL */}
-        <MenuListBulkDeleteModal menuStore={menuStore} />
+        { dashboardMainStore.checkIfSubrouteExist('menu-delete') ? 
+            <MenuListBulkDeleteModal menuStore={menuStore} /> : <></>
+        }
 
     </div>
 

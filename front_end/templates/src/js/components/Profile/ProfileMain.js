@@ -1,12 +1,13 @@
 require('../../config')
 
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom"
+import { observer } from 'mobx-react'
 
 import ProfileUsernameForm from "./ProfileUsernameFormComp";
 import ProfilePasswordForm from "./ProfilePasswordFormComp";
 
 
-const ProfileMain = (props) => {
+const ProfileMain = observer(({ dashboardMainStore }) => {
 
     return (
     <div className="pcoded-content">
@@ -47,13 +48,13 @@ const ProfileMain = (props) => {
                                     </div>
                                     <div className="card-block">
                                         <p className="lead m-t-0">
-                                            Name : { props.currentUser.fullname ? props.currentUser.fullname : "N/A"  }
+                                            Name : { dashboardMainStore.current_user.fullname ? dashboardMainStore.current_user.fullname : "N/A"  }
                                         </p>
                                         <p className="lead m-t-0">
-                                            Username : { props.currentUser.username }
+                                            Username : { dashboardMainStore.current_user.username }
                                         </p>
                                         <p className="lead m-t-0">
-                                            Email : { props.currentUser.email ? props.currentUser.email : "N/A" }
+                                            Email : { dashboardMainStore.current_user.email ? dashboardMainStore.current_user.email : "N/A" }
                                         </p>
                                     </div>
                                 </div>
@@ -68,6 +69,6 @@ const ProfileMain = (props) => {
     </div>
     )
 
-}
+})
 
 export default ProfileMain

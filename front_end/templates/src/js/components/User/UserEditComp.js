@@ -142,75 +142,81 @@ const UserEdit = observer(({ userStore }) => {
                                     </div>
 
                                     <div className="card-block">
-                                        <div className="col-md-12">
-                                            <h4 className="sub-title">User Details</h4>
+                            
+                                        <div className="row">
+                                            
+                                            <div className="col-md-6">
+                                                <h4 className="sub-title">User Details</h4>
 
-                                            <InputTextInline 
-                                                type="text"
-                                                label="Firstname:"
-                                                placeholder="Firstname"
-                                                errorField={ userStore.error_fields.firstname }
-                                                value={ userStore.first_name }
-                                                setter={ e => userStore.setFirstname(e.target.value) }
-                                            />
+                                                <InputTextInline 
+                                                    type="text"
+                                                    label="Firstname:"
+                                                    placeholder="Firstname"
+                                                    errorField={ userStore.error_fields.firstname }
+                                                    value={ userStore.first_name }
+                                                    setter={ e => userStore.setFirstname(e.target.value) }
+                                                />
 
-                                            <InputTextInline 
-                                                type="text"
-                                                label="Lastname:"
-                                                placeholder="Lastname"
-                                                errorField={ userStore.error_fields.lastname }
-                                                value={ userStore.last_name }
-                                                setter={ e => userStore.setLastname(e.target.value) }
-                                            />
+                                                <InputTextInline 
+                                                    type="text"
+                                                    label="Lastname:"
+                                                    placeholder="Lastname"
+                                                    errorField={ userStore.error_fields.lastname }
+                                                    value={ userStore.last_name }
+                                                    setter={ e => userStore.setLastname(e.target.value) }
+                                                />
 
-                                            <InputTextInline 
-                                                type="text"
-                                                label="Email:"
-                                                placeholder="Email"
-                                                errorField={ userStore.error_fields.email }
-                                                value={ userStore.email }
-                                                setter={ e => userStore.setEmail(e.target.value) }
-                                            />
+                                                <InputTextInline 
+                                                    type="text"
+                                                    label="Email:"
+                                                    placeholder="Email"
+                                                    errorField={ userStore.error_fields.email }
+                                                    value={ userStore.email }
+                                                    setter={ e => userStore.setEmail(e.target.value) }
+                                                />
 
-                                            <InputTextInline 
-                                                type="text"
-                                                label="Username:"
-                                                placeholder="Username"
-                                                errorField={ userStore.error_fields.username }
-                                                value={ userStore.username }
-                                                setter={ e => userStore.setUsername(e.target.value) }
-                                            />
+                                                <InputTextInline 
+                                                    type="text"
+                                                    label="Username:"
+                                                    placeholder="Username"
+                                                    errorField={ userStore.error_fields.username }
+                                                    value={ userStore.username }
+                                                    setter={ e => userStore.setUsername(e.target.value) }
+                                                />
+
+                                            </div>
+
+
+                                            <div className="col-sm-6">
+                                                <h4 className="sub-title">User Modules and Module Permissions</h4>
+
+                                                <SelectMultiInline 
+                                                    label="Modules:"
+                                                    name="user_routes"
+                                                    value={userStore.user_routes}
+                                                    errorField={ userStore.error_fields.user_routes }
+                                                    options={userStore.route_options}
+                                                    onChange={handleUserRouteMultiSelectChange}
+                                                    closeMenuOnSelect={false}
+                                                    defaultMenuIsOpen={false}
+
+                                                />
+
+                                                <SelectMultiInline 
+                                                    label="Permissions:"
+                                                    name="user_subroutes"
+                                                    value={userStore.user_subroutes}
+                                                    errorField={ userStore.error_fields.user_subroutes }
+                                                    options={userStore.subroute_options}
+                                                    onChange={handleUserSubrouteMultiSelectChange}
+                                                    closeMenuOnSelect={false}
+                                                    defaultMenuIsOpen={false}
+                                                />
+
+                                            </div>
 
                                         </div>
-
-
-                                        <div className="col-sm-12 mt-5">
-                                            <h4 className="sub-title">User Modules and Module Permissions</h4>
-
-                                            <SelectMultiInline 
-                                                label="Modules:"
-                                                name="user_routes"
-                                                value={userStore.user_routes}
-                                                errorField={ userStore.error_fields.user_routes }
-                                                options={userStore.route_options}
-                                                onChange={handleUserRouteMultiSelectChange}
-                                                closeMenuOnSelect={false}
-                                                defaultMenuIsOpen={false}
-
-                                            />
-
-                                            <SelectMultiInline 
-                                                label="Permissions:"
-                                                name="user_subroutes"
-                                                value={userStore.user_subroutes}
-                                                errorField={ userStore.error_fields.user_subroutes }
-                                                options={userStore.subroute_options}
-                                                onChange={handleUserSubrouteMultiSelectChange}
-                                                closeMenuOnSelect={false}
-                                                defaultMenuIsOpen={false}
-                                            />
-
-                                        </div>
+                                    
 
 
                                         {/* BUTTON / FOOTERS */}

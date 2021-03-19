@@ -9,37 +9,48 @@ import MenuCreate from './MenuCreateComp.js'
 import MenuDetails from './MenuDetailsComp.js'
 import MenuEdit from './MenuEditComp.js'
 import MenuEditPermission from './MenuEditPermissionComp.js'
+import NotFoundPage from '../ErrorPages/NotFoundPageComp'
 
 
-const MenuMain = observer(({ menuStore }) => {
-    
+const MenuMain = observer(({ menuStore, dashboardMainStore }) => {
+
     return (
         <HashRouter>
             <Switch>
 
                 {/* LIST */}
                 <Route exact path="/menus">
-                    <MenuList menuStore={ menuStore }/>
+                    { dashboardMainStore.checkIfSubrouteExist('menu-manage-page') ? 
+                        <MenuList menuStore={ menuStore } dashboardMainStore={dashboardMainStore}/> : <NotFoundPage/> }
                 </Route>
 
                 {/* CREATE */}
                 <Route exact path="/menus/create">
-                    <MenuCreate menuStore={ menuStore }/>
+                    { dashboardMainStore.checkIfSubrouteExist('menu-create-page') ? 
+                        <MenuCreate menuStore={ menuStore }/> : <NotFoundPage/> }
                 </Route>
 
                 {/* DETAILS */}
                 <Route exact path="/menus/:menu_id">
-                    <MenuDetails menuStore={ menuStore }/>
+                    { dashboardMainStore.checkIfSubrouteExist('menu-details-page') ? 
+                        <MenuDetails menuStore={ menuStore } dashboardMainStore={dashboardMainStore}/> : <NotFoundPage/> }
                 </Route>
 
                 {/* EDIT */}
                 <Route exact path="/menus/:menu_id/edit">
-                    <MenuEdit menuStore={ menuStore }/>
+                    { dashboardMainStore.checkIfSubrouteExist('menu-edit-page') ? 
+                        <MenuEdit menuStore={ menuStore }/> : <NotFoundPage/> }
                 </Route>
 
                 {/* EDIT Permissions*/}
                 <Route exact path="/menus/:menu_id/edit_permissions">
-                    <MenuEditPermission menuStore={ menuStore }/>
+                    { dashboardMainStore.checkIfSubrouteExist('menu-edit-permissions-page') ? 
+                        <MenuEditPermission menuStore={ menuStore }/> : <NotFoundPage/> }
+                </Route>
+    
+                {/* Page not found */}
+                <Route path="/menus/*">
+                    <NotFoundPage/>
                 </Route>
 
             </Switch>
