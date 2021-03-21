@@ -2,10 +2,10 @@ import React from "react";
 
 
 // Add Button
-function AddButton(props){
+function CreateButton(props){
     return (
-        <button className="btn btn-md btn-success" type="button" onClick={ props.clickHandler }>
-            <i className="fa fa-plus-square"></i> { props.displayText }
+        <button className="btn btn-md btn-success" type="button" onClick={ props.onClick }>
+            <i className="fa fa-plus-square"></i> Create
         </button>
     );
 }
@@ -29,8 +29,18 @@ function SearchInput(props){
 // Filter Button
 function FilterButton(props){
     return (
-        <button className="btn btn-primary" type="button" onClick={ props.clickHandler } >
+        <button className="btn btn-primary" type="button" onClick={ props.onClick } >
             <i className="fa fa-filter"></i> Filters
+        </button>
+    );
+}
+
+
+// Sort Button
+function SortButton(props){
+    return (
+        <button className="btn btn-primary" type="button" onClick={ props.onClick } >
+            <i className="fa fa-sort"></i> Sort
         </button>
     );
 }
@@ -39,8 +49,8 @@ function FilterButton(props){
 // Refresh Button
 function RefreshButton(props){
     return (
-        <button className="btn btn-primary" type="button" onClick={ props.clickHandler } >
-            &nbsp;<i className="fa fa-refresh"></i>
+        <button className="btn btn-primary" type="button" onClick={ props.onClick } >
+            &nbsp;<i className="fa fa-refresh"></i> Refresh
         </button>
     );
 }
@@ -125,19 +135,27 @@ function TableHeaderDefault(props){
 
                 { props.filterButton === true ?
                     (
-                        <div className="pl-4">
-                            <FilterButton clickHandler={ props.filterButtonClickHandler } />
+                        <div className="pl-3">
+                            <FilterButton onClick={ props.filterButtonClickHandler } />
                         </div>
                     ) : ""
                 }
 
-                <div className="pl-4">
-                    <RefreshButton clickHandler={ props.refreshButtonClickHandler } />
+                { props.sortButton === true ?
+                    (
+                        <div className="pl-3">
+                            <SortButton onClick={ props.sortButtonClickHandler } />
+                        </div>
+                    ) : ""
+                }
+
+                <div className="pl-3">
+                    <RefreshButton onClick={ props.refreshButtonClickHandler } />
                 </div>
 
                 { props.deleteButton === true ?
                     (
-                        <div className="pl-4">
+                        <div className="pl-3">
                             <DeleteButton isDisabled={ !props.deleteButtonDisable } onClick={ props.deleteButtonClickHandler } />
                         </div>
                     ) : ""
@@ -145,8 +163,8 @@ function TableHeaderDefault(props){
 
                 { props.createButton === true ?
                     (
-                        <div className="pl-4">
-                            <AddButton displayText="Add" clickHandler={ props.addButtonClickHandler }/>
+                        <div className="pl-3">
+                            <CreateButton onClick={ props.addButtonClickHandler }/>
                         </div>
                     ) : ""
                 }
@@ -180,4 +198,4 @@ function TableHeaderDefault(props){
 
 
 // Export Functions
-export { AddButton, SearchInput, FilterButton, RefreshButton, EntriesSelect, HeaderPaginationDefault, TableHeaderDefault }
+export { CreateButton, SearchInput, FilterButton, RefreshButton, EntriesSelect, HeaderPaginationDefault, TableHeaderDefault }

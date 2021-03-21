@@ -38,15 +38,18 @@ class RouteViewSet(viewsets.ModelViewSet):
 
 
     def list(self, request):
-        search = request.GET.get('q', None)  
+        search = request.GET.get('q', None)
+        sort = request.GET.get('sort', None)
+        sort_order = request.GET.get('sort_order', None)
+        sort_order_symbol = "-" if sort_order == "desc" else ""
         filter_conditions = Q()
 
         if search:
-            if search:
-                filter_conditions.add(Q(name__icontains=search) | Q(category__icontains=search), Q.AND)
-            page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by('-updated_at'))
+            filter_conditions.add(Q(name__icontains=search) | Q(category__icontains=search), Q.AND)
+        if sort and sort_order or sort:
+            page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by(sort_order_symbol+""+sort))
         else:
-            page = self.paginate_queryset(self.queryset.order_by('-updated_at'))
+            page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by('-updated_at'))
         
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)

@@ -6,6 +6,7 @@ import { observer } from 'mobx-react'
 
 import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
+import { SelectFilter } from '../Utils/Forms/FilterInputs'
 import MenuListBulkDeleteModal from './MenuListBulkDeleteModalComp'
 
 
@@ -40,6 +41,12 @@ const MenuList = observer(({ menuStore, dashboardMainStore }) => {
     });
 
 
+    const handleSortClick = (e, id) => {
+        e.preventDefault()
+        $("#menu-sort-modal").modal('toggle')
+    }
+
+
     const handleOpenMenuDetails = (e, id) => {
         e.preventDefault()
         redirectToMenuDetails(id)
@@ -56,6 +63,23 @@ const MenuList = observer(({ menuStore, dashboardMainStore }) => {
         return menuStore.selected_rows.some(data => {
             return data.id === id && data.status === true;
         })
+    }
+
+
+    const handleSortFieldChange = (values) => {
+        menuStore.setSortField(values)
+    }
+
+
+    const handleSortOrderChange = (values) => {
+        menuStore.setSortOrder(values)
+    }
+
+
+    const handleSortSubmit = (e) => {
+        e.preventDefault()
+        menuStore.handleSortSubmit()
+        $("#menu-sort-modal").modal('hide')
     }
 
 
@@ -101,7 +125,8 @@ const MenuList = observer(({ menuStore, dashboardMainStore }) => {
                                             addButtonClickHandler={ redirectToMenuCreate }
                                             searchInputValue={ menuStore.query }
                                             searchInputHandler={ (e) => menuStore.handleSearch(e) }
-                                            filterButton={ false }
+                                            sortButton={ true }
+                                            sortButtonClickHandler={ handleSortClick }
                                             refreshButtonClickHandler={ (e) => menuStore.handleRefreshClick(e) }
                                             createButton={ dashboardMainStore.checkIfSubrouteExist('menu-create-page') }
                                             deleteButton={ dashboardMainStore.checkIfSubrouteExist('menu-delete') }
@@ -138,9 +163,7 @@ const MenuList = observer(({ menuStore, dashboardMainStore }) => {
                                                                 </div>
                                                             </th> : <></>
                                                         }
-                                                        <th className="align-middle">
-                                                            <a href="#" onClick={e => e.preventDefault()}><ins className="text-info">Name</ins></a>
-                                                        </th>
+                                                        <th className="align-middle">Name</th>
                                                         <th className="align-middle">Category</th>
                                                         <th className="align-middle">Is Side Nav.</th>
                                                         <th className="align-middle">Is Side Nav. Dropdown</th>
@@ -224,11 +247,65 @@ const MenuList = observer(({ menuStore, dashboardMainStore }) => {
                 </div>
             </div>
         </div>
-                                                                    
+
+
         {/* BULK DELETE MODAL */}
         { dashboardMainStore.checkIfSubrouteExist('menu-delete') ? 
             <MenuListBulkDeleteModal menuStore={menuStore} /> : <></>
         }
+
+
+        {/* SORT MODAL */}
+        <div className="modal" id="menu-sort-modal" role="dialog">
+            <div className="modal-dialog modal-lg" role="document">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h4 className="modal-title">Sort Records</h4>
+                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        <div className="form-group row">
+
+                            <SelectFilter
+                                divColumn="col-md-6"
+                                name="sort_field"
+                                label="Sort Field:"
+                                value={ menuStore.sort_field }
+                                isDisabled={false}
+                                options={ [
+                                    {value : "", label : "Select"},
+                                    {value : "name", label : "Name"},
+                                    {value : "category", label : "Category"},
+                                    {value : "is_menu", label : "Is Side Nav."},
+                                    {value : "is_dropdown", label : "Is Side Nav. Dropdown"},
+                                    {value : "url", label : "Url"},
+                                    {value : "url_name", label : "Url Name"},
+                                ] }
+                                onChange={ handleSortFieldChange }
+                            />
+
+                            <SelectFilter
+                                divColumn="col-md-6"
+                                name="sort_order"
+                                label="Sort Order:"
+                                value={menuStore.sort_order}
+                                isDisabled={false}
+                                options={ [{value:"", label:"Select"}, {value:"asc", label:'Ascending'}, {value:"desc", label:'Descending'} ] }
+                                onChange={ handleSortOrderChange }
+                            />
+
+                        </div>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                        <button type="button" className="btn btn-primary waves-effect waves-light" onClick={ handleSortSubmit }>Sort</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
     </div>
 

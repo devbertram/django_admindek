@@ -13,6 +13,8 @@ class MenuStore{
     page_size = 10;
     page_limit = 0;
     query = "";
+    sort_field = "";
+    sort_order = "";
 
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
     selected_route = 0; // selected menu id after create or update
@@ -46,6 +48,8 @@ class MenuStore{
                 q: this.query, 
                 page_size: this.page_size, 
                 page: this.page_current, 
+                sort: this.sort_field.value,
+                sort_order: this.sort_order.value, 
             }
         }).then((response) => {
             runInAction(() => {
@@ -200,6 +204,14 @@ class MenuStore{
 
 
     // List Handlers
+    setSortField(sort_field){
+        this.sort_field = sort_field;
+    }
+
+    setSortOrder(sort_order){
+        this.sort_order = sort_order;
+    }
+
     handleSearch(e){
         e.preventDefault()
         this.page_prev = 0;
@@ -209,6 +221,13 @@ class MenuStore{
         this.delaySearch();
     }
 
+    handleSortSubmit(){
+        this.page_prev = 0;
+        this.page_current = 1;
+        this.page_next = 2;
+        this.fetch();
+    }
+
     handleRefreshClick(e){
         e.preventDefault()
         this.page_prev = 0;
@@ -216,6 +235,8 @@ class MenuStore{
         this.page_next = 2;
         this.page_size = 10;
         this.query = "";
+        this.sort_field = "";
+        this.sort_order = "";
         this.selected_route = 0;
         this.fetch();
     }
