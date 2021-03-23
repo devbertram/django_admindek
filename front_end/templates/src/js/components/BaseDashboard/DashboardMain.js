@@ -88,7 +88,6 @@ const DashboardMain = observer(({ dashboardMainStore }) => {
         return profile_name;
     }
 
-
     return (
     <HashRouter>
         <div id="pcoded" className="pcoded">
@@ -152,18 +151,18 @@ const DashboardMain = observer(({ dashboardMainStore }) => {
                             </Route>
     
                             {/* Users */}
-                            { dashboardMainStore.checkIfRouteExist('user-module') ? 
-                                <Route path="/users">
-                                    <UserMain userStore={userStore} dashboardMainStore={dashboardMainStore}/>
-                                </Route> : ""
-                            }
+                            <Route path="/users">
+                                { dashboardMainStore.checkIfRouteExist('user-module') ? 
+                                    <UserMain userStore={userStore} dashboardMainStore={dashboardMainStore}/> : <NotFoundPage/>
+                                }
+                            </Route> 
     
                             {/* Menu */}
-                            { dashboardMainStore.checkIfRouteExist('menu-module') ? 
-                                <Route path="/menus">
-                                    <MenuMain menuStore={menuStore} dashboardMainStore={dashboardMainStore}/>
-                                </Route> : ""
-                            }
+                            <Route path="/menus">
+                                { dashboardMainStore.checkIfRouteExist('menu-module') ?
+                                    <MenuMain menuStore={menuStore} dashboardMainStore={dashboardMainStore}/>: <NotFoundPage/>
+                                }
+                            </Route> 
     
                             {/* Page not found */}
                             <Route path="*">

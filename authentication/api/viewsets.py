@@ -37,20 +37,28 @@ class RouteViewSet(viewsets.ModelViewSet):
     pagination_class = RouteListPagination
 
 
+    def __sort_field(self):
+        field = '-updated_at'
+        sort_field = self.request.GET.get('sort_field', None)
+        sort_order = self.request.GET.get('sort_order', None)
+        available_sort_fields = ["name", "category", "is_menu", "is_dropdown", "url", "url_name"]
+        if sort_field:
+            if sort_field in available_sort_fields:
+                if sort_order == "desc":
+                    field = "-"+sort_field
+                else:
+                    field = sort_field
+        return field
+
+
     def list(self, request):
         search = request.GET.get('q', None)
-        sort = request.GET.get('sort', None)
-        sort_order = request.GET.get('sort_order', None)
-        sort_order_symbol = "-" if sort_order == "desc" else ""
         filter_conditions = Q()
-
-        if search:
-            filter_conditions.add(Q(name__icontains=search) | Q(category__icontains=search), Q.AND)
-        if sort and sort_order or sort:
-            page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by(sort_order_symbol+""+sort))
-        else:
-            page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by('-updated_at'))
         
+        if search: 
+            filter_conditions.add(Q(name__icontains=search) | Q(category__icontains=search), Q.AND)
+
+        page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by(self.__sort_field()))
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
         
@@ -190,21 +198,25 @@ class SubrouteViewSet(viewsets.ModelViewSet):
 
 
 
-class UserRouteViewSet(viewsets.ModelViewSet):
-    
-    @action(methods=['get'], detail=False)
-    def get_by_user(self, request):
-        user_route = UserRoute.objects.all().filter(user_id=request.user.id).prefetch_related('route').select_related('route')
-        serializer =  UserRouteSerializer(user_route, many=True)
-        return Response(serializer.data, 200)
-
-
-
 class UserViewSet(viewsets.ModelViewSet):
     
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = UserListPagination
+
+
+    def __sort_field(self):
+        field = '-date_joined'
+        sort_field = self.request.GET.get('sort_field', None)
+        sort_order = self.request.GET.get('sort_order', None)
+        available_sort_fields = ["username", "first_name", "last_name", "is_active", "last_login", "date_joined"]
+        if sort_field:
+            if sort_field in available_sort_fields:
+                if sort_order == "desc":
+                    field = "-"+sort_field
+                else:
+                    field = sort_field
+        return field
 
 
     def list(self, request):
@@ -220,10 +232,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 filter_conditions.add(Q(is_active = online_status), Q.AND) 
             if su_status:
                 filter_conditions.add(Q(is_superuser = su_status), Q.AND)
-            page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by('-date_joined'))
-        else:
-            page = self.paginate_queryset(self.queryset.order_by('-date_joined'))
         
+        page = self.paginate_queryset(self.queryset.filter(filter_conditions).order_by(self.__sort_field()))
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
         

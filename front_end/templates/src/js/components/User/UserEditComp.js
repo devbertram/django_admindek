@@ -14,7 +14,7 @@ const UserEdit = observer(({ userStore }) => {
 
     const history = useHistory();
     const { user_id } = useParams();
-    const [loader, SetLoader] = useState(false);
+    const [page_loader, SetPageLoader] = useState(false);
     
     
     useEffect (() => {
@@ -47,7 +47,7 @@ const UserEdit = observer(({ userStore }) => {
 
     const handleUpdate = (e, btl) => {
         e.preventDefault()
-        SetLoader(true)
+        SetPageLoader(true)
         axios.put('api/user/' + user_id +'/', {
             first_name : userStore.first_name,
             last_name : userStore.last_name,
@@ -60,7 +60,7 @@ const UserEdit = observer(({ userStore }) => {
             userStore.fetch();
             userStore.setSelectedUser(response.data.id);
             if(btl === 1){ redirectBackToUserList() }
-            SetLoader(false);
+            SetPageLoader(false);
         }).catch((error) => {
             if(error.response.status == 400){
                 let field_errors = error.response.data;
@@ -83,7 +83,7 @@ const UserEdit = observer(({ userStore }) => {
                     message: "There's an error trying to send data to the server!", type: "danger" 
                 });
             }
-            SetLoader(false);
+            SetPageLoader(false);
         });
     }
     
@@ -130,7 +130,7 @@ const UserEdit = observer(({ userStore }) => {
                             <div className="col-sm-12">
                                 <div className="card">
 
-                                    <DivLoader type="Circles" loading={loader}/>
+                                    <DivLoader type="Circles" loading={page_loader}/>
                                     <div className="card-header">
                                         <h5>Edit User </h5>
                                         <Link to={`/users/${user_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">

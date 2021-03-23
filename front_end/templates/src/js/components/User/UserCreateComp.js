@@ -12,7 +12,7 @@ import { InputTextInline, SelectMultiInline } from '../Utils/Forms/InlineInputs'
 const UserCreate = observer(({ userStore }) => {
     
     const history = useHistory();
-    const [loader, SetLoader] = useState(false);
+    const [page_loader, SetPageLoader] = useState(false);
 
 
     useEffect (() => {
@@ -49,10 +49,10 @@ const UserCreate = observer(({ userStore }) => {
 
     const handleCreate = (e, is_save_another) => {
         e.preventDefault()
-        SetLoader(true)
+        SetPageLoader(true)
         if(userStore.password != userStore.password_confirm){
             userStore.setErrorFields({ password : "Password doesn't match!" })
-            SetLoader(false)
+            SetPageLoader(false)
         }else{
             axios.post('api/user/', { 
                 first_name : userStore.first_name,
@@ -72,7 +72,7 @@ const UserCreate = observer(({ userStore }) => {
                 if (is_save_another == 0){
                     redirectBackToUserList()
                 }
-                SetLoader(false);
+                SetPageLoader(false);
             }).catch((error) => {
                 if(error.response.status == 400){
                     let field_errors = error.response.data;
@@ -96,7 +96,7 @@ const UserCreate = observer(({ userStore }) => {
                         message: "There's an error trying to send data to the server!", type: "danger" 
                     });
                 }
-                SetLoader(false);
+                SetPageLoader(false);
             });
         }
     }
@@ -142,7 +142,7 @@ const UserCreate = observer(({ userStore }) => {
                             <div className="col-sm-12">
                                 <div className="card">
 
-                                    <DivLoader type="Circles" loading={loader}/>
+                                    <DivLoader type="Circles" loading={page_loader}/>
                                     <div className="card-header">
                                         <h5>Create User</h5>
                                         <Link to="/users" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2">

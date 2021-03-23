@@ -12,7 +12,7 @@ import DivLoader from '../Utils/DivLoaderComp'
 const MenuEditPermission = observer(({ menuStore }) => {
 
     const { menu_id } = useParams();
-    const [is_page_loading, SetIsPageLoading] = useState(false);
+    const [page_loader, SetPageLoader] = useState(false);
     const [selected_subroute_id, SetSelectedSubrouteId] = useState("");
     const [subroute_delete_id, SetSubrouteDeleteId] = useState("");
     
@@ -20,10 +20,8 @@ const MenuEditPermission = observer(({ menuStore }) => {
     useEffect (() => {
         let is_mounted = true;
         if(is_mounted = true){
-            SetIsPageLoading(true)
             menuStore.setIsOpenedForm(1)
             menuStore.retrieve(menu_id)
-            SetIsPageLoading(false)
         }
         return () => {
             is_mounted = false;
@@ -63,7 +61,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
 
     const handleCreateSubroute = (e, key) => {
         e.preventDefault();
-        SetIsPageLoading(true)
+        SetPageLoader(true)
         const subroute = menuStore.findSubrouteByKey(key)
         axios.post('api/subroute/', { 
             route: menu_id,
@@ -79,7 +77,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
             SetSelectedSubrouteId(response.data.id)
             menuStore.setSelectedRoute(menu_id)
             menuStore.retrieve(menu_id)
-            SetIsPageLoading(false);
+            SetPageLoader(false);
         }).catch((error) => {
             if(error.response.status === 400){
                 let field_errors = error.response.data;
@@ -92,14 +90,14 @@ const MenuEditPermission = observer(({ menuStore }) => {
                     message: "There's an error trying to send data to the server!", type: "danger" 
                 });
             }
-            SetIsPageLoading(false);
+            SetPageLoader(false);
         });
     }
 
 
     const handleUpdateSubroute = (e, key, id) => {
         e.preventDefault();
-        SetIsPageLoading(true)
+        SetPageLoader(true)
         const subroute = menuStore.findSubrouteById(id)
         axios.put('api/subroute/'+id+'/', { 
             route: menu_id,
@@ -115,7 +113,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
             SetSelectedSubrouteId(response.data.id)
             menuStore.setSelectedRoute(menu_id)
             menuStore.retrieve(menu_id)
-            SetIsPageLoading(false);
+            SetPageLoader(false);
         }).catch((error) => {
             if(error.response.status === 400){
                 let field_errors = error.response.data;
@@ -128,7 +126,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                     message: "There's an error trying to send data to the server!", type: "danger" 
                 });
             }
-            SetIsPageLoading(false);
+            SetPageLoader(false);
         });
 
     }
@@ -143,7 +141,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
 
     const handleDeleteSubrouteSubmit = (e, subroute_delete_id) => {
         e.preventDefault()
-        SetIsPageLoading(true);
+        SetPageLoader(true);
         axios.delete('api/subroute/'+subroute_delete_id+"/")
              .then((response) => {
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
@@ -151,7 +149,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                 });
                 menuStore.retrieve(menu_id)
                 $("#subroute-delete-modal").modal('hide');
-                SetIsPageLoading(false);
+                SetPageLoader(false);
              }).catch((error) => {
                 if(error.response.status == 404){
                     eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
@@ -163,7 +161,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                         message: "There's an error trying to send data to the server!", type: "danger" 
                     });
                 }
-                SetIsPageLoading(false);
+                SetPageLoader(false);
             });
     }
 
@@ -211,7 +209,7 @@ const MenuEditPermission = observer(({ menuStore }) => {
                             <div className="col-sm-12">
                                 <div className="card">
 
-                                    <DivLoader type="Circles" loading={is_page_loading}/>
+                                    <DivLoader type="Circles" loading={page_loader}/>
                                     <div className="card-header">
                                         <h5>Edit Menu Permissions</h5>
                                         <Link to={`/menus/${menu_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">

@@ -1,6 +1,6 @@
 
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback } from 'react'
 
 import moment from 'moment'
 import { observer } from 'mobx-react'
@@ -10,6 +10,7 @@ import { TableHeaderDefault } from '../Utils/Table/TableHeaders'
 import { TableFooterDefault } from '../Utils/Table/TableFooters'
 import UserListFilterModal from './UserListFilterModalComp'
 import UserListBulkDeleteModal from './UserListBulkDeleteModalComp'
+import UserListSortModal from './UserListSortModalComp'
 
 
 const UserList = observer(({ userStore, dashboardMainStore }) => {
@@ -39,7 +40,7 @@ const UserList = observer(({ userStore, dashboardMainStore }) => {
     });
 
 
-    const handleCreateButton = (e) => {
+    const handleCreateButtonClick = (e) => {
         e.preventDefault()
         if(userStore.is_opened_form === 1){
             userStore.resetForm()
@@ -55,13 +56,19 @@ const UserList = observer(({ userStore, dashboardMainStore }) => {
     }
 
 
-    const handleFilterButton = (e) => {
+    const handleFilterButtonClick = (e) => {
         e.preventDefault()
         $("#user-filter-modal").modal('toggle')
     }
 
+
+    const handleSortButtonClick = (e) => {
+        e.preventDefault()
+        $("#user-sort-modal").modal('toggle')
+    }
+
     
-    const handleOpenBulkDeleteModal = (e) => {
+    const handleDeleteButtonClick = (e) => {
         e.preventDefault()
         $("#user-bulk-delete-modal").modal('toggle')
     }
@@ -113,15 +120,17 @@ const UserList = observer(({ userStore, dashboardMainStore }) => {
                                     {/* Table Header */}
                                     <div className="card-header"> 
                                         <TableHeaderDefault
-                                            addButtonClickHandler={ handleCreateButton }
+                                            addButtonClickHandler={ handleCreateButtonClick }
                                             searchInputValue={ userStore.query }
                                             searchInputHandler={ (e) => userStore.handleSearch(e) }
                                             filterButton={true}
-                                            filterButtonClickHandler={ handleFilterButton }
+                                            filterButtonClickHandler={ handleFilterButtonClick }
+                                            sortButton={ true }
+                                            sortButtonClickHandler={ handleSortButtonClick }
                                             refreshButtonClickHandler={ (e) => userStore.handleRefreshClick(e) }
-                                            deleteButton={dashboardMainStore.checkIfSubrouteExist('user-delete')}
+                                            deleteButton={ dashboardMainStore.checkIfSubrouteExist('user-delete') }
                                             deleteButtonDisable= { userStore.selected_rows.some(data => data.status === true) }
-                                            deleteButtonClickHandler={ (e) => handleOpenBulkDeleteModal(e) }
+                                            deleteButtonClickHandler={ handleDeleteButtonClick }
                                             createButton={dashboardMainStore.checkIfSubrouteExist('user-create-page')}
                                             entriesSelectPageSize={ userStore.page_size }
                                             entriesSelectChangeHandler={ (e) => userStore.handlePageSizeClick(e) }
@@ -238,10 +247,12 @@ const UserList = observer(({ userStore, dashboardMainStore }) => {
         
         {/* Filter Modal */}
         <UserListFilterModal userStore={ userStore } />
+        
+        {/* Sort Modal */}
+        <UserListSortModal userStore={ userStore } />
 
         {/* Bulk Delete Modal */}
-        { dashboardMainStore.checkIfSubrouteExist('user-delete') ?                                                   
-            <UserListBulkDeleteModal userStore={ userStore } /> : <></>}
+        { dashboardMainStore.checkIfSubrouteExist('user-delete') ? <UserListBulkDeleteModal userStore={ userStore } /> : <></> }
 
     </div>
     );

@@ -48,7 +48,7 @@ class MenuStore{
                 q: this.query, 
                 page_size: this.page_size, 
                 page: this.page_current, 
-                sort: this.sort_field.value,
+                sort_field: this.sort_field.value,
                 sort_order: this.sort_order.value, 
             }
         }).then((response) => {

@@ -14,7 +14,7 @@ const UserDetails = observer(({ userStore, dashboardMainStore }) => {
 
     const history = useHistory();
     const { user_id } = useParams();
-    const [ is_page_loading, SetIsPageLoading ] = useState(false);
+    const [ page_loader, SetPageLoader ] = useState(false);
 
     
     useEffect (() => {
@@ -40,14 +40,14 @@ const UserDetails = observer(({ userStore, dashboardMainStore }) => {
 
     const handleDeleteUserSubmit = (e) => {
         e.preventDefault()
-        SetIsPageLoading(true)
+        SetPageLoader(true)
         axios.delete('api/user/'+user_id+'/')
              .then((response) => {
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                     message: "User has been successfully Deleted!", type: "inverse"
                 });
                 redirectBackToUserList()
-                SetIsPageLoading(false)
+                SetPageLoader(false)
              }).catch((error) => {
                 if(error.response.status == 404){
                     eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
@@ -59,7 +59,7 @@ const UserDetails = observer(({ userStore, dashboardMainStore }) => {
                         message: "There's an error trying to send data to the server!", type: "danger" 
                     });
                 }
-                SetIsPageLoading(false)
+                SetPageLoader(false)
             });
         $("#user-delete-modal").modal('hide');
     }
@@ -104,7 +104,7 @@ const UserDetails = observer(({ userStore, dashboardMainStore }) => {
 
                             <div className="col-sm-12">
                                 <div className="card">
-                                    <DivLoader type="Circles" loading={is_page_loading}/>
+                                    <DivLoader type="Circles" loading={page_loader}/>
                                     <div className="card-header">
                                         <h5>User Details</h5>
                                         <Link to="/users" 

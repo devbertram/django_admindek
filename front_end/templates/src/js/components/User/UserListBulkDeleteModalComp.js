@@ -9,11 +9,11 @@ import DivLoader from '../Utils/DivLoaderComp'
 
 const UserListBulkDeleteModal = observer(({ userStore }) => {
 
-    const [loader, SetLoader] = useState(false);
+    const [page_loader, SetPageLoader] = useState(false);
 
     const handleBulkDeleteSubmit = (e) => {
         e.preventDefault()
-        SetLoader(true)
+        SetPageLoader(true)
         let ids_for_delete = [];
         userStore.selected_rows.map(data => {
             if(data.status === true){
@@ -30,14 +30,14 @@ const UserListBulkDeleteModal = observer(({ userStore }) => {
                     message: "The users has been successfully Deleted!", type: "inverse"
                 });
                 userStore.fetch()
-                SetLoader(false)
+                SetPageLoader(false)
             }).catch((error) => {
                 if(error.response.status == 500){
                     eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                         message: "There's an error trying to send data to the server!", type: "danger" 
                     });
                 }
-                SetLoader(false)
+                SetPageLoader(false)
             });
         }
         $("#user-bulk-delete-modal").modal('hide');
@@ -48,7 +48,7 @@ const UserListBulkDeleteModal = observer(({ userStore }) => {
         <div className="modal" id="user-bulk-delete-modal" role="dialog">
             <div className="modal-dialog modal-lg" role="document">
                 <div className="modal-content">
-                    <DivLoader type="Circles" loading={loader}/>
+                    <DivLoader type="Circles" loading={page_loader}/>
                     <div className="modal-header">
                         <h4 className="modal-title">Delete Users</h4>
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close">

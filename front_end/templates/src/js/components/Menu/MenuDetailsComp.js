@@ -13,16 +13,14 @@ const MenuDetails = observer(({ menuStore, dashboardMainStore }) => {
 
     const history = useHistory();
     const { menu_id } = useParams();
-    const [ is_page_loading, SetIsPageLoading ] = useState(false);
+    const [ delete_loader, SetDeleteLoader ] = useState(false);
 
     
     useEffect (() => {
         let is_mounted = true;
         if(is_mounted = true){
-            SetIsPageLoading(true)
             menuStore.retrieve(menu_id)
             menuStore.setIsOpenedForm(1)
-            SetIsPageLoading(false)
         }
         return () => {
             is_mounted = false;
@@ -43,14 +41,14 @@ const MenuDetails = observer(({ menuStore, dashboardMainStore }) => {
 
     const handleDeleteRouteSubmit = (e) => {
         e.preventDefault()
-        SetIsPageLoading(true)
+        SetDeleteLoader(true)
         axios.delete('api/route/'+menu_id+'/')
              .then((response) => {
                 eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                     message: "Menu has been successfully Deleted!", type: "inverse"
                 });
                 redirectBackToMenuList()
-                SetIsPageLoading(false)
+                SetDeleteLoader(false)
              }).catch((error) => {
                 if(error.response.status == 404){
                     eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
@@ -62,7 +60,7 @@ const MenuDetails = observer(({ menuStore, dashboardMainStore }) => {
                         message: "There's an error trying to send data to the server!", type: "danger" 
                     });
                 }
-                SetIsPageLoading(false)
+                SetDeleteLoader(false)
             });
         $("#route-delete-modal").modal('hide');
     }
@@ -108,7 +106,7 @@ const MenuDetails = observer(({ menuStore, dashboardMainStore }) => {
                             <div className="col-sm-12">
                                 <div className="card">
 
-                                    <DivLoader type="Circles" loading={is_page_loading}/>
+                                    <DivLoader type="Circles" loading={delete_loader}/>
                                     <div className="card-header">
                                         <h5>Menu Details</h5>
                                         <Link to="/menus" className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">

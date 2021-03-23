@@ -9,12 +9,12 @@ import DivLoader from '../Utils/DivLoaderComp'
 
 const MenuListBulkDeleteModal = observer(({ menuStore }) => {
 
-    const [loader, SetLoader] = useState(false);
+    const [page_loader, SetPageLoader] = useState(false);
 
 
     const handleBulkDeleteSubmit = (e) => {
         e.preventDefault()
-        SetLoader(true)
+        SetPageLoader(true)
         let ids_for_delete = [];
         menuStore.selected_rows.map(data => {
             if(data.status === true){
@@ -31,14 +31,14 @@ const MenuListBulkDeleteModal = observer(({ menuStore }) => {
                     message: "The menus has been successfully Deleted!", type: "inverse"
                 });
                 menuStore.fetch()
-                SetLoader(false)
+                SetPageLoader(false)
             }).catch((error) => {
                 if(error.response.status == 500){
                     eventBus.dispatch("SHOW_TOAST_NOTIFICATION", {
                         message: "There's an error trying to send data to the server!", type: "danger" 
                     });
                 }
-                SetLoader(false)
+                SetPageLoader(false)
             });
         }
         $("#route-bulk-delete-modal").modal('hide');
@@ -49,7 +49,7 @@ const MenuListBulkDeleteModal = observer(({ menuStore }) => {
         <div className="modal" id="route-bulk-delete-modal" role="dialog">
             <div className="modal-dialog modal-lg" role="document">
                 <div className="modal-content">
-                    <DivLoader type="Circles" loading={loader}/>
+                    <DivLoader type="Circles" loading={page_loader}/>
                     <div className="modal-header">
                         <h4 className="modal-title">Delete Menus</h4>
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close">

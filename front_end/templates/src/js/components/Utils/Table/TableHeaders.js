@@ -135,7 +135,7 @@ function TableHeaderDefault(props){
 
                 { props.filterButton === true ?
                     (
-                        <div className="pl-3">
+                        <div className="pl-2">
                             <FilterButton onClick={ props.filterButtonClickHandler } />
                         </div>
                     ) : ""
@@ -143,19 +143,19 @@ function TableHeaderDefault(props){
 
                 { props.sortButton === true ?
                     (
-                        <div className="pl-3">
+                        <div className="pl-2">
                             <SortButton onClick={ props.sortButtonClickHandler } />
                         </div>
                     ) : ""
                 }
 
-                <div className="pl-3">
+                <div className="pl-2">
                     <RefreshButton onClick={ props.refreshButtonClickHandler } />
                 </div>
 
                 { props.deleteButton === true ?
                     (
-                        <div className="pl-3">
+                        <div className="pl-2">
                             <DeleteButton isDisabled={ !props.deleteButtonDisable } onClick={ props.deleteButtonClickHandler } />
                         </div>
                     ) : ""
@@ -163,7 +163,7 @@ function TableHeaderDefault(props){
 
                 { props.createButton === true ?
                     (
-                        <div className="pl-3">
+                        <div className="pl-2">
                             <CreateButton onClick={ props.addButtonClickHandler }/>
                         </div>
                     ) : ""

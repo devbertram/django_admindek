@@ -14,16 +14,14 @@ const MenuEdit = observer(({ menuStore }) => {
 
     const history = useHistory();
     const { menu_id } = useParams();
-    const [is_page_loading, SetIsPageLoading] = useState(false);
+    const [page_loader, SetPageLoader] = useState(false);
     
     
     useEffect (() => {
         let is_mounted = true;
         if(is_mounted = true){
-            SetIsPageLoading(true)
             menuStore.setIsOpenedForm(1)
             menuStore.retrieve(menu_id)
-            SetIsPageLoading(false)
         }
         return () => {
             is_mounted = false;
@@ -38,7 +36,7 @@ const MenuEdit = observer(({ menuStore }) => {
 
     const handleSave = (e, btl) => {
         e.preventDefault();
-        SetIsPageLoading(true)
+        SetPageLoader(true)
         axios.put('api/route/'+menu_id+'/', { 
             category : menuStore.category,
             name : menuStore.name,
@@ -54,7 +52,7 @@ const MenuEdit = observer(({ menuStore }) => {
             });
             menuStore.setSelectedRoute(response.data.id)
             if(btl === 1){ redirectBackToMenuList() }
-            SetIsPageLoading(false);
+            SetPageLoader(false);
         }).catch((error) => {
             if(error.response.status === 400){
                 let field_errors = error.response.data;
@@ -75,7 +73,7 @@ const MenuEdit = observer(({ menuStore }) => {
                     message: "There's an error trying to send data to the server!", type: "danger" 
                 });
             }
-            SetIsPageLoading(false);
+            SetPageLoader(false);
         });
     }
     
@@ -122,7 +120,7 @@ const MenuEdit = observer(({ menuStore }) => {
                             <div className="col-sm-12">
                                 <div className="card">
 
-                                    <DivLoader type="Circles" loading={is_page_loading}/>
+                                    <DivLoader type="Circles" loading={page_loader}/>
                                     <div className="card-header">
                                         <h5>Edit Menu </h5>
                                         <Link to={`/menus/${menu_id}`} className="btn btn-primary btn-outline-primary float-right pt-2 pb-2 ml-2">

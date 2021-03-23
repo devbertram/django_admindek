@@ -15,6 +15,8 @@ class UserStore{
     query = "";
     filter_online_status = { value:"", label:"Select" }; // filter
     filter_su_status = { value:"", label:"Select" }; // filter
+    sort_field = "";
+    sort_order = "";
     
 	delaySearch = debounce(() => this.fetch(), 500); // search delay
     selected_user = 0; // selected user id after create or update
@@ -56,7 +58,9 @@ class UserStore{
                 page_size: this.page_size, 
                 page: this.page_current, 
                 os: this.filter_online_status.value,
-                sus: this.filter_su_status.value
+                sus: this.filter_su_status.value,
+                sort_field: this.sort_field.value,
+                sort_order: this.sort_order.value, 
             }
         }).then((response) => {
             runInAction(() => {
@@ -330,6 +334,14 @@ class UserStore{
 
 
     // List Handlers
+    setSortField(sort_field){
+        this.sort_field = sort_field;
+    }
+
+    setSortOrder(sort_order){
+        this.sort_order = sort_order;
+    }
+
     handleSearch(e){
         e.preventDefault()
         this.page_prev = 0;
@@ -339,6 +351,12 @@ class UserStore{
         this.delaySearch();
     }
 
+    handleSortSubmit(){
+        this.page_prev = 0;
+        this.page_current = 1;
+        this.page_next = 2;
+        this.fetch();
+    }
 
     handleRefreshClick(e){
         e.preventDefault()
@@ -349,10 +367,11 @@ class UserStore{
         this.query = "";
         this.filter_online_status = "";
         this.filter_su_status = "";
+        this.sort_field = "";
+        this.sort_order = "";
         this.selected_user = 0;
         this.fetch();
     }
-
 
     handlePageSizeClick(e){
         e.preventDefault()
@@ -365,7 +384,6 @@ class UserStore{
         }
     }
 
-
     handlePaginationClick(e, page_current){
         e.preventDefault()
         if(page_current > 0 && page_current <= this.page_limit){
@@ -375,7 +393,6 @@ class UserStore{
             this.fetch();
         }
     }
-
 
     handleFilterSubmit(){
         this.page_prev = 0;
