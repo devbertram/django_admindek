@@ -1,8 +1,9 @@
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+#BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -13,7 +14,7 @@ SECRET_KEY = 'g@uun2h2hm+s!(3lu70-$!$f%$j0uyo+=6(n-+q^hpo55_2+e%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -105,11 +106,11 @@ WSGI_APPLICATION = 'django_admindek.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'mysql.connector.django',
         'NAME': 'django_admindek',
         'USER': 'root',
-        'PASSWORD': 'misqc',
-        'HOST': 'localhost',
+        'PASSWORD': 'ltpi58r',
+        'HOST': 'db',
         'PORT': '3306',
     },
     'OPTIONS':{
@@ -154,6 +155,5 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+STATIC_ROOT = '/front_end/static'
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [ BASE_DIR / "front_end/static" ]
