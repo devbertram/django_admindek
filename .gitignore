@@ -1,5 +1,5 @@
 __pycache__
 /.vscode
-/django_admindek/settings.py
+# /django_admindek/settings.py
 /front_end/templates/node_modules
-/front_end/templates/static/build
+/front_end/static/build
