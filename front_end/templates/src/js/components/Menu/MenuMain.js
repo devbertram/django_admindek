@@ -29,7 +29,7 @@ const MenuMain = observer(({ menuStore, dashboardMainStore }) => {
             <Switch>
 
                 {/* LIST */}
-                <Route path="/menus">
+                <Route exact path="/menus">
                     { dashboardMainStore.checkIfSubrouteExist('menu-manage-page') ? 
                         <MenuList menuStore={menuStore} dashboardMainStore={dashboardMainStore}/> : <NotFoundPage/> }
                 </Route>
@@ -59,7 +59,7 @@ const MenuMain = observer(({ menuStore, dashboardMainStore }) => {
                 </Route>
     
                 {/* Page not found */}
-                <Route path="/menus/*">
+                <Route exact path="/menus/*">
                     <NotFoundPage/>
                 </Route>
 

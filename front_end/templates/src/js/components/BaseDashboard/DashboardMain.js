@@ -111,7 +111,7 @@ const DashboardMain = observer(({ dashboardMainStore }) => {
                                 <li className="user-profile header-notification">
                                     <div className="dropdown-primary dropdown">
                                         <div className="dropdown-toggle" data-toggle="dropdown">
-                                            <img src={`${window.location.origin}/static/static/images/user_avatar.jpeg`} className="img-radius" alt="User-Profile-Image"/>
+                                            <img src={`${window.location.origin}/static/images/user_avatar.jpeg`} className="img-radius" alt="User-Profile-Image"/>
                                             <span>{ getProfileName() }</span>
                                             <i className="feather icon-chevron-down"></i>
                                         </div>
