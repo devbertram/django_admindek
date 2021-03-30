@@ -35,7 +35,10 @@ def logoutUser(request):
     protocol = 'https://' if request.is_secure() else 'http://'
     url = protocol + request.get_host() + '/auth/token/logout/'
     header = {'Authorization' : request.META.get('HTTP_AUTHORIZATION')}
-    response = requests.post(url, data={}, headers=header)
+    try:
+        response = requests.post(url, data={}, headers=header)
+    except requests.exceptions.ConnectionError:
+        response = {"Connection refused", 500}
     return Response(response)
 
 
