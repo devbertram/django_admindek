@@ -59,6 +59,11 @@ function LoginFormMain(props){
 
                     <p className="text-muted text-center p-b-5">Sign in with your regular account</p>
 
+                    <div class="alert alert-info">
+                        <strong>Default user:</strong><br/>
+                        <code>username: admin</code> <code>password: admin123456</code>
+                    </div>
+
                     <div className={ error_fields.username || error_fields.non_field_errors ? "form-group form-danger has-danger" : "form-group form-primary"}>
                         <input type="text" className="form-control" value={username} onChange={ e => setUsername(e.target.value)}/>
                         <span className="form-bar"></span>
